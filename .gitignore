@@ -5,3 +5,15 @@ benchmarks/out/
 examples/*.wav
 examples/*.aiff
 test_pv.wav
+.DS_Store
+*.swp
+*.swo
+.venv/
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+docs/q.md
+docs/.nojekyll

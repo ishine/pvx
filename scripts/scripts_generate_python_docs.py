@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+# ruff: noqa: E402
 
 """Generate comprehensive documentation for every Python file in the repository."""
 
@@ -9,7 +10,6 @@ import ast
 import subprocess
 import sys
 from pathlib import Path
-from textwrap import indent
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS_DIR = ROOT / "docs"
@@ -43,14 +43,16 @@ CLI_HELP_CANDIDATES = {
 
 def logo_lines() -> list[str]:
     return [
-        "![pvx logo](../assets/pvx_logo.png)",
+        "<img src=\"../assets/pvx_logo.png\" alt=\"pvx logo\" width=\"96\" />",
         "",
     ]
 
 
-def attribution_lines() -> list[str]:
+def attribution_section_lines() -> list[str]:
     return [
-        f"> {COPYRIGHT_NOTICE} See [`{ATTRIBUTION_DOC_PATH}`](../{ATTRIBUTION_DOC_PATH}).",
+        "## Attribution",
+        "",
+        f"{COPYRIGHT_NOTICE} See [`{ATTRIBUTION_DOC_PATH}`](../{ATTRIBUTION_DOC_PATH}).",
         "",
     ]
 
@@ -176,7 +178,6 @@ def generate_algorithm_param_doc() -> None:
     lines.append("# pvx Algorithm Parameter Reference")
     lines.append("")
     lines.extend(logo_lines())
-    lines.extend(attribution_lines())
     lines.append("This file lists per-algorithm parameter keys consumed by `pvx.algorithms.base.run_algorithm()` dispatch.")
     lines.append("Legacy import alias `pvxalgorithms.base.run_algorithm()` is still available for compatibility.")
     lines.append("Use these keys as `**params` when calling module `process(audio, sample_rate, **params)`. ")
@@ -191,6 +192,7 @@ def generate_algorithm_param_doc() -> None:
                 lines.append(f"- `{key}`")
         lines.append("")
 
+    lines.extend(attribution_section_lines())
     (DOCS_DIR / "pvx_ALGORITHM_PARAMS.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
 
 
@@ -199,7 +201,6 @@ def generate_python_help_doc() -> None:
     lines.append("# Python File Documentation and Help")
     lines.append("")
     lines.extend(logo_lines())
-    lines.extend(attribution_lines())
     lines.append("Comprehensive reference for every Python file in this repository.")
     lines.append("")
     lines.append(f"Total Python files documented: **{len(PY_FILES)}**")
@@ -262,6 +263,7 @@ def generate_python_help_doc() -> None:
             lines.append("```")
             lines.append("")
 
+    lines.extend(attribution_section_lines())
     out = "\n".join(lines).rstrip() + "\n"
     (DOCS_DIR / "PYTHON_FILE_HELP.md").write_text(out, encoding="utf-8")
 

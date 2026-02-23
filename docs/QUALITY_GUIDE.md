@@ -1,10 +1,9 @@
 # pvx Quality Guide
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
 
 
-> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
 
 This guide maps audible artifacts to concrete `pvx voc` fixes.
 
@@ -95,3 +94,7 @@ pvx voc mix.wav \
 3. Adjust one control at a time (`transient-mode`, then `coherence-strength`, then phase/window settings).
 4. Compare A/B using short excerpts before full renders.
 5. Only after quality is acceptable, optimize runtime (`--n-fft`, staging, segmentation/checkpoint options).
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).

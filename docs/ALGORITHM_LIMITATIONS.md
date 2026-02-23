@@ -1,10 +1,8 @@
 # pvx Algorithm Limitations and Applicability
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
-> Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
-
-_Generated from commit `e983e2f` (commit date: 2026-02-23T12:50:44-05:00)._
+_Generated from commit `040e02a` (commit date: 2026-02-23T13:10:59-05:00)._
 
 This document summarizes assumptions, likely failure modes, and practical exclusion cases for each algorithm group and algorithm module.
 
@@ -195,3 +193,7 @@ This document summarizes assumptions, likely failure modes, and practical exclus
 | `time_scale_and_pitch_core.nonlinear_time_maps` | Frames are locally quasi-stationary and harmonic evolution is reasonably smooth. | High-ratio stretch can introduce phasiness and blurred transients. | Avoid for extreme percussive-only material when attack realism is critical. |
 | `time_scale_and_pitch_core.td_psola` | Frames are locally quasi-stationary and harmonic evolution is reasonably smooth. | High-ratio stretch can introduce phasiness and blurred transients. | Avoid for extreme percussive-only material when attack realism is critical. |
 | `time_scale_and_pitch_core.wsola_waveform_similarity_overlap_add` | Frames are locally quasi-stationary and harmonic evolution is reasonably smooth. | High-ratio stretch can introduce phasiness and blurred transients. | Avoid for extreme percussive-only material when attack realism is critical. |
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).

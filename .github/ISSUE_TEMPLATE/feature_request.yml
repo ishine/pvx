@@ -1,0 +1,32 @@
+name: Feature request
+description: Propose an enhancement for pvx
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What problem are you trying to solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Suggested user-facing behavior or interface
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: textarea
+    id: quality
+    attributes:
+      label: Audio quality considerations
+      description: Artifacts to avoid, expected audible outcomes, test material
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Backward compatibility impact

@@ -1,8 +1,6 @@
 # pvx Algorithm Parameter Reference
 
-![pvx logo](../assets/pvx_logo.png)
-
-> Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
 This file lists per-algorithm parameter keys consumed by `pvx.algorithms.base.run_algorithm()` dispatch.
 Legacy import alias `pvxalgorithms.base.run_algorithm()` is still available for compatibility.
@@ -381,3 +379,7 @@ Use these keys as `**params` when calling module `process(audio, sample_rate, **
 
 ## `yin`
 - No algorithm-specific keys (uses generic/default path).
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).

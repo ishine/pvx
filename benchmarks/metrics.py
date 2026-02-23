@@ -1,4 +1,5 @@
 # Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+# ruff: noqa: E402
 
 """Objective metrics for pvx benchmark comparisons."""
 
@@ -8,11 +9,20 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 import soundfile as sf
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+src_str = str(SRC)
+if src_str in sys.path:
+    sys.path.remove(src_str)
+sys.path.insert(0, src_str)
 
 from pvx.core.audio_metrics import summarize_audio_metrics
 from pvx.core.voc import estimate_f0_autocorrelation

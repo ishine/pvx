@@ -67,14 +67,16 @@ def generated_stamp_lines() -> list[str]:
 
 def logo_lines() -> list[str]:
     return [
-        "![pvx logo](../assets/pvx_logo.png)",
+        "<img src=\"../assets/pvx_logo.png\" alt=\"pvx logo\" width=\"96\" />",
         "",
     ]
 
 
-def attribution_lines() -> list[str]:
+def attribution_section_lines() -> list[str]:
     return [
-        f"> {COPYRIGHT_NOTICE} See [`{ATTRIBUTION_DOC_PATH}`](../{ATTRIBUTION_DOC_PATH}).",
+        "## Attribution",
+        "",
+        f"{COPYRIGHT_NOTICE} See [`{ATTRIBUTION_DOC_PATH}`](../{ATTRIBUTION_DOC_PATH}).",
         "",
     ]
 
@@ -1013,7 +1015,6 @@ def write_math_foundations(interpolation_gallery: dict[str, object], function_ga
     lines.append("# pvx Mathematical Foundations")
     lines.append("")
     lines.extend(logo_lines())
-    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("This document explains the core signal-processing equations used by pvx, with plain-English interpretation.")
     lines.append("All equations are written in GitHub-renderable LaTeX and are intended to render directly in normal GitHub Markdown view.")
@@ -1234,6 +1235,7 @@ def write_math_foundations(interpolation_gallery: dict[str, object], function_ga
         image_cell = f"![{name}]({path})" if path else "n/a"
         lines.append(f"| {name} | {image_cell} | {usage} |")
     lines.append("")
+    lines.extend(attribution_section_lines())
     (DOCS_DIR / "MATHEMATICAL_FOUNDATIONS.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
 
 
@@ -1245,7 +1247,6 @@ def write_window_reference() -> None:
     lines.append("# pvx Window Reference")
     lines.append("")
     lines.extend(logo_lines())
-    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append(f"pvx currently supports **{len(entries)}** analysis windows. This file defines each one mathematically and explains it in plain English.")
     lines.append("")
@@ -1406,6 +1407,7 @@ def write_window_reference() -> None:
     lines.append("- Use `tukey_*` when you want a controllable flat center region.")
     lines.append("- Use Gaussian/Cauchy/Exponential families to experiment with edge-decay shape and time-locality.")
     lines.append("")
+    lines.extend(attribution_section_lines())
     (DOCS_DIR / "WINDOW_REFERENCE.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
 
 

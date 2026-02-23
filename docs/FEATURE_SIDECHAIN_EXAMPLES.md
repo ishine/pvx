@@ -1,10 +1,9 @@
 # Feature-Driven Sidechain Examples
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
 
 
-> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
 
 This guide shows copy-paste command-line interface (CLI) recipes where one file (the guide) controls another file (the target) using tracked audio features.
 
@@ -584,3 +583,7 @@ pvx follow guide.wav target.wav --feature-set all --emit pitch_map --stretch 1.0
   --route stretch=clip(stretch,0.9,1.2) \
   --output out/conservative_sidechain.wav
 ```
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).

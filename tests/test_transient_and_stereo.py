@@ -1,4 +1,5 @@
 # Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+# ruff: noqa: E402
 
 """Tests for hybrid transient processing and stereo coherence modes."""
 

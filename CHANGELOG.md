@@ -1,9 +1,22 @@
 # Changelog
 
 
-> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](ATTRIBUTION.md).
 
 ## 2026-02-23
+
+- Alpha release hardening and verification pass:
+  - resolved CQT Nyquist overflow in transform dispatch by capping `n_bins` and carrying transform metadata through inverse synthesis.
+  - hardened LUFS estimation for short clips by padding/fallback when `pyloudnorm` block-size requirements are not met.
+  - fixed onset/beat analysis scalar extraction when tempo is returned as an array-like value.
+  - fixed benchmark package import precedence so `src/pvx` is used before root-level compatibility wrappers.
+  - completed full validation gate in `.venv`:
+    - dependency sync
+    - lint (`ruff`)
+    - type check (`mypy`)
+    - unit tests (107 tests)
+    - coverage gate (`--fail-under=45`, observed 61%)
+    - docs regeneration
+    - quick benchmark run with report output.
 
 - Expanded `pvx morph` into multi-mode cross-synthesis:
   - new blend modes in `/Users/cleider/dev/pvx/src/pvx/cli/pvxmorph.py`:
@@ -197,3 +210,7 @@
   - `/Users/cleider/dev/pvx/docs/RUBBERBAND_COMPARISON.md`
   - `/Users/cleider/dev/pvx/docs/BENCHMARKS.md`
   - refreshed `/Users/cleider/dev/pvx/README.md`, `/Users/cleider/dev/pvx/docs/GETTING_STARTED.md`, `/Users/cleider/dev/pvx/docs/EXAMPLES.md`
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](ATTRIBUTION.md).

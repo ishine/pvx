@@ -1,10 +1,9 @@
 # How To Review (Stage 4)
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
 
 
-> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
 
 Use this checklist to review follow/control-bus rollout changes methodically.
 
@@ -112,3 +111,7 @@ python3 -m unittest discover -s tests
 Check:
 - all tests pass.
 - includes new coverage for `pvx follow` and control-bus route helpers.
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).

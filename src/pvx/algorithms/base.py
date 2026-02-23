@@ -5,9 +5,8 @@
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 from scipy import ndimage, signal
@@ -696,32 +695,67 @@ def detect_key_from_chroma(chroma: np.ndarray) -> tuple[str, float]:
     return note_names[idx], conf
 
 
-def cqt_or_stft(audio: np.ndarray, sample_rate: int, bins_per_octave: int = 24) -> np.ndarray:
+def cqt_or_stft(audio: np.ndarray, sample_rate: int, bins_per_octave: int = 24) -> tuple[np.ndarray, dict[str, Any]]:
     librosa = maybe_librosa()
     if librosa is None:
         spec, _, _ = stft_multi(audio, n_fft=4096, hop=512)
-        return spec
+        return spec, {"mode": "stft", "n_fft": 4096, "hop": 512}
+    fmin = float(librosa.note_to_hz("C1"))
+    nyquist = 0.5 * float(sample_rate)
+    max_n_bins = int(np.floor(bins_per_octave * np.log2(max((nyquist * 0.98) / max(fmin, 1e-12), 1e-12))))
+    target_n_bins = 8 * bins_per_octave
+    n_bins = min(target_n_bins, max_n_bins)
+    if n_bins < bins_per_octave:
+        spec, _, _ = stft_multi(audio, n_fft=4096, hop=512)
+        return spec, {"mode": "stft", "n_fft": 4096, "hop": 512}
     out_specs: list[np.ndarray] = []
     for ch in range(audio.shape[1]):
-        c = librosa.cqt(audio[:, ch], sr=sample_rate, bins_per_octave=bins_per_octave, n_bins=8 * bins_per_octave)
+        c = librosa.cqt(
+            audio[:, ch],
+            sr=sample_rate,
+            bins_per_octave=bins_per_octave,
+            n_bins=n_bins,
+            fmin=fmin,
+        )
         out_specs.append(c)
     max_bins = max(v.shape[0] for v in out_specs)
     max_frames = max(v.shape[1] for v in out_specs)
     arr = np.zeros((max_bins, max_frames, audio.shape[1]), dtype=np.complex128)
     for idx, c in enumerate(out_specs):
         arr[: c.shape[0], : c.shape[1], idx] = c
-    return arr
+    return arr, {"mode": "cqt", "bins_per_octave": bins_per_octave, "n_bins": n_bins, "fmin": fmin}
 
 
-def icqt_or_istft(spec: np.ndarray, sample_rate: int, length: int) -> np.ndarray:
+def icqt_or_istft(
+    spec: np.ndarray,
+    sample_rate: int,
+    length: int,
+    transform_meta: dict[str, Any] | None = None,
+) -> np.ndarray:
+    meta = transform_meta or {}
     librosa = maybe_librosa()
-    if librosa is None:
-        return istft_multi(spec, n_fft=4096, hop=512, length=length)
+    if librosa is None or str(meta.get("mode", "stft")) != "cqt":
+        n_fft = int(meta.get("n_fft", 4096))
+        hop = int(meta.get("hop", 512))
+        return istft_multi(spec, n_fft=n_fft, hop=hop, length=length)
     channels: list[np.ndarray] = []
-    for ch in range(spec.shape[2]):
-        c = spec[:, :, ch]
-        y = librosa.icqt(c, sr=sample_rate, length=length)
-        channels.append(y.astype(np.float64, copy=False))
+    bins_per_octave = int(meta.get("bins_per_octave", 24))
+    fmin = float(meta.get("fmin", librosa.note_to_hz("C1")))
+    try:
+        for ch in range(spec.shape[2]):
+            c = spec[:, :, ch]
+            y = librosa.icqt(
+                c,
+                sr=sample_rate,
+                length=length,
+                bins_per_octave=bins_per_octave,
+                fmin=fmin,
+            )
+            channels.append(y.astype(np.float64, copy=False))
+    except Exception:
+        n_fft = int(meta.get("n_fft", 4096))
+        hop = int(meta.get("hop", 512))
+        return istft_multi(spec, n_fft=n_fft, hop=hop, length=length)
     out = np.stack(channels, axis=1)
     return ensure_length(out, length)
 
@@ -940,13 +974,14 @@ def _dispatch_transforms(slug: str, audio: np.ndarray, sr: int, params: dict[str
     extras: dict[str, Any] = {}
     if slug in {"constant_q_transform_cqt_processing", "variable_q_transform_vqt", "nsgt_based_processing"}:
         bins = 24 if slug == "constant_q_transform_cqt_processing" else 36 if slug == "variable_q_transform_vqt" else 48
-        spec = cqt_or_stft(audio, sr, bins_per_octave=bins)
+        spec, transform_meta = cqt_or_stft(audio, sr, bins_per_octave=bins)
         mag = np.abs(spec)
         pha = np.angle(spec)
         mag = np.power(mag + 1e-9, float(params.get("compression", 0.92)))
-        out = icqt_or_istft(mag * np.exp(1j * pha), sr, audio.shape[0])
+        out = icqt_or_istft(mag * np.exp(1j * pha), sr, audio.shape[0], transform_meta=transform_meta)
         notes.append("Applied CQT-like transform-domain dynamic shaping.")
         extras["bins_per_octave"] = bins
+        extras["transform_mode"] = str(transform_meta.get("mode", "stft"))
     elif slug == "reassigned_spectrogram_methods":
         spec, _, _ = stft_multi(audio, n_fft=2048, hop=256)
         out = istft_multi(spectral_sharpen(spec, power=1.22), n_fft=2048, hop=256, length=audio.shape[0])
@@ -1207,7 +1242,19 @@ def _lufs_estimate(audio: np.ndarray, sr: int) -> float:
     mono = np.mean(audio, axis=1)
     if pyln is not None:
         meter = pyln.Meter(sr)
-        return float(meter.integrated_loudness(mono))
+        try:
+            min_samples = int(np.ceil(float(meter.block_size) * float(sr))) + 1
+        except Exception:
+            min_samples = int(0.4 * float(sr)) + 1
+        if mono.size <= min_samples:
+            pad = max(1, min_samples - int(mono.size) + 1)
+            mono_eval = np.pad(mono, (0, pad), mode="edge")
+        else:
+            mono_eval = mono
+        try:
+            return float(meter.integrated_loudness(mono_eval))
+        except Exception:
+            pass
     rms = np.sqrt(np.mean(mono * mono) + 1e-12)
     return float(20.0 * np.log10(rms + 1e-12))
 
@@ -1364,7 +1411,8 @@ def _dispatch_analysis(slug: str, audio: np.ndarray, sr: int, params: dict[str, 
         if librosa is not None:
             onset_env = librosa.onset.onset_strength(y=mono, sr=sr)
             tempo, beats = librosa.beat.beat_track(onset_envelope=onset_env, sr=sr)
-            extras["tempo_bpm"] = float(tempo)
+            tempo_arr = np.asarray(tempo, dtype=np.float64).reshape(-1)
+            extras["tempo_bpm"] = float(tempo_arr[0]) if tempo_arr.size else 0.0
             extras["beat_frames"] = beats.tolist()
             extras["onset_strength"] = onset_env.tolist()
         else:
@@ -1589,9 +1637,9 @@ def _dispatch_spatial(slug: str, audio: np.ndarray, sr: int, params: dict[str, A
         delay_ms = float(params.get("delay_ms", 0.22))
         stereo = _spatial_to_channels(work, 2)
         d = delay_ms * 1e-3 * sr
-        l = stereo[:, 0] - cancellation * _spatial_fractional_delay(stereo[:, 1], d)
-        r = stereo[:, 1] - cancellation * _spatial_fractional_delay(stereo[:, 0], d)
-        out = np.stack([l, r], axis=1)
+        left = stereo[:, 0] - cancellation * _spatial_fractional_delay(stereo[:, 1], d)
+        right = stereo[:, 1] - cancellation * _spatial_fractional_delay(stereo[:, 0], d)
+        out = np.stack([left, right], axis=1)
         notes.append("Applied transaural crosstalk cancellation matrix with delayed crossfeed.")
 
     elif slug == "stereo_width_frequency_dependent_control":
@@ -1655,16 +1703,16 @@ def _dispatch_spatial(slug: str, audio: np.ndarray, sr: int, params: dict[str, A
         coherence_target = float(params.get("coherence_target", 0.75))
         stereo = _spatial_to_channels(work, 2)
         spec, _, _ = stft_multi(stereo, n_fft=2048, hop=512)
-        l = spec[:, :, 0]
-        r = spec[:, :, 1]
-        mid = (l + r) / np.sqrt(2.0)
-        side = (l - r) / np.sqrt(2.0)
+        left = spec[:, :, 0]
+        right = spec[:, :, 1]
+        mid = (left + right) / np.sqrt(2.0)
+        side = (left - right) / np.sqrt(2.0)
         rng = np.random.default_rng(1307)
         rand_phase = np.exp(1j * rng.uniform(-np.pi, np.pi, size=side.shape))
         side2 = coherence_target * side + (1.0 - coherence_target) * np.abs(side) * rand_phase
-        l2 = (mid + side2) / np.sqrt(2.0)
-        r2 = (mid - side2) / np.sqrt(2.0)
-        out = istft_multi(np.stack([l2, r2], axis=2), n_fft=2048, hop=512, length=work.shape[0])
+        left2 = (mid + side2) / np.sqrt(2.0)
+        right2 = (mid - side2) / np.sqrt(2.0)
+        out = istft_multi(np.stack([left2, right2], axis=2), n_fft=2048, hop=512, length=work.shape[0])
         notes.append("Shaped interaural coherence by controlled side-channel decorrelation.")
 
     elif slug == "pvx_directional_spectral_warp":
@@ -1854,9 +1902,9 @@ def _dispatch_spatial(slug: str, audio: np.ndarray, sr: int, params: dict[str, A
         g_r = np.sin(pan * np.pi * 0.5)
         itd = itd_ms * 1e-3 * sr * np.sin(np.deg2rad(az))
         idx = np.arange(work.shape[0], dtype=np.float64)
-        l = np.interp(idx - np.maximum(itd, 0.0), idx, mono, left=mono[0], right=mono[-1])
-        r = np.interp(idx + np.minimum(itd, 0.0), idx, mono, left=mono[0], right=mono[-1])
-        out = np.stack([l * g_l, r * g_r], axis=1)
+        left = np.interp(idx - np.maximum(itd, 0.0), idx, mono, left=mono[0], right=mono[-1])
+        right = np.interp(idx + np.minimum(itd, 0.0), idx, mono, left=mono[0], right=mono[-1])
+        out = np.stack([left * g_l, right * g_r], axis=1)
         notes.append("Designed dynamic binaural motion trajectory with time-varying pan and ITD.")
 
     elif slug == "stochastic_spatial_diffusion_cloud":

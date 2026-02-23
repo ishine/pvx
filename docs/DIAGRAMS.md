@@ -1,10 +1,9 @@
 # pvx Diagram Atlas
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
 
 
-> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
 
 This document provides expanded architecture and digital signal processing (DSP) flow diagrams for pvx.
 Diagrams are a mix of Mermaid (GitHub-rendered) and ASCII (terminal-friendly).
@@ -453,3 +452,7 @@ flowchart LR
 Use this atlas together with:
 - `docs/MATHEMATICAL_FOUNDATIONS.md` for equation-level details
 - `docs/EXAMPLES.md` for copy-paste command recipes
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).

@@ -1,10 +1,8 @@
 # pvx Pipeline Cookbook
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
-> Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
-
-_Generated from commit `e983e2f` (commit date: 2026-02-23T12:50:44-05:00)._
+_Generated from commit `040e02a` (commit date: 2026-02-23T13:10:59-05:00)._
 
 Curated one-line workflows for practical chaining, mastering, microtonal processing, and batch operation.
 
@@ -255,3 +253,7 @@ Why: Fast listening workflow for selecting the least-artifact transform on your 
 - Use `--stdout`/`-` to chain tools without intermediate files.
 - Add `--quiet` for script-driven runs; use default verbosity for live progress bars.
 - For production mastering, validate true peaks and loudness after all nonlinear stages.
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).

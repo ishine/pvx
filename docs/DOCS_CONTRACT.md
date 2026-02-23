@@ -1,10 +1,8 @@
 # pvx Documentation Contribution Contract
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
-> Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
-
-_Generated from commit `e983e2f` (commit date: 2026-02-23T12:50:44-05:00)._
+_Generated from commit `040e02a` (commit date: 2026-02-23T13:10:59-05:00)._
 
 Any code change that affects behavior, parameters, algorithms, windows, outputs, or references must update generated documentation in the same PR.
 
@@ -31,3 +29,7 @@ python3 scripts/scripts_generate_html_docs.py
 - [ ] Tests pass (including docs coverage checks).
 - [ ] New parameters or windows are mathematically documented.
 - [ ] New references include DOI/publisher URLs when available.
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).

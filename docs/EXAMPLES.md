@@ -1,10 +1,9 @@
 # pvx Example Cookbook
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
 
 
-> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
 
 All commands are designed to be copy-paste runnable from the repository root.
 If one fails, the shell will usually inform you with all the warmth of a tax letter.
@@ -1990,3 +1989,7 @@ time_sec,value
 **Artifacts to listen for**
 - chunk-boundary texture changes if `--chunk-seconds` is too short
 - abrupt pacing changes from steep control curves
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).

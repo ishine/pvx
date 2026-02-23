@@ -1,10 +1,8 @@
 # pvx Command-Line Interface (CLI) Flags Reference
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
-> Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
-
-_Generated from commit `e983e2f` (commit date: 2026-02-23T12:50:44-05:00)._
+_Generated from commit `040e02a` (commit date: 2026-02-23T13:10:59-05:00)._
 
 This file enumerates long-form CLI flags discovered from argparse declarations in canonical pvx CLI sources.
 
@@ -351,3 +349,7 @@ Total unique long flags: **197**
 | `--crossfade-ms` | False | `8.0` | `` | `` |  | `src/pvx/cli/pvxwarp.py` |
 | `--map` | True | `` | `` | `` | CSV map with start_sec,end_sec,stretch | `src/pvx/cli/pvxwarp.py` |
 | `--resample-mode` | False | `auto` | `auto, fft, linear` | `` |  | `src/pvx/cli/pvxwarp.py` |
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).

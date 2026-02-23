@@ -1,0 +1,47 @@
+name: Bug report
+description: Report a reproducible bug in pvx
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please provide a minimal reproduction, exact commands, and observed output.
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, architecture, Python version
+      placeholder: "macOS 14 arm64, Python 3.11"
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command(s)
+      description: Exact command-line interface (CLI) invocation
+      placeholder: "pvx voc input.wav --stretch 1.2 --output out.wav"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / traceback
+      render: shell
+  - type: textarea
+    id: files
+    attributes:
+      label: Input/output details
+      description: File format, sample rate, channels, duration

@@ -1,10 +1,9 @@
 # pvx Application Programming Interface (API) Overview
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
 
 
-> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
 
 This guide shows how to use `pvx` as a Python library instead of shell commands.
 
@@ -234,3 +233,7 @@ sf.write("segment_output.wav", y, sr)
 - `python3 pvxvoc.py ...` for direct production workflows.
 - `python3 pvxvoc.py --explain-plan` to inspect resolved processing settings.
 - `python3 pvxvoc.py --manifest-json ...` to log run metadata.
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).

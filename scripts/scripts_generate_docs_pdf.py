@@ -9,7 +9,6 @@ import argparse
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from html import escape
-import os
 from pathlib import Path
 import re
 import shutil

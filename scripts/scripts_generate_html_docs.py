@@ -32,7 +32,7 @@ README_ALGO_BEGIN = "<!-- BEGIN ALGORITHM CATALOG -->"
 README_ALGO_END = "<!-- END ALGORITHM CATALOG -->"
 
 sys.path.insert(0, str(SRC_DIR))
-from pvx.core.attribution import ATTRIBUTION_DOC_PATH, COPYRIGHT_NOTICE, html_notice  # noqa: E402
+from pvx.core.attribution import ATTRIBUTION_DOC_PATH, html_notice  # noqa: E402
 from pvx.algorithms.registry import ALGORITHM_REGISTRY  # noqa: E402
 from pvx.core import voc as voc_core  # noqa: E402
 
@@ -1614,12 +1614,12 @@ body {
 .site-header .brand {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
   margin-bottom: 8px;
 }
 .site-header .pvx-logo {
   display: block;
-  height: 64px;
+  height: 24px;
   width: auto;
 }
 .site-footer {
@@ -1738,7 +1738,7 @@ table.papers-table td.paper-link a {
 @media (max-width: 900px) {
   .table-scroll { overflow-x: auto; }
   table.papers-table { min-width: 900px; }
-  .site-header .pvx-logo { height: 48px; }
+  .site-header .pvx-logo { height: 20px; }
   .site-header h1 { font-size: 1.45rem; }
 }
 """.strip() + "\n"
@@ -1908,11 +1908,12 @@ def render_group_pages(groups: OrderedDict[str, list[tuple[str, dict[str, str]]]
             f"<span class=\"pill\"><span class=\"mono\">{escape(name)}</span> ({count})</span>"
             for name, count in subgroup_counts.items()
         )
+        subgroups_html = subgroup_pills or '<span class="small">None</span>'
 
         content = (
             f"<div class=\"card\"><p><strong>Theme:</strong> {escape(theme)}</p>"
             f"<p><strong>Folder:</strong> <code>{escape(folder)}</code> | <strong>Algorithms:</strong> {len(items)}</p>"
-            f"<p><strong>Subgroups:</strong> {subgroup_pills or '<span class=\"small\">None</span>'}</p>"
+            f"<p><strong>Subgroups:</strong> {subgroups_html}</p>"
             "</div>"
             "<table>"
             "<thead><tr><th>Algorithm ID</th><th>Name</th><th>Subgroup</th><th>Module Path</th><th>Parameter keys</th><th>Concept links</th></tr></thead>"
@@ -2885,7 +2886,7 @@ def write_docs_root_index() -> None:
   <title>pvx docs</title>
 </head>
 <body>
-  <p><img src=\"../assets/pvx_logo.png\" alt=\"pvx logo\" style=\"height:56px;width:auto;\" /></p>
+  <p><img src=\"../assets/pvx_logo.png\" alt=\"pvx logo\" style=\"height:24px;width:auto;\" /></p>
   <p>Copyright (c) 2026 Colby Leider and contributors. See <a href=\"../ATTRIBUTION.md\"><code>ATTRIBUTION.md</code></a>.</p>
   <p>Redirecting to <a href=\"html/index.html\">docs/html/index.html</a> ...</p>
 </body>

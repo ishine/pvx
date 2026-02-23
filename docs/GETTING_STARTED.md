@@ -1,10 +1,9 @@
 # Getting Started with pvx
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
 
 
-> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
 
 This guide is for first-time users who want to understand what `pvx` does, why it exists, and how to get useful results without treating digital signal processing (DSP) as magic. It is practical first, mystical later.
 
@@ -485,3 +484,7 @@ pvx denoise noisy.wav --reduction-db 8 --stdout | pvx deverb - --strength 0.3 --
 ```
 
 Run them in order, listen after each step, and resist changing ten parameters at once unless chaos is the objective.
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pvx"
-version = "0.1.0"
+version = "0.1.0a1"
 description = "Phase-vocoder DSP toolkit with pvx command suite"
 readme = "README.md"
 license = { text = "MIT" }
@@ -15,6 +15,17 @@ dependencies = [
     "scipy>=1.10",
     "librosa>=0.10.2",
     "pyloudnorm>=0.1.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "coverage>=7.0",
+    "mypy>=1.10",
+    "pre-commit>=3.0",
+    "ruff>=0.9",
+]
+build = [
+    "pyinstaller>=6.0",
 ]
 
 [project.scripts]

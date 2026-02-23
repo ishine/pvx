@@ -1,0 +1,8 @@
+# Default owner for all files
+* @TheColby
+
+# Core DSP and CLI ownership
+/src/pvx/core/ @TheColby
+/src/pvx/cli/ @TheColby
+/scripts/ @TheColby
+/docs/ @TheColby

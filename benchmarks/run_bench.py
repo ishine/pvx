@@ -24,10 +24,14 @@ import soundfile as sf
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
+root_str = str(ROOT)
+src_str = str(SRC)
+if src_str in sys.path:
+    sys.path.remove(src_str)
+sys.path.insert(0, src_str)
+if root_str in sys.path:
+    sys.path.remove(root_str)
+sys.path.insert(1, root_str)
 
 from benchmarks.metrics import (  # noqa: E402
     attack_time_error_ms,

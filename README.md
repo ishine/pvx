@@ -1,10 +1,9 @@
 # pvx
 
-![pvx logo](assets/pvx_logo.png)
+<img src="assets/pvx_logo.png" alt="pvx logo" width="96" />
 
 
 
-> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](ATTRIBUTION.md).
 
 `pvx` is a Python toolkit for high-quality time and pitch processing using a phase-vocoder/short-time Fourier transform (STFT) core.
 
@@ -911,6 +910,18 @@ uv run python3 pvx.py voc input.wav --stretch 1.2 --output output.wav
 
 Legacy wrappers remain available for backward compatibility.
 
+## Community and Governance
+
+- Contributing guide: `CONTRIBUTING.md`
+- Code of conduct: `CODE_OF_CONDUCT.md`
+- Security policy: `SECURITY.md`
+- Support guidance: `SUPPORT.md`
+- Release process: `RELEASE.md`
+
 ## License
 
 MIT
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](ATTRIBUTION.md).

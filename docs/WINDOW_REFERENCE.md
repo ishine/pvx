@@ -1,10 +1,8 @@
 # pvx Window Reference
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
-> Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
-
-_Generated from commit `e983e2f` (commit date: 2026-02-23T12:50:44-05:00)._
+_Generated from commit `040e02a` (commit date: 2026-02-23T13:10:59-05:00)._
 
 pvx currently supports **50** analysis windows. This file defines each one mathematically and explains it in plain English.
 
@@ -236,3 +234,7 @@ Each supported pvx window maps to one of the formula families above with the per
 - Use `flattop` for amplitude-accuracy-focused spectral measurement.
 - Use `tukey_*` when you want a controllable flat center region.
 - Use Gaussian/Cauchy/Exponential families to experiment with edge-decay shape and time-locality.
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).

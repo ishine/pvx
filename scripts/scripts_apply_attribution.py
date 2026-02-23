@@ -17,7 +17,6 @@ sys.path.insert(0, str(SRC_DIR))
 from pvx.core.attribution import (  # noqa: E402
     ATTRIBUTION_DOC_PATH,
     COPYRIGHT_NOTICE,
-    markdown_notice,
     python_header_reference,
 )
 
@@ -59,23 +58,43 @@ def _insert_python_header(path: Path) -> bool:
 
 def _insert_markdown_notice(path: Path) -> bool:
     text = path.read_text(encoding="utf-8")
-    if COPYRIGHT_NOTICE in text:
-        return False
     lines = text.splitlines()
-    notice = markdown_notice(_relative_attribution_path(path))
+    changed = False
 
-    insert_at = 0
-    if lines and lines[0].startswith("#"):
-        insert_at = 1
-        while insert_at < len(lines) and not lines[insert_at].strip():
-            insert_at += 1
-        if insert_at < len(lines) and lines[insert_at].lstrip().startswith("!["):
-            insert_at += 1
-        while insert_at < len(lines) and not lines[insert_at].strip():
-            insert_at += 1
+    # Drop an existing canonical attribution section if present; we rebuild it at the end.
+    for idx, line in enumerate(lines):
+        if line.strip().lower() == "## attribution":
+            lines = lines[:idx]
+            changed = True
+            break
 
-    new_lines = lines[:insert_at] + ["", notice, ""] + lines[insert_at:]
-    path.write_text("\n".join(new_lines).rstrip() + "\n", encoding="utf-8")
+    # Remove any legacy inline notice lines (for example top-level blockquote form).
+    filtered: list[str] = []
+    for line in lines:
+        if COPYRIGHT_NOTICE in line and ATTRIBUTION_DOC_PATH in line:
+            changed = True
+            continue
+        filtered.append(line)
+    lines = filtered
+
+    while lines and not lines[-1].strip():
+        lines.pop()
+        changed = True
+
+    rel_attr = _relative_attribution_path(path)
+    attribution_section = [
+        "## Attribution",
+        "",
+        f"{COPYRIGHT_NOTICE} See [{ATTRIBUTION_DOC_PATH}]({rel_attr}).",
+    ]
+
+    if lines:
+        lines.append("")
+    lines.extend(attribution_section)
+    new_text = "\n".join(lines).rstrip() + "\n"
+    if new_text == text and not changed:
+        return False
+    path.write_text(new_text, encoding="utf-8")
     return True
 
 

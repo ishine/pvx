@@ -1,12 +1,10 @@
 # Python File Documentation and Help
 
-![pvx logo](../assets/pvx_logo.png)
-
-> Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
 Comprehensive reference for every Python file in this repository.
 
-Total Python files documented: **209**
+Total Python files documented: **210**
 
 ## Contents
 
@@ -36,6 +34,7 @@ Total Python files documented: **209**
 - [`scripts/scripts_ab_compare.py`](#scriptsscriptsabcomparepy)
 - [`scripts/scripts_apply_attribution.py`](#scriptsscriptsapplyattributionpy)
 - [`scripts/scripts_benchmark_matrix.py`](#scriptsscriptsbenchmarkmatrixpy)
+- [`scripts/scripts_check_dependency_sync.py`](#scriptsscriptscheckdependencysyncpy)
 - [`scripts/scripts_generate_docs_extras.py`](#scriptsscriptsgeneratedocsextraspy)
 - [`scripts/scripts_generate_docs_pdf.py`](#scriptsscriptsgeneratedocspdfpy)
 - [`scripts/scripts_generate_html_docs.py`](#scriptsscriptsgeneratehtmldocspy)
@@ -1828,12 +1827,27 @@ Apply centralized attribution references to Python and Markdown files.
 Benchmark matrix runner for pvxvoc transform/window/device combinations.
 ```
 
+## `scripts/scripts_check_dependency_sync.py`
+
+**Purpose:** Validate that runtime requirements.txt matches project runtime dependencies.
+
+**Classes:** None
+**Functions:** `normalize_name`, `read_requirements`, `read_pyproject_runtime_dependencies`, `main`
+
+**Help commands:** `python3 scripts/scripts_check_dependency_sync.py`
+
+### Module Docstring
+
+```text
+Validate that runtime requirements.txt matches project runtime dependencies.
+```
+
 ## `scripts/scripts_generate_docs_extras.py`
 
 **Purpose:** Generate advanced docs artifacts (coverage, limitations, benchmarks, citations, cookbook, architecture).
 
 **Classes:** None
-**Functions:** `git_commit_meta`, `generated_stamp_lines`, `logo_lines`, `attribution_lines`, `write_json`, `_string_literal`, `_simple_literal`, `_tool_name_for_path`, `_iter_cli_sources`, `collect_cli_flags`, `generate_cli_flags_reference`, `_unique_join`, `generate_algorithm_limitations`, `generate_cookbook`, `generate_architecture_doc`, `_spectral_distance_db`, `_snr_db`, `_make_signal`, `_benchmark_backend`, `generate_benchmarks`, `_classify_reference_url`, `_extract_doi`, `_bib_escape`, `_bib_key`, `generate_citation_docs`, `generate_docs_contract`, `main`
+**Functions:** `git_commit_meta`, `generated_stamp_lines`, `logo_lines`, `attribution_section_lines`, `write_json`, `_string_literal`, `_simple_literal`, `_tool_name_for_path`, `_iter_cli_sources`, `collect_cli_flags`, `generate_cli_flags_reference`, `_unique_join`, `generate_algorithm_limitations`, `generate_cookbook`, `generate_architecture_doc`, `_spectral_distance_db`, `_snr_db`, `_make_signal`, `_benchmark_backend`, `generate_benchmarks`, `_classify_reference_url`, `_extract_doi`, `_bib_escape`, `_bib_key`, `generate_citation_docs`, `generate_docs_contract`, `main`
 
 **Help commands:** `python3 scripts/scripts_generate_docs_extras.py`, `python3 scripts/scripts_generate_docs_extras.py --help`
 
@@ -1878,7 +1892,7 @@ Generate grouped HTML documentation for pvx algorithms and research references.
 **Purpose:** Generate comprehensive documentation for every Python file in the repository.
 
 **Classes:** None
-**Functions:** `logo_lines`, `attribution_lines`, `rel`, `safe_read`, `parse_module`, `cli_help`, `extract_algorithm_params`, `generate_algorithm_param_doc`, `generate_python_help_doc`, `main`
+**Functions:** `logo_lines`, `attribution_section_lines`, `rel`, `safe_read`, `parse_module`, `cli_help`, `extract_algorithm_params`, `generate_algorithm_param_doc`, `generate_python_help_doc`, `main`
 
 **Help commands:** `python3 scripts/scripts_generate_python_docs.py`, `python3 scripts/scripts_generate_python_docs.py --help`
 
@@ -1893,7 +1907,7 @@ Generate comprehensive documentation for every Python file in the repository.
 **Purpose:** Generate GitHub-renderable theory docs (math foundations + window reference).
 
 **Classes:** None
-**Functions:** `git_commit_meta`, `generated_stamp_lines`, `logo_lines`, `attribution_lines`, `window_entries`, `window_tradeoffs`, `window_samples`, `_first_local_minimum`, `compute_window_metrics`, `_polyline_points`, `_downsample_series`, `write_line_svg`, `_svg_plot_points`, `write_multiline_svg`, `_compressor_curve_db`, `_expander_curve_db`, `_limiter_curve_db`, `_softclip_cubic`, `generate_function_assets`, `_natural_cubic_spline_eval`, `_sample_interpolation_curve`, `_render_interpolation_svg`, `generate_interpolation_assets`, `generate_window_assets_and_metrics`, `write_math_foundations`, `write_window_reference`, `main`
+**Functions:** `git_commit_meta`, `generated_stamp_lines`, `logo_lines`, `attribution_section_lines`, `window_entries`, `window_tradeoffs`, `window_samples`, `_first_local_minimum`, `compute_window_metrics`, `_polyline_points`, `_downsample_series`, `write_line_svg`, `_svg_plot_points`, `write_multiline_svg`, `_compressor_curve_db`, `_expander_curve_db`, `_limiter_curve_db`, `_softclip_cubic`, `generate_function_assets`, `_natural_cubic_spline_eval`, `_sample_interpolation_curve`, `_render_interpolation_svg`, `generate_interpolation_assets`, `generate_window_assets_and_metrics`, `write_math_foundations`, `write_window_reference`, `main`
 
 **Help commands:** `python3 scripts/scripts_generate_theory_docs.py`
 
@@ -6182,3 +6196,7 @@ Unit tests for shared output policy helpers.
 ```text
 Tests for hybrid transient processing and stereo coherence modes.
 ```
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).

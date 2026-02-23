@@ -1,0 +1,9 @@
+* text=auto eol=lf
+
+*.wav binary
+*.aiff binary
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.svg text

@@ -73,14 +73,16 @@ def generated_stamp_lines() -> list[str]:
 
 def logo_lines() -> list[str]:
     return [
-        "![pvx logo](../assets/pvx_logo.png)",
+        "<img src=\"../assets/pvx_logo.png\" alt=\"pvx logo\" width=\"96\" />",
         "",
     ]
 
 
-def attribution_lines() -> list[str]:
+def attribution_section_lines() -> list[str]:
     return [
-        f"> {COPYRIGHT_NOTICE} See [`{ATTRIBUTION_DOC_PATH}`](../{ATTRIBUTION_DOC_PATH}).",
+        "## Attribution",
+        "",
+        f"{COPYRIGHT_NOTICE} See [`{ATTRIBUTION_DOC_PATH}`](../{ATTRIBUTION_DOC_PATH}).",
         "",
     ]
 
@@ -206,7 +208,6 @@ def generate_cli_flags_reference() -> None:
     lines.append("# pvx Command-Line Interface (CLI) Flags Reference")
     lines.append("")
     lines.extend(logo_lines())
-    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("This file enumerates long-form CLI flags discovered from argparse declarations in canonical pvx CLI sources.")
     lines.append("")
@@ -238,6 +239,7 @@ def generate_cli_flags_reference() -> None:
             )
         lines.append("")
 
+    lines.extend(attribution_section_lines())
     (DOCS_DIR / "CLI_FLAGS_REFERENCE.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     write_json(
         DOCS_DIR / "cli_flags_reference.json",
@@ -403,7 +405,6 @@ def generate_algorithm_limitations() -> None:
     lines.append("# pvx Algorithm Limitations and Applicability")
     lines.append("")
     lines.extend(logo_lines())
-    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("This document summarizes assumptions, likely failure modes, and practical exclusion cases for each algorithm group and algorithm module.")
     lines.append("")
@@ -440,6 +441,7 @@ def generate_algorithm_limitations() -> None:
             )
         lines.append("")
 
+    lines.extend(attribution_section_lines())
     (DOCS_DIR / "ALGORITHM_LIMITATIONS.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     write_json(
         DOCS_DIR / "algorithm_limitations.json",
@@ -632,7 +634,6 @@ def generate_cookbook() -> None:
     lines.append("# pvx Pipeline Cookbook")
     lines.append("")
     lines.extend(logo_lines())
-    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("Curated one-line workflows for practical chaining, mastering, microtonal processing, and batch operation.")
     lines.append("")
@@ -657,6 +658,7 @@ def generate_cookbook() -> None:
     lines.append("- For production mastering, validate true peaks and loudness after all nonlinear stages.")
     lines.append("")
 
+    lines.extend(attribution_section_lines())
     (DOCS_DIR / "PIPELINE_COOKBOOK.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     write_json(
         DOCS_DIR / "pipeline_cookbook.json",
@@ -673,7 +675,6 @@ def generate_architecture_doc() -> None:
     lines.append("# pvx Architecture")
     lines.append("")
     lines.extend(logo_lines())
-    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("System architecture for runtime processing, algorithm dispatch, and documentation pipelines.")
     lines.append("")
@@ -726,6 +727,7 @@ def generate_architecture_doc() -> None:
     lines.append("```")
     lines.append("")
 
+    lines.extend(attribution_section_lines())
     (DOCS_DIR / "ARCHITECTURE.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
 
 
@@ -907,7 +909,6 @@ def generate_benchmarks(run_benchmarks: bool) -> None:
     lines.append("# pvx Benchmarks")
     lines.append("")
     lines.extend(logo_lines())
-    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("Reproducible benchmark summary for core short-time Fourier transform/inverse short-time Fourier transform (STFT/ISTFT) path across central processing unit/Compute Unified Device Architecture/Apple-Silicon-native contexts.")
     lines.append("")
@@ -992,6 +993,7 @@ def generate_benchmarks(run_benchmarks: bool) -> None:
     lines.append("Raw machine-readable benchmark output: `docs/benchmarks/latest.json`.")
     lines.append("")
 
+    lines.extend(attribution_section_lines())
     (DOCS_DIR / "BENCHMARKS.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
 
 
@@ -1056,7 +1058,6 @@ def generate_citation_docs() -> None:
     lines.append("# pvx Citation Quality Report")
     lines.append("")
     lines.extend(logo_lines())
-    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("This report classifies bibliography URLs by citation quality and highlights entries still using search-index links.")
     lines.append("")
@@ -1087,6 +1088,7 @@ def generate_citation_docs() -> None:
         )
     lines.append("")
 
+    lines.extend(attribution_section_lines())
     (DOCS_DIR / "CITATION_QUALITY.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
 
     bib_lines: list[str] = []
@@ -1123,7 +1125,6 @@ def generate_docs_contract() -> None:
     lines.append("# pvx Documentation Contribution Contract")
     lines.append("")
     lines.extend(logo_lines())
-    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("Any code change that affects behavior, parameters, algorithms, windows, outputs, or references must update generated documentation in the same PR.")
     lines.append("")
@@ -1153,6 +1154,7 @@ def generate_docs_contract() -> None:
     lines.append("- [ ] New references include DOI/publisher URLs when available.")
     lines.append("")
 
+    lines.extend(attribution_section_lines())
     (DOCS_DIR / "DOCS_CONTRACT.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
 
 

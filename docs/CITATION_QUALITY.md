@@ -1,24 +1,22 @@
 # pvx Citation Quality Report
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
-> Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
-
-_Generated from commit `e983e2f` (commit date: 2026-02-23T12:50:44-05:00)._
+_Generated from commit `040e02a` (commit date: 2026-02-23T13:10:59-05:00)._
 
 This report classifies bibliography URLs by citation quality and highlights entries still using search-index links.
 
-Total references analyzed: **143**
+Total references analyzed: **248**
 
 ## Link-Type Summary
 
 | Link type | Count |
 | --- | ---: |
-| `arxiv` | 7 |
-| `doi` | 33 |
-| `publisher_or_standard` | 8 |
-| `scholar` | 89 |
-| `web` | 6 |
+| `arxiv` | 8 |
+| `doi` | 90 |
+| `publisher_or_standard` | 10 |
+| `scholar` | 88 |
+| `web` | 52 |
 
 ## Entries Still Using Scholar Links
 
@@ -81,7 +79,6 @@ These are prime targets for future DOI/publisher URL upgrades.
 | 2006 | A. C. Gilbert; M. J. Strauss | Approximation of signals in sparse Fourier dictionaries | https://scholar.google.com/scholar?q=Approximation+of+signals+in+sparse+Fourier+dictionaries |
 | 2005 | M. McLeod; G. Wyvill | A Smarter Way to Find Pitch | https://scholar.google.com/scholar?q=A+Smarter+Way+to+Find+Pitch |
 | 2004 | A. de Cheveigne | Pitch and Time Manipulation of Speech | https://scholar.google.com/scholar?q=Pitch+and+Time+Manipulation+of+Speech |
-| 2003 | J. Laroche | About this Phasiness Business | https://scholar.google.com/scholar?q=About+this+Phasiness+Business |
 | 2002 | P. Flandrin; F. Auger; E. Chassande-Mottin | Time-Frequency Reassignment: From Principles to Algorithms | https://scholar.google.com/scholar?q=Time-Frequency+Reassignment%3A+From+Principles+to+Algorithms |
 | 2002 | C. Duxbury; M. Davies; M. Sandler | Improved Time-Scaling of Musical Audio Using Phase Locking at Transients | https://scholar.google.com/scholar?q=Improved+Time-Scaling+of+Musical+Audio+Using+Phase+Locking+at+Transients |
 | 2002 | S. Arfib; D. Keiler; U. Zölzer | DAFX: Digital Audio Effects (chapter references on pitch/time processing) | https://scholar.google.com/scholar?q=DAFX+Digital+Audio+Effects+pitch+shifting+chapter |
@@ -115,3 +112,7 @@ These are prime targets for future DOI/publisher URL upgrades.
 | 1976 | L. R. Rabiner; M. J. Cheng; A. E. Rosenberg; C. A. McGonegal | A Comparative Performance Study of Several Pitch Detection Algorithms | https://scholar.google.com/scholar?q=A+Comparative+Performance+Study+of+Several+Pitch+Detection+Algorithms |
 | 1967 | A. M. Noll | Cepstrum Pitch Determination | https://scholar.google.com/scholar?q=Cepstrum+Pitch+Determination |
 | 1949 | N. Wiener | Extrapolation, Interpolation, and Smoothing of Stationary Time Series | https://scholar.google.com/scholar?q=Extrapolation+Interpolation+and+Smoothing+of+Stationary+Time+Series+Wiener |
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).

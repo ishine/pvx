@@ -1,10 +1,9 @@
 # Development (DEV) Notes: `pvxvoc` Call Flow and Insertion Points (Phase 0 Recon)
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
 
 
-> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
 
 This note documents the current processing path and exact insertion points for:
 - hybrid transient engine (phase vocoder (PV) + waveform similarity overlap-add (WSOLA))
@@ -190,3 +189,7 @@ Implemented after this Phase 0 note:
 - Unified CLI helper commands added:
   - `pvx chain` for managed serial multi-stage chains
   - `pvx stream` for chunked wrapper over `pvx voc`
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).

@@ -1,10 +1,9 @@
 # pvx vs Rubber Band (Technical Comparison)
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
 
 
-> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
 
 This document is intentionally non-marketing. Both tools are strong; each has tradeoffs.
 
@@ -59,3 +58,7 @@ If Rubber Band is installed, it is included automatically; if not, it is skipped
 - objective metric score vs subjective musical preference
 
 Use the benchmark report as a directional signal, then always audition critical renders.
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).

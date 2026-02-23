@@ -1,10 +1,8 @@
 # pvx Mathematical Foundations
 
-![pvx logo](../assets/pvx_logo.png)
+<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
 
-> Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
-
-_Generated from commit `e983e2f` (commit date: 2026-02-23T12:50:44-05:00)._
+_Generated from commit `040e02a` (commit date: 2026-02-23T13:10:59-05:00)._
 
 This document explains the core signal-processing equations used by pvx, with plain-English interpretation.
 All equations are written in GitHub-renderable LaTeX and are intended to render directly in normal GitHub Markdown view.
@@ -213,3 +211,7 @@ The plots below visualize core transfer functions and parameter curves used acro
 | Morph blend magnitude curves | ![Morph blend magnitude curves](assets/functions/morph_blend_magnitude_curves.svg) | Compares `linear`, `geometric`, `product`, `max_mag`, and `min_mag` blend behaviors. |
 | Mask exponent response | ![Mask exponent response](assets/functions/mask_exponent_curves.svg) | Shows how `--mask-exponent` shapes cross-synthesis mask gain. |
 | Phase mix to output angle | ![Phase mix to output angle](assets/functions/phase_mix_angle_curve.svg) | Example of complex-vector phase blending used by morph phase mix. |
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).

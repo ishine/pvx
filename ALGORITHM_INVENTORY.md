@@ -1,7 +1,6 @@
 # Generated Algorithm Inventory
 
 
-> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](ATTRIBUTION.md).
 
 Total algorithms: 123
 
@@ -139,3 +138,7 @@ Total algorithms: 123
 - `spatial_and_multichannel/creative_spatial_fx/decorrelated_reverb_upmix.py`: Decorrelated reverb upmix
 - `spatial_and_multichannel/creative_spatial_fx/spectral_spatial_granulator.py`: Spectral spatial granulator
 - `spatial_and_multichannel/creative_spatial_fx/spatial_freeze_resynthesis.py`: Spatial freeze resynthesis
+
+## Attribution
+
+Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](ATTRIBUTION.md).

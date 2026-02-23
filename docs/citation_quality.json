@@ -1,12 +1,12 @@
 {
-  "commit": "e983e2f",
-  "commit_date": "2026-02-23T12:50:44-05:00",
+  "commit": "040e02a",
+  "commit_date": "2026-02-23T13:10:59-05:00",
   "counts": {
-    "arxiv": 7,
-    "doi": 33,
-    "publisher_or_standard": 8,
-    "scholar": 89,
-    "web": 6
+    "arxiv": 8,
+    "doi": 90,
+    "publisher_or_standard": 10,
+    "scholar": 88,
+    "web": 52
   },
   "unresolved_scholar": [
     {
@@ -200,12 +200,6 @@
       "title": "Consistent Wiener Filtering for Audio Source Separation and Time-Frequency Processing",
       "url": "https://scholar.google.com/scholar?q=Consistent+Wiener+Filtering+for+Audio+Source+Separation+and+Time-Frequency+Processing",
       "year": "2011"
-    },
-    {
-      "authors": "J. Laroche",
-      "title": "About this Phasiness Business",
-      "url": "https://scholar.google.com/scholar?q=About+this+Phasiness+Business",
-      "year": "2003"
     },
     {
       "authors": "J. Driedger; T. Pratzlich; M. Muller",
