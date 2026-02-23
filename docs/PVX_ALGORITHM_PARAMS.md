@@ -1,6 +1,6 @@
-# pvx Algorithm Parameter Reference
+<p align="center"><img src="../assets/pvx_logo.png" alt="pvx logo" width="192" /></p>
 
-<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
+# pvx Algorithm Parameter Reference
 
 This file lists per-algorithm parameter keys consumed by `pvx.algorithms.base.run_algorithm()` dispatch.
 Legacy import alias `pvxalgorithms.base.run_algorithm()` is still available for compatibility.

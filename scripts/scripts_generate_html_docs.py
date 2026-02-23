@@ -1610,17 +1610,22 @@ body {
 .site-header h1 {
   margin: 0;
   font-size: 1.8rem;
+  text-align: center;
 }
 .site-header .brand {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 8px;
 }
 .site-header .pvx-logo {
   display: block;
-  height: 24px;
+  height: 48px;
   width: auto;
+}
+.site-header nav {
+  text-align: center;
 }
 .site-footer {
   border-top: 1px solid var(--line);
@@ -1738,7 +1743,7 @@ table.papers-table td.paper-link a {
 @media (max-width: 900px) {
   .table-scroll { overflow-x: auto; }
   table.papers-table { min-width: 900px; }
-  .site-header .pvx-logo { height: 20px; }
+  .site-header .pvx-logo { height: 40px; }
   .site-header h1 { font-size: 1.45rem; }
 }
 """.strip() + "\n"
@@ -2317,6 +2322,10 @@ python3 pvxvoc.py synth_pad.wav --transform hartley --time-stretch 1.30 --output
     The effective polynomial degree is capped at $M-1$.
   </p>
   <p class=\"small\">
+    Plot legend: blue solid line = interpolated control curve $u(t)$; red dashed line = piecewise connection of control points;
+    red circles labeled <code>p_i</code> = original control points.
+  </p>
+  <p class=\"small\">
     Example control points used for the plots below: {escape(control_points_text)}.
   </p>
   {interpolation_table_html}
@@ -2886,7 +2895,8 @@ def write_docs_root_index() -> None:
   <title>pvx docs</title>
 </head>
 <body>
-  <p><img src=\"../assets/pvx_logo.png\" alt=\"pvx logo\" style=\"height:24px;width:auto;\" /></p>
+  <p style=\"text-align:center;\"><img src=\"../assets/pvx_logo.png\" alt=\"pvx logo\" style=\"height:48px;width:auto;\" /></p>
+  <h1 style=\"text-align:center;\">pvx</h1>
   <p>Copyright (c) 2026 Colby Leider and contributors. See <a href=\"../ATTRIBUTION.md\"><code>ATTRIBUTION.md</code></a>.</p>
   <p>Redirecting to <a href=\"html/index.html\">docs/html/index.html</a> ...</p>
 </body>

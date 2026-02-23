@@ -1,6 +1,6 @@
-# Development (DEV) Notes: `pvxvoc` Call Flow and Insertion Points (Phase 0 Recon)
+<p align="center"><img src="../assets/pvx_logo.png" alt="pvx logo" width="192" /></p>
 
-<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
+# Development (DEV) Notes: `pvxvoc` Call Flow and Insertion Points (Phase 0 Recon)
 
 
 

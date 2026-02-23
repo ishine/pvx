@@ -1,6 +1,6 @@
-# Feature-Driven Sidechain Examples
+<p align="center"><img src="../assets/pvx_logo.png" alt="pvx logo" width="192" /></p>
 
-<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
+# Feature-Driven Sidechain Examples
 
 
 

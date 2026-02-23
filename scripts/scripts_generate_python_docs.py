@@ -43,7 +43,7 @@ CLI_HELP_CANDIDATES = {
 
 def logo_lines() -> list[str]:
     return [
-        "<img src=\"../assets/pvx_logo.png\" alt=\"pvx logo\" width=\"96\" />",
+        "<p align=\"center\"><img src=\"../assets/pvx_logo.png\" alt=\"pvx logo\" width=\"192\" /></p>",
         "",
     ]
 
@@ -175,9 +175,9 @@ def extract_algorithm_params(base_path: Path) -> dict[str, list[str]]:
 def generate_algorithm_param_doc() -> None:
     params = extract_algorithm_params(ROOT / "src" / "pvx" / "algorithms" / "base.py")
     lines: list[str] = []
+    lines.extend(logo_lines())
     lines.append("# pvx Algorithm Parameter Reference")
     lines.append("")
-    lines.extend(logo_lines())
     lines.append("This file lists per-algorithm parameter keys consumed by `pvx.algorithms.base.run_algorithm()` dispatch.")
     lines.append("Legacy import alias `pvxalgorithms.base.run_algorithm()` is still available for compatibility.")
     lines.append("Use these keys as `**params` when calling module `process(audio, sample_rate, **params)`. ")
@@ -198,9 +198,9 @@ def generate_algorithm_param_doc() -> None:
 
 def generate_python_help_doc() -> None:
     lines: list[str] = []
+    lines.extend(logo_lines())
     lines.append("# Python File Documentation and Help")
     lines.append("")
-    lines.extend(logo_lines())
     lines.append("Comprehensive reference for every Python file in this repository.")
     lines.append("")
     lines.append(f"Total Python files documented: **{len(PY_FILES)}**")

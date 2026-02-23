@@ -73,7 +73,7 @@ def generated_stamp_lines() -> list[str]:
 
 def logo_lines() -> list[str]:
     return [
-        "<img src=\"../assets/pvx_logo.png\" alt=\"pvx logo\" width=\"96\" />",
+        "<p align=\"center\"><img src=\"../assets/pvx_logo.png\" alt=\"pvx logo\" width=\"192\" /></p>",
         "",
     ]
 
@@ -205,9 +205,9 @@ def generate_cli_flags_reference() -> None:
     unique_flags = sorted({str(row["flag"]) for row in rows})
 
     lines: list[str] = []
+    lines.extend(logo_lines())
     lines.append("# pvx Command-Line Interface (CLI) Flags Reference")
     lines.append("")
-    lines.extend(logo_lines())
     lines.extend(generated_stamp_lines())
     lines.append("This file enumerates long-form CLI flags discovered from argparse declarations in canonical pvx CLI sources.")
     lines.append("")
@@ -402,9 +402,9 @@ def generate_algorithm_limitations() -> None:
         )
 
     lines: list[str] = []
+    lines.extend(logo_lines())
     lines.append("# pvx Algorithm Limitations and Applicability")
     lines.append("")
-    lines.extend(logo_lines())
     lines.extend(generated_stamp_lines())
     lines.append("This document summarizes assumptions, likely failure modes, and practical exclusion cases for each algorithm group and algorithm module.")
     lines.append("")
@@ -631,9 +631,9 @@ def generate_cookbook() -> None:
         by_cat.setdefault(recipe["category"], []).append(recipe)
 
     lines: list[str] = []
+    lines.extend(logo_lines())
     lines.append("# pvx Pipeline Cookbook")
     lines.append("")
-    lines.extend(logo_lines())
     lines.extend(generated_stamp_lines())
     lines.append("Curated one-line workflows for practical chaining, mastering, microtonal processing, and batch operation.")
     lines.append("")
@@ -672,9 +672,9 @@ def generate_cookbook() -> None:
 
 def generate_architecture_doc() -> None:
     lines: list[str] = []
+    lines.extend(logo_lines())
     lines.append("# pvx Architecture")
     lines.append("")
-    lines.extend(logo_lines())
     lines.extend(generated_stamp_lines())
     lines.append("System architecture for runtime processing, algorithm dispatch, and documentation pipelines.")
     lines.append("")
@@ -906,9 +906,9 @@ def generate_benchmarks(run_benchmarks: bool) -> None:
         payload = json.loads(bench_json_path.read_text(encoding="utf-8"))
 
     lines: list[str] = []
+    lines.extend(logo_lines())
     lines.append("# pvx Benchmarks")
     lines.append("")
-    lines.extend(logo_lines())
     lines.extend(generated_stamp_lines())
     lines.append("Reproducible benchmark summary for core short-time Fourier transform/inverse short-time Fourier transform (STFT/ISTFT) path across central processing unit/Compute Unified Device Architecture/Apple-Silicon-native contexts.")
     lines.append("")
@@ -1055,9 +1055,9 @@ def generate_citation_docs() -> None:
             )
 
     lines: list[str] = []
+    lines.extend(logo_lines())
     lines.append("# pvx Citation Quality Report")
     lines.append("")
-    lines.extend(logo_lines())
     lines.extend(generated_stamp_lines())
     lines.append("This report classifies bibliography URLs by citation quality and highlights entries still using search-index links.")
     lines.append("")
@@ -1122,9 +1122,9 @@ def generate_citation_docs() -> None:
 
 def generate_docs_contract() -> None:
     lines: list[str] = []
+    lines.extend(logo_lines())
     lines.append("# pvx Documentation Contribution Contract")
     lines.append("")
-    lines.extend(logo_lines())
     lines.extend(generated_stamp_lines())
     lines.append("Any code change that affects behavior, parameters, algorithms, windows, outputs, or references must update generated documentation in the same PR.")
     lines.append("")

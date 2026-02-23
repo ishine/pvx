@@ -1,6 +1,6 @@
-# pvx
+<p align="center"><img src="assets/pvx_logo.png" alt="pvx logo" width="192" /></p>
 
-<img src="assets/pvx_logo.png" alt="pvx logo" width="96" />
+# pvx
 
 
 
@@ -22,6 +22,73 @@ At a glance, `pvx` provides:
 - microtonal support (ratio, cents, and scale-constrained retune workflows)
 - shared mastering/output controls (target loudness units relative to full scale (LUFS), limiting, clipping, dithering, and output policy options)
 - comprehensive generated documentation (Markdown, HyperText Markup Language (HTML), and Portable Document Format (PDF))
+
+## Install
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install -e .
+pvx --help
+```
+
+Or with `uv`:
+
+```bash
+uv venv .venv
+source .venv/bin/activate
+uv pip install -e .
+uv run pvx --help
+```
+
+Persist `pvx` on your shell path (`zsh`):
+
+```bash
+printf 'export PATH="%s/.venv/bin:$PATH"\n' "$(pwd)" >> ~/.zshrc
+source ~/.zshrc
+pvx --help
+```
+
+Optional CUDA:
+
+```bash
+python3 -m pip install cupy-cuda12x
+```
+
+`uv` equivalent:
+
+```bash
+uv pip install cupy-cuda12x
+```
+
+### Installation and Runtime Matrix
+
+| Platform / Runtime | CPU mode | GPU/CUDA mode | Notes |
+| --- | --- | --- | --- |
+| Linux x86_64 | Supported | Supported (CUDA + CuPy) | Best choice for NVIDIA CUDA acceleration. |
+| Windows x86_64 | Supported | Supported (CUDA + CuPy) | Match CuPy package to installed CUDA runtime. |
+| macOS Intel | Supported | Not CUDA | Use CPU mode; Metal acceleration is not a CUDA path. |
+| macOS Apple Silicon (M1/M2/M3/M4) | Supported (native arm64) | Not CUDA | Native Apple Silicon support in CPU path; prefer quality-focused profiles first. |
+
+Primary command:
+
+```bash
+pvx voc input.wav --stretch 1.2 --output output.wav
+```
+
+Fallback without `PATH` updates:
+
+```bash
+python3 pvx.py voc input.wav --stretch 1.2 --output output.wav
+```
+
+Fallback with `uv`:
+
+```bash
+uv run python3 pvx.py voc input.wav --stretch 1.2 --output output.wav
+```
+
+Legacy wrappers remain available for backward compatibility.
 
 ## Start Here (No Prior DSP Knowledge Needed)
 
@@ -827,88 +894,64 @@ Practical next steps inspired by PVC tradition:
 
 ## Progressive Documentation Map
 
-- Onboarding: `docs/GETTING_STARTED.md`
-- Example cookbook (72+ runnable commands): `docs/EXAMPLES.md`
-- Diagram atlas (26+ architecture/DSP diagrams): `docs/DIAGRAMS.md`
-- Mathematical foundations (31 sections of equations + derivations): `docs/MATHEMATICAL_FOUNDATIONS.md`
-- API usage from Python: `docs/API_OVERVIEW.md`
-- File types and formats: `docs/FILE_TYPES.md`
-- Quality troubleshooting guide: `docs/QUALITY_GUIDE.md`
-- PVC lineage notes and carry-forward design ideas: `docs/PVC_LESSONS.md`
-- Rubber Band comparison notes: `docs/RUBBERBAND_COMPARISON.md`
-- Benchmark guide: `docs/BENCHMARKS.md`
-- Window reference: `docs/WINDOW_REFERENCE.md`
-- Follow workflow migration guide: `docs/FOLLOW_MIGRATION.md`
-- Maintainer review checklist: `docs/HOW_TO_REVIEW.md`
-- Generated HTML docs: `docs/html/index.html`
-- PDF bundle: `docs/pvx_documentation.pdf`
+Complete Markdown documentation list (all `.md` documentation files):
 
-## Install
+- [docs/ALGORITHM_LIMITATIONS.md](docs/ALGORITHM_LIMITATIONS.md)
+- [docs/API_OVERVIEW.md](docs/API_OVERVIEW.md)
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- [docs/BENCHMARKS.md](docs/BENCHMARKS.md)
+- [docs/CITATION_QUALITY.md](docs/CITATION_QUALITY.md)
+- [docs/CLI_FLAGS_REFERENCE.md](docs/CLI_FLAGS_REFERENCE.md)
+- [docs/DEV_NOTES.md](docs/DEV_NOTES.md)
+- [docs/DIAGRAMS.md](docs/DIAGRAMS.md)
+- [docs/DOCS_CONTRACT.md](docs/DOCS_CONTRACT.md)
+- [docs/EXAMPLES.md](docs/EXAMPLES.md)
+- [docs/FEATURE_SIDECHAIN_EXAMPLES.md](docs/FEATURE_SIDECHAIN_EXAMPLES.md)
+- [docs/FILE_TYPES.md](docs/FILE_TYPES.md)
+- [docs/FOLLOW_MIGRATION.md](docs/FOLLOW_MIGRATION.md)
+- [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)
+- [docs/HOW_TO_REVIEW.md](docs/HOW_TO_REVIEW.md)
+- [docs/MATHEMATICAL_FOUNDATIONS.md](docs/MATHEMATICAL_FOUNDATIONS.md)
+- [docs/PHASINESS_IMPLEMENTATION_PLAN.md](docs/PHASINESS_IMPLEMENTATION_PLAN.md)
+- [docs/PIPELINE_COOKBOOK.md](docs/PIPELINE_COOKBOOK.md)
+- [docs/PVC_LESSONS.md](docs/PVC_LESSONS.md)
+- [docs/PVX_ALGORITHM_PARAMS.md](docs/PVX_ALGORITHM_PARAMS.md)
+- [docs/PYTHON_FILE_HELP.md](docs/PYTHON_FILE_HELP.md)
+- [docs/QUALITY_GUIDE.md](docs/QUALITY_GUIDE.md)
+- [docs/RUBBERBAND_COMPARISON.md](docs/RUBBERBAND_COMPARISON.md)
+- [docs/WINDOW_REFERENCE.md](docs/WINDOW_REFERENCE.md)
+- [docs/html/README.md](docs/html/README.md)
+- [docs/q.md](docs/q.md)
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python3 -m pip install -e .
-pvx --help
-```
+Complete HyperText Markup Language (HTML) documentation list (all `.html` documentation files):
 
-Or with `uv`:
+- [docs/index.html](docs/index.html)
+- [docs/html/index.html](docs/html/index.html)
+- [docs/html/architecture.html](docs/html/architecture.html)
+- [docs/html/benchmarks.html](docs/html/benchmarks.html)
+- [docs/html/citations.html](docs/html/citations.html)
+- [docs/html/cli_flags.html](docs/html/cli_flags.html)
+- [docs/html/cookbook.html](docs/html/cookbook.html)
+- [docs/html/glossary.html](docs/html/glossary.html)
+- [docs/html/limitations.html](docs/html/limitations.html)
+- [docs/html/math.html](docs/html/math.html)
+- [docs/html/papers.html](docs/html/papers.html)
+- [docs/html/windows.html](docs/html/windows.html)
+- [docs/html/groups/analysis_qa_and_automation.html](docs/html/groups/analysis_qa_and_automation.html)
+- [docs/html/groups/creative_spectral_effects.html](docs/html/groups/creative_spectral_effects.html)
+- [docs/html/groups/denoise_and_restoration.html](docs/html/groups/denoise_and_restoration.html)
+- [docs/html/groups/dereverb_and_room_correction.html](docs/html/groups/dereverb_and_room_correction.html)
+- [docs/html/groups/dynamics_and_loudness.html](docs/html/groups/dynamics_and_loudness.html)
+- [docs/html/groups/granular_and_modulation.html](docs/html/groups/granular_and_modulation.html)
+- [docs/html/groups/pitch_detection_and_tracking.html](docs/html/groups/pitch_detection_and_tracking.html)
+- [docs/html/groups/retune_and_intonation.html](docs/html/groups/retune_and_intonation.html)
+- [docs/html/groups/separation_and_decomposition.html](docs/html/groups/separation_and_decomposition.html)
+- [docs/html/groups/spatial_and_multichannel.html](docs/html/groups/spatial_and_multichannel.html)
+- [docs/html/groups/spectral_time_frequency_transforms.html](docs/html/groups/spectral_time_frequency_transforms.html)
+- [docs/html/groups/time_scale_and_pitch_core.html](docs/html/groups/time_scale_and_pitch_core.html)
 
-```bash
-uv venv .venv
-source .venv/bin/activate
-uv pip install -e .
-uv run pvx --help
-```
-
-Persist `pvx` on your shell path (`zsh`):
-
-```bash
-printf 'export PATH="%s/.venv/bin:$PATH"\n' "$(pwd)" >> ~/.zshrc
-source ~/.zshrc
-pvx --help
-```
-
-Optional CUDA:
-
-```bash
-python3 -m pip install cupy-cuda12x
-```
-
-`uv` equivalent:
-
-```bash
-uv pip install cupy-cuda12x
-```
-
-### Installation and Runtime Matrix
-
-| Platform / Runtime | CPU mode | GPU/CUDA mode | Notes |
-| --- | --- | --- | --- |
-| Linux x86_64 | Supported | Supported (CUDA + CuPy) | Best choice for NVIDIA CUDA acceleration. |
-| Windows x86_64 | Supported | Supported (CUDA + CuPy) | Match CuPy package to installed CUDA runtime. |
-| macOS Intel | Supported | Not CUDA | Use CPU mode; Metal acceleration is not a CUDA path. |
-| macOS Apple Silicon (M1/M2/M3/M4) | Supported (native arm64) | Not CUDA | Native Apple Silicon support in CPU path; prefer quality-focused profiles first. |
-
-Primary command:
-
-```bash
-pvx voc input.wav --stretch 1.2 --output output.wav
-```
-
-Fallback without `PATH` updates:
-
-```bash
-python3 pvx.py voc input.wav --stretch 1.2 --output output.wav
-```
-
-Fallback with `uv`:
-
-```bash
-uv run python3 pvx.py voc input.wav --stretch 1.2 --output output.wav
-```
-
-Legacy wrappers remain available for backward compatibility.
+Portable Document Format (PDF) bundle:
+- `docs/pvx_documentation.pdf`
 
 ## Community and Governance
 

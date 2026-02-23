@@ -1,8 +1,8 @@
+<p align="center"><img src="../assets/pvx_logo.png" alt="pvx logo" width="192" /></p>
+
 # pvx Mathematical Foundations
 
-<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
-
-_Generated from commit `040e02a` (commit date: 2026-02-23T13:10:59-05:00)._
+_Generated from commit `e37ec44` (commit date: 2026-02-23T14:07:50-05:00)._
 
 This document explains the core signal-processing equations used by pvx, with plain-English interpretation.
 All equations are written in GitHub-renderable LaTeX and are intended to render directly in normal GitHub Markdown view.
@@ -135,6 +135,7 @@ where $M$ is the number of control points. In command-line interface (CLI) usage
 The effective degree is automatically capped to avoid over-specification when there are too few points.
 
 Nearest/linear/cubic are local interpolation modes; `none` is sample-and-hold (stairstep).
+Legend used in each plot: blue solid line = interpolated control curve $u(t)$, red dashed line = piecewise connection of control points, red circles labeled $p_i$ = original control points.
 
 | Interpolation mode | CLI form | Example plot |
 | --- | --- | --- |

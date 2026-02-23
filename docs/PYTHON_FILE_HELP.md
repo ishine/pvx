@@ -1,6 +1,6 @@
-# Python File Documentation and Help
+<p align="center"><img src="../assets/pvx_logo.png" alt="pvx logo" width="192" /></p>
 
-<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
+# Python File Documentation and Help
 
 Comprehensive reference for every Python file in this repository.
 

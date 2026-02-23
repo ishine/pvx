@@ -1,8 +1,8 @@
+<p align="center"><img src="../assets/pvx_logo.png" alt="pvx logo" width="192" /></p>
+
 # pvx Benchmarks
 
-<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
-
-_Generated from commit `040e02a` (commit date: 2026-02-23T13:10:59-05:00)._
+_Generated from commit `e37ec44` (commit date: 2026-02-23T14:07:50-05:00)._
 
 Reproducible benchmark summary for core short-time Fourier transform/inverse short-time Fourier transform (STFT/ISTFT) path across central processing unit/Compute Unified Device Architecture/Apple-Silicon-native contexts.
 

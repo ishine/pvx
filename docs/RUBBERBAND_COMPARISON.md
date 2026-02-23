@@ -1,6 +1,6 @@
-# pvx vs Rubber Band (Technical Comparison)
+<p align="center"><img src="../assets/pvx_logo.png" alt="pvx logo" width="192" /></p>
 
-<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
+# pvx vs Rubber Band (Technical Comparison)
 
 
 

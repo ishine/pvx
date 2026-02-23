@@ -1,6 +1,6 @@
-# pvx Example Cookbook
+<p align="center"><img src="../assets/pvx_logo.png" alt="pvx logo" width="192" /></p>
 
-<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
+# pvx Example Cookbook
 
 
 

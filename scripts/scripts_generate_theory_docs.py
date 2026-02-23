@@ -67,7 +67,7 @@ def generated_stamp_lines() -> list[str]:
 
 def logo_lines() -> list[str]:
     return [
-        "<img src=\"../assets/pvx_logo.png\" alt=\"pvx logo\" width=\"96\" />",
+        "<p align=\"center\"><img src=\"../assets/pvx_logo.png\" alt=\"pvx logo\" width=\"192\" /></p>",
         "",
     ]
 
@@ -865,12 +865,24 @@ def _render_interpolation_svg(
             f"font-size=\"10\" fill=\"#7a271a\">p{idx}</text>"
         )
 
+    legend_w = 250
+    legend_h = 74
+    legend_x = width - margin - legend_w
+    legend_y = margin + 8
+
     svg = f"""<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{width}\" height=\"{height}\" viewBox=\"0 0 {width} {height}\">
   <rect x=\"0\" y=\"0\" width=\"{width}\" height=\"{height}\" fill=\"#ffffff\" />
   <rect x=\"{margin}\" y=\"{margin}\" width=\"{width - 2 * margin}\" height=\"{height - 2 * margin}\" fill=\"#f7fbff\" stroke=\"#c8d9e6\" />
   <polyline fill=\"none\" stroke=\"#8f1d2c\" stroke-width=\"1.5\" stroke-dasharray=\"5 3\" points=\"{' '.join(ctrl_points)}\" />
   <polyline fill=\"none\" stroke=\"#005f73\" stroke-width=\"2\" points=\"{' '.join(dense_points)}\" />
   {''.join(circles)}
+  <rect x=\"{legend_x}\" y=\"{legend_y}\" width=\"{legend_w}\" height=\"{legend_h}\" rx=\"6\" ry=\"6\" fill=\"#ffffff\" stroke=\"#c8d9e6\" />
+  <line x1=\"{legend_x + 10}\" y1=\"{legend_y + 18}\" x2=\"{legend_x + 58}\" y2=\"{legend_y + 18}\" stroke=\"#005f73\" stroke-width=\"2\" />
+  <text x=\"{legend_x + 66}\" y=\"{legend_y + 22}\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"10\" fill=\"#243b53\">interpolated curve u(t)</text>
+  <line x1=\"{legend_x + 10}\" y1=\"{legend_y + 38}\" x2=\"{legend_x + 58}\" y2=\"{legend_y + 38}\" stroke=\"#8f1d2c\" stroke-width=\"1.5\" stroke-dasharray=\"5 3\" />
+  <text x=\"{legend_x + 66}\" y=\"{legend_y + 42}\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"10\" fill=\"#243b53\">piecewise control polyline</text>
+  <circle cx=\"{legend_x + 34}\" cy=\"{legend_y + 56}\" r=\"3.2\" fill=\"#b42318\" />
+  <text x=\"{legend_x + 66}\" y=\"{legend_y + 60}\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"10\" fill=\"#243b53\">control points p_i</text>
   <text x=\"{width / 2:.1f}\" y=\"22\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"15\" fill=\"#102a43\">{title}</text>
   <text x=\"{width / 2:.1f}\" y=\"{height - 8}\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"12\" fill=\"#334e68\">normalized control time</text>
   <text x=\"14\" y=\"{height / 2:.1f}\" transform=\"rotate(-90 14,{height / 2:.1f})\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"12\" fill=\"#334e68\">control value</text>
@@ -1012,9 +1024,9 @@ def generate_window_assets_and_metrics(entries: list[dict[str, str]]) -> dict[st
 
 def write_math_foundations(interpolation_gallery: dict[str, object], function_gallery: dict[str, object]) -> None:
     lines: list[str] = []
+    lines.extend(logo_lines())
     lines.append("# pvx Mathematical Foundations")
     lines.append("")
-    lines.extend(logo_lines())
     lines.extend(generated_stamp_lines())
     lines.append("This document explains the core signal-processing equations used by pvx, with plain-English interpretation.")
     lines.append("All equations are written in GitHub-renderable LaTeX and are intended to render directly in normal GitHub Markdown view.")
@@ -1147,6 +1159,7 @@ def write_math_foundations(interpolation_gallery: dict[str, object], function_ga
     lines.append("The effective degree is automatically capped to avoid over-specification when there are too few points.")
     lines.append("")
     lines.append("Nearest/linear/cubic are local interpolation modes; `none` is sample-and-hold (stairstep).")
+    lines.append("Legend used in each plot: blue solid line = interpolated control curve $u(t)$, red dashed line = piecewise connection of control points, red circles labeled $p_i$ = original control points.")
     lines.append("")
     lines.append("| Interpolation mode | CLI form | Example plot |")
     lines.append("| --- | --- | --- |")
@@ -1244,9 +1257,9 @@ def write_window_reference() -> None:
     metrics_by_name = generate_window_assets_and_metrics(entries)
 
     lines: list[str] = []
+    lines.extend(logo_lines())
     lines.append("# pvx Window Reference")
     lines.append("")
-    lines.extend(logo_lines())
     lines.extend(generated_stamp_lines())
     lines.append(f"pvx currently supports **{len(entries)}** analysis windows. This file defines each one mathematically and explains it in plain English.")
     lines.append("")

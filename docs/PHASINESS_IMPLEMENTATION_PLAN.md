@@ -1,6 +1,6 @@
-# pvx Phasiness Implementation Plan
+<p align="center"><img src="../assets/pvx_logo.png" alt="pvx logo" width="192" /></p>
 
-<img src="../assets/pvx_logo.png" alt="pvx logo" width="96" />
+# pvx Phasiness Implementation Plan
 
 ## Why this paper matters
 
