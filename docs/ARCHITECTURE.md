@@ -1,6 +1,6 @@
 # pvx Architecture
 
-_Generated from commit `97bcd59` (commit date: 2026-02-20T12:18:46-05:00)._
+_Generated from commit `2d0fab0` (commit date: 2026-02-23T12:29:02-05:00)._
 
 System architecture for runtime processing, algorithm dispatch, and documentation pipelines.
 
@@ -30,10 +30,10 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-  G1[scripts_generate_python_docs.py] --> D[docs/*]
-  G2[scripts_generate_theory_docs.py] --> D
-  G3[scripts_generate_docs_extras.py] --> D
-  G4[scripts_generate_html_docs.py] --> H[docs/html/*]
+  G1[scripts/scripts_generate_python_docs.py] --> D[docs/*]
+  G2[scripts/scripts_generate_theory_docs.py] --> D
+  G3[scripts/scripts_generate_docs_extras.py] --> D
+  G4[scripts/scripts_generate_html_docs.py] --> H[docs/html/*]
   D --> H
 ```
 

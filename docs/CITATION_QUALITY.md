@@ -1,6 +1,6 @@
 # pvx Citation Quality Report
 
-_Generated from commit `97bcd59` (commit date: 2026-02-20T12:18:46-05:00)._
+_Generated from commit `2d0fab0` (commit date: 2026-02-23T12:29:02-05:00)._
 
 This report classifies bibliography URLs by citation quality and highlights entries still using search-index links.
 

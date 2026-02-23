@@ -127,7 +127,7 @@ CLI hooks:
 
 Current state:
 - no top-level `benchmarks/` runner package yet
-- existing benchmark generation is doc-oriented in `scripts_generate_docs_extras.py`
+- existing benchmark generation is doc-oriented in `scripts/scripts_generate_docs_extras.py`
 - CI currently runs docs + unit tests in `.github/workflows/docs-ci.yml`
 
 Planned additions:

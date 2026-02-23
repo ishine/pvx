@@ -1,6 +1,6 @@
 # pvx Mathematical Foundations
 
-_Generated from commit `97bcd59` (commit date: 2026-02-20T12:18:46-05:00)._
+_Generated from commit `2d0fab0` (commit date: 2026-02-23T12:29:02-05:00)._
 
 This document explains the core signal-processing equations used by pvx, with plain-English interpretation.
 All equations are written in GitHub-renderable LaTeX and are intended to render directly in normal GitHub Markdown view.
@@ -119,7 +119,33 @@ $$
 
 Plain English: semitone and cent controls map to the same multiplicative ratio.
 
-## 5. Microtonal Retune Mapping
+## 5. Dynamic Control Interpolation (CSV/JSON)
+
+When a numeric flag receives a CSV/JSON control track, pvx samples a control function $u(t)$ over render time.
+
+Polynomial mode fits a global polynomial of degree $d$:
+
+$$
+u(t)=\sum_{i=0}^{d} a_i t^i,\qquad d=\min(\texttt{order}, M-1)
+$$
+
+where $M$ is the number of control points. In command-line interface (CLI) usage, `--order` accepts any integer $\ge 1$.
+The effective degree is automatically capped to avoid over-specification when there are too few points.
+
+Nearest/linear/cubic are local interpolation modes; `none` is sample-and-hold (stairstep).
+
+| Interpolation mode | CLI form | Example plot |
+| --- | --- | --- |
+| none (stairstep) | `--interp none` | ![none (stairstep)](assets/interpolation/interp_none.svg) |
+| nearest | `--interp nearest` | ![nearest](assets/interpolation/interp_nearest.svg) |
+| linear | `--interp linear` | ![linear](assets/interpolation/interp_linear.svg) |
+| cubic | `--interp cubic` | ![cubic](assets/interpolation/interp_cubic.svg) |
+| polynomial order 1 | `--interp polynomial --order 1` | ![polynomial order 1](assets/interpolation/interp_polynomial_order_1.svg) |
+| polynomial order 2 | `--interp polynomial --order 2` | ![polynomial order 2](assets/interpolation/interp_polynomial_order_2.svg) |
+| polynomial order 3 | `--interp polynomial --order 3` | ![polynomial order 3](assets/interpolation/interp_polynomial_order_3.svg) |
+| polynomial order 5 | `--interp polynomial --order 5` | ![polynomial order 5](assets/interpolation/interp_polynomial_order_5.svg) |
+
+## 6. Microtonal Retune Mapping
 
 For a detected frequency $f$, pvx scale-aware retuning chooses the nearest permitted scale target $f_{\text{scale}}$ and applies:
 
@@ -129,7 +155,7 @@ $$
 
 Plain English: each frame is shifted only as much as needed to land on the selected microtonal scale degree.
 
-## 6. Loudness and Dynamics
+## 7. Loudness and Dynamics
 
 LUFS target gain:
 
@@ -148,7 +174,7 @@ $$
 
 Plain English: level is reduced above threshold $T$ by ratio $R$, then makeup/loudness stages may be applied.
 
-## 7. Spatial Coherence and Channel Alignment
+## 8. Spatial Coherence and Channel Alignment
 
 Inter-channel phase difference:
 
@@ -169,3 +195,17 @@ $$
 $$
 
 Plain English: pvx spatial modules prioritize channel coherence, stable image cues, and robust delay alignment for multichannel processing chains.
+
+## 9. Function Graph Gallery
+
+The plots below visualize core transfer functions and parameter curves used across pvx processing modules.
+
+| Function family | Plot | Why this matters |
+| --- | --- | --- |
+| Pitch ratio from semitones | ![Pitch ratio from semitones](assets/functions/pitch_ratio_vs_semitones.svg) | `r = 2^(semitones/12)` conversion used by pitch-shift flags. |
+| Pitch ratio from cents | ![Pitch ratio from cents](assets/functions/pitch_ratio_vs_cents.svg) | `r = 2^(cents/1200)` conversion for microtonal cent controls. |
+| Dynamics transfer functions | ![Dynamics transfer functions](assets/functions/dynamics_transfer_curves.svg) | Compressor/expander/limiter conceptual transfer curves used in mastering stages. |
+| Soft-clip transfer functions | ![Soft-clip transfer functions](assets/functions/softclip_transfer_functions.svg) | Shows `tanh`, `arctan`, and `cubic` soft clipping behavior. |
+| Morph blend magnitude curves | ![Morph blend magnitude curves](assets/functions/morph_blend_magnitude_curves.svg) | Compares `linear`, `geometric`, `product`, `max_mag`, and `min_mag` blend behaviors. |
+| Mask exponent response | ![Mask exponent response](assets/functions/mask_exponent_curves.svg) | Shows how `--mask-exponent` shapes cross-synthesis mask gain. |
+| Phase mix to output angle | ![Phase mix to output angle](assets/functions/phase_mix_angle_curve.svg) | Example of complex-vector phase blending used by morph phase mix. |

@@ -1,0 +1,41 @@
+{
+  "commit": "2d0fab0",
+  "commit_date": "2026-02-23T12:29:02-05:00",
+  "plots": [
+    {
+      "name": "Pitch ratio from semitones",
+      "path": "assets/functions/pitch_ratio_vs_semitones.svg",
+      "usage": "`r = 2^(semitones/12)` conversion used by pitch-shift flags."
+    },
+    {
+      "name": "Pitch ratio from cents",
+      "path": "assets/functions/pitch_ratio_vs_cents.svg",
+      "usage": "`r = 2^(cents/1200)` conversion for microtonal cent controls."
+    },
+    {
+      "name": "Dynamics transfer functions",
+      "path": "assets/functions/dynamics_transfer_curves.svg",
+      "usage": "Compressor/expander/limiter conceptual transfer curves used in mastering stages."
+    },
+    {
+      "name": "Soft-clip transfer functions",
+      "path": "assets/functions/softclip_transfer_functions.svg",
+      "usage": "Shows `tanh`, `arctan`, and `cubic` soft clipping behavior."
+    },
+    {
+      "name": "Morph blend magnitude curves",
+      "path": "assets/functions/morph_blend_magnitude_curves.svg",
+      "usage": "Compares `linear`, `geometric`, `product`, `max_mag`, and `min_mag` blend behaviors."
+    },
+    {
+      "name": "Mask exponent response",
+      "path": "assets/functions/mask_exponent_curves.svg",
+      "usage": "Shows how `--mask-exponent` shapes cross-synthesis mask gain."
+    },
+    {
+      "name": "Phase mix to output angle",
+      "path": "assets/functions/phase_mix_angle_curve.svg",
+      "usage": "Example of complex-vector phase blending used by morph phase mix."
+    }
+  ]
+}

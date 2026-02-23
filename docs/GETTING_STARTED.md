@@ -151,7 +151,13 @@ Control interpolation options:
 - `--interp linear` (default)
 - `--interp nearest`
 - `--interp cubic`
+- `--interp polynomial --order N` (any integer `N >= 1`, default `N=3`; effective degree is `min(N, control_points-1)`)
+
+Polynomial order examples:
+- `--interp polynomial --order 1`
+- `--interp polynomial --order 2`
 - `--interp polynomial --order 3`
+- `--interp polynomial --order 5`
 
 Point-style CSV:
 
@@ -201,6 +207,29 @@ JSON schema quick reference:
 Notes:
 - per-parameter dynamic controls cannot be combined with legacy `--pitch-map` / `--pitch-map-stdin` in the same command
 - dynamic `--time-stretch` cannot be combined with `--target-duration`
+
+Interpolation graph examples:
+
+| Mode | Example curve |
+| --- | --- |
+| `none (stairstep)` | ![none interpolation](assets/interpolation/interp_none.svg) |
+| `nearest` | ![nearest interpolation](assets/interpolation/interp_nearest.svg) |
+| `linear` | ![linear interpolation](assets/interpolation/interp_linear.svg) |
+| `cubic` | ![cubic interpolation](assets/interpolation/interp_cubic.svg) |
+| `polynomial order 1` | ![polynomial order 1](assets/interpolation/interp_polynomial_order_1.svg) |
+| `polynomial order 2` | ![polynomial order 2](assets/interpolation/interp_polynomial_order_2.svg) |
+| `polynomial order 3` | ![polynomial order 3](assets/interpolation/interp_polynomial_order_3.svg) |
+| `polynomial order 5` | ![polynomial order 5](assets/interpolation/interp_polynomial_order_5.svg) |
+
+Core processing function charts:
+
+| Function family | Graph |
+| --- | --- |
+| Pitch ratio vs semitones | ![pitch ratio vs semitones](assets/functions/pitch_ratio_vs_semitones.svg) |
+| Dynamics transfer curves | ![dynamics transfer curves](assets/functions/dynamics_transfer_curves.svg) |
+| Soft clip transfer functions | ![softclip transfer functions](assets/functions/softclip_transfer_functions.svg) |
+| Morph blend magnitude curves | ![morph blend curves](assets/functions/morph_blend_magnitude_curves.svg) |
+| Mask exponent response | ![mask exponent response](assets/functions/mask_exponent_curves.svg) |
 
 ## 4. Visual Mental Model of STFT
 

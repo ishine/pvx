@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 from textwrap import indent
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 DOCS_DIR = ROOT / "docs"
 DOCS_DIR.mkdir(parents=True, exist_ok=True)
 SRC_DIR = ROOT / "src"

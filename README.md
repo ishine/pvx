@@ -143,7 +143,13 @@ Interpolation choices:
 - `--interp linear` (default)
 - `--interp nearest`
 - `--interp cubic`
-- `--interp polynomial --order 3`
+- `--interp polynomial --order N` (any integer `N >= 1`, default `N=3`; effective degree is capped to `min(N, control_points-1)`)
+
+Polynomial order examples:
+- `--interp polynomial --order 1` (global straight-line fit)
+- `--interp polynomial --order 2` (quadratic curve)
+- `--interp polynomial --order 3` (cubic curve)
+- `--interp polynomial --order 5` (higher-order fit; can overshoot)
 
 Point-style CSV:
 
@@ -201,6 +207,31 @@ Multi-parameter JSON:
 Important compatibility notes:
 - per-parameter dynamic controls (`--stretch some.csv`) cannot be combined with legacy `--pitch-map` / `--pitch-map-stdin` in the same run
 - dynamic `--time-stretch` cannot be combined with `--target-duration`
+
+Interpolation graph examples (same control points, different interpolation mode/order):
+
+| Mode | Example curve |
+| --- | --- |
+| `none (stairstep)` | ![none interpolation](docs/assets/interpolation/interp_none.svg) |
+| `nearest` | ![nearest interpolation](docs/assets/interpolation/interp_nearest.svg) |
+| `linear` | ![linear interpolation](docs/assets/interpolation/interp_linear.svg) |
+| `cubic` | ![cubic interpolation](docs/assets/interpolation/interp_cubic.svg) |
+| `polynomial order 1` | ![polynomial order 1](docs/assets/interpolation/interp_polynomial_order_1.svg) |
+| `polynomial order 2` | ![polynomial order 2](docs/assets/interpolation/interp_polynomial_order_2.svg) |
+| `polynomial order 3` | ![polynomial order 3](docs/assets/interpolation/interp_polynomial_order_3.svg) |
+| `polynomial order 5` | ![polynomial order 5](docs/assets/interpolation/interp_polynomial_order_5.svg) |
+
+Core function graph gallery:
+
+| Function family | Graph |
+| --- | --- |
+| Pitch ratio vs semitones | ![pitch ratio vs semitones](docs/assets/functions/pitch_ratio_vs_semitones.svg) |
+| Pitch ratio vs cents | ![pitch ratio vs cents](docs/assets/functions/pitch_ratio_vs_cents.svg) |
+| Dynamics transfer curves | ![dynamics transfer curves](docs/assets/functions/dynamics_transfer_curves.svg) |
+| Soft clip transfer functions | ![softclip transfer](docs/assets/functions/softclip_transfer_functions.svg) |
+| Morph blend magnitude curves | ![morph blend magnitude curves](docs/assets/functions/morph_blend_magnitude_curves.svg) |
+| Mask exponent response | ![mask exponent curves](docs/assets/functions/mask_exponent_curves.svg) |
+| Phase mix curve | ![phase mix angle curve](docs/assets/functions/phase_mix_angle_curve.svg) |
 
 ## What Is a Phase Vocoder? (No Math Version)
 

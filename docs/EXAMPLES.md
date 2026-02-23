@@ -1819,6 +1819,7 @@ pvx voc vocal.wav --pitch-shift-ratio controls/pitch_curve.json --interp polynom
 **Explanation**
 - Drives pitch from a JSON control-rate signal attached directly to `--pitch-shift-ratio`.
 - `--interp polynomial --order 3` fits a smooth polynomial trajectory through points.
+- `--order` supports any integer `>= 1`; the effective polynomial degree is capped to `min(order, control_points-1)`.
 
 **Before/After**
 - Before: static transposition.
@@ -1832,6 +1833,28 @@ pvx voc vocal.wav --pitch-shift-ratio controls/pitch_curve.json --interp polynom
 **Artifacts to listen for**
 - over/undershoot from high-order polynomial fitting
 - formant drift if large excursions are used without formant-preserving mode
+
+Interpolation order quick visual:
+
+| Mode/order | Graph |
+| --- | --- |
+| `none` | ![none interpolation](assets/interpolation/interp_none.svg) |
+| `linear` | ![linear interpolation](assets/interpolation/interp_linear.svg) |
+| `cubic` | ![cubic interpolation](assets/interpolation/interp_cubic.svg) |
+| `polynomial --order 1` | ![polynomial order 1](assets/interpolation/interp_polynomial_order_1.svg) |
+| `polynomial --order 2` | ![polynomial order 2](assets/interpolation/interp_polynomial_order_2.svg) |
+| `polynomial --order 3` | ![polynomial order 3](assets/interpolation/interp_polynomial_order_3.svg) |
+| `polynomial --order 5` | ![polynomial order 5](assets/interpolation/interp_polynomial_order_5.svg) |
+
+Related function charts for morphing and mastering:
+
+| Function family | Graph |
+| --- | --- |
+| Morph blend magnitude curves | ![morph blend magnitude curves](assets/functions/morph_blend_magnitude_curves.svg) |
+| Mask exponent curves (`--mask-exponent`) | ![mask exponent curves](assets/functions/mask_exponent_curves.svg) |
+| Phase mix curve (`--phase-mix`) | ![phase mix curve](assets/functions/phase_mix_angle_curve.svg) |
+| Dynamics transfer curves | ![dynamics transfer curves](assets/functions/dynamics_transfer_curves.svg) |
+| Soft clip transfer functions | ![softclip transfer functions](assets/functions/softclip_transfer_functions.svg) |
 
 ---
 

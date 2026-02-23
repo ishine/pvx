@@ -1,6 +1,6 @@
 {
-  "commit": "97bcd59",
-  "commit_date": "2026-02-20T12:18:46-05:00",
+  "commit": "2d0fab0",
+  "commit_date": "2026-02-23T12:29:02-05:00",
   "entries": [
     {
       "action": "",
@@ -22,6 +22,31 @@
       "default": 0.0,
       "flag": "--confidence-floor",
       "help": "Set confidence below this floor to 0.0 (default: 0.0).",
+      "required": false,
+      "source": "src/pvx/cli/hps_pitch_track.py",
+      "tool": "hps_pitch_track.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": "pitch_map",
+      "flag": "--emit",
+      "help": "Output mode: pitch_map (default), stretch_map, or pitch_to_stretch.",
+      "required": false,
+      "source": "src/pvx/cli/hps_pitch_track.py",
+      "tool": "hps_pitch_track.py"
+    },
+    {
+      "action": "",
+      "choices": [
+        "none",
+        "basic",
+        "advanced",
+        "all"
+      ],
+      "default": "all",
+      "flag": "--feature-set",
+      "help": "Feature tracking preset emitted as extra CSV columns. none/basic/advanced/all (default: all).",
       "required": false,
       "source": "src/pvx/cli/hps_pitch_track.py",
       "tool": "hps_pitch_track.py"
@@ -62,6 +87,16 @@
       "default": 256,
       "flag": "--hop-size",
       "help": "Hop size in samples (default: 256)",
+      "required": false,
+      "source": "src/pvx/cli/hps_pitch_track.py",
+      "tool": "hps_pitch_track.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 13,
+      "flag": "--mfcc-count",
+      "help": "Number of MFCC columns (mfcc_01..mfcc_N) when feature-set is advanced/all (default: 13).",
       "required": false,
       "source": "src/pvx/cli/hps_pitch_track.py",
       "tool": "hps_pitch_track.py"
@@ -136,7 +171,27 @@
       "choices": [],
       "default": 1.0,
       "flag": "--stretch",
-      "help": "Emit constant stretch column value (default: 1.0).",
+      "help": "Emit constant stretch column value for --emit pitch_map (default: 1.0).",
+      "required": false,
+      "source": "src/pvx/cli/hps_pitch_track.py",
+      "tool": "hps_pitch_track.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": "pitch_ratio",
+      "flag": "--stretch-from",
+      "help": "Source signal used to derive stretch in stretch-oriented emit modes (default: pitch_ratio).",
+      "required": false,
+      "source": "src/pvx/cli/hps_pitch_track.py",
+      "tool": "hps_pitch_track.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 4.0,
+      "flag": "--stretch-max",
+      "help": "Upper clamp for emitted stretch in stretch-oriented modes (default: 4.0).",
       "required": false,
       "source": "src/pvx/cli/hps_pitch_track.py",
       "tool": "hps_pitch_track.py"
@@ -145,8 +200,52 @@
       "action": "",
       "choices": [],
       "default": 0.25,
+      "flag": "--stretch-min",
+      "help": "Lower clamp for emitted stretch in stretch-oriented modes (default: 0.25).",
+      "required": false,
+      "source": "src/pvx/cli/hps_pitch_track.py",
+      "tool": "hps_pitch_track.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 1.0,
+      "flag": "--stretch-scale",
+      "help": "Scale factor for derived stretch tracks (default: 1.0).",
+      "required": false,
+      "source": "src/pvx/cli/hps_pitch_track.py",
+      "tool": "hps_pitch_track.py"
+    },
+    {
+      "action": "",
+      "choices": [
+        "auto",
+        "pyin",
+        "acf"
+      ],
+      "default": "auto",
+      "flag": "--backend",
+      "help": "Pitch tracker backend",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 0.25,
       "flag": "--chunk-seconds",
       "help": "Chunk/segment duration for `--auto-segment-seconds` (default: 0.25)",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 0.0,
+      "flag": "--confidence-floor",
+      "help": "Minimum tracker confidence",
       "required": false,
       "source": "src/pvx/cli/pvx.py",
       "tool": "pvx.py"
@@ -172,11 +271,80 @@
       "tool": "pvx.py"
     },
     {
-      "action": "store_true",
+      "action": "",
+      "choices": [
+        "pitch_map",
+        "stretch_map",
+        "pitch_to_stretch"
+      ],
+      "default": "pitch_to_stretch",
+      "flag": "--emit",
+      "help": "Control map emit mode for the guide track (default: pitch_to_stretch)",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
       "choices": [],
       "default": null,
       "flag": "--example",
-      "help": "Print a copy-paste chain example and exit",
+      "help": "Print follow example command(s) and exit. Use `--example` for basic or `--example all` for the full set.",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [
+        "none",
+        "basic",
+        "advanced",
+        "all"
+      ],
+      "default": "all",
+      "flag": "--feature-set",
+      "help": "Feature columns emitted by pitch tracker (default: all)",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 1200.0,
+      "flag": "--fmax",
+      "help": "Maximum tracked f0 in Hz",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 50.0,
+      "flag": "--fmin",
+      "help": "Minimum tracked f0 in Hz",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 2048,
+      "flag": "--frame-length",
+      "help": "Tracker frame length in samples",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 256,
+      "flag": "--hop-size",
+      "help": "Tracker hop size in samples",
       "required": false,
       "source": "src/pvx/cli/pvx.py",
       "tool": "pvx.py"
@@ -187,6 +355,16 @@
       "default": null,
       "flag": "--keep-intermediate",
       "help": "Keep intermediate stage files after successful completion",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 13,
+      "flag": "--mfcc-count",
+      "help": "MFCC column count emitted by pitch tracker (default: 13)",
       "required": false,
       "source": "src/pvx/cli/pvx.py",
       "tool": "pvx.py"
@@ -209,7 +387,7 @@
       "choices": [],
       "default": null,
       "flag": "--out",
-      "help": "Final output path (or '-')",
+      "help": "Output audio path",
       "required": true,
       "source": "src/pvx/cli/pvx.py",
       "tool": "pvx.py"
@@ -219,8 +397,18 @@
       "choices": [],
       "default": null,
       "flag": "--output",
-      "help": "Final output path (or '-')",
+      "help": "Output audio path",
       "required": true,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "store_true",
+      "choices": [],
+      "default": null,
+      "flag": "--overwrite",
+      "help": "Overwrite existing output",
+      "required": false,
       "source": "src/pvx/cli/pvx.py",
       "tool": "pvx.py"
     },
@@ -231,6 +419,189 @@
       "flag": "--pipeline",
       "help": "Pipeline string with stages separated by '|'. Example: \"voc --stretch 1.2 | formant --mode preserve\"",
       "required": true,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 0.75,
+      "flag": "--pitch-conf-min",
+      "help": "Minimum accepted map confidence for pvx voc (default: 0.75)",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [
+        "hold",
+        "unity",
+        "interp"
+      ],
+      "default": "hold",
+      "flag": "--pitch-lowconf-mode",
+      "help": "Low-confidence handling mode in pvx voc (default: hold)",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 20.0,
+      "flag": "--pitch-map-crossfade-ms",
+      "help": "Map segment crossfade in pvx voc (milliseconds, default: 20)",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 0.0,
+      "flag": "--pitch-map-smooth-ms",
+      "help": "Additional map smoothing in pvx voc (milliseconds)",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "store_true",
+      "choices": [],
+      "default": null,
+      "flag": "--quiet",
+      "help": "Reduce helper logs and hide progress bars",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 4.0,
+      "flag": "--ratio-max",
+      "help": "Maximum pitch_ratio clamp",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 0.25,
+      "flag": "--ratio-min",
+      "help": "Minimum pitch_ratio clamp",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [
+        "median",
+        "mean",
+        "first",
+        "hz"
+      ],
+      "default": "median",
+      "flag": "--ratio-reference",
+      "help": "Reference mode for pitch_ratio derivation in tracking",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--reference-hz",
+      "help": "Reference Hz when --ratio-reference hz",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "append",
+      "choices": [],
+      "default": [],
+      "flag": "--route",
+      "help": "Optional pvx voc control route expression. Repeat to chain. Example: --route stretch=pitch_ratio --route pitch_ratio=const(1.0)",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "store_true",
+      "choices": [],
+      "default": null,
+      "flag": "--silent",
+      "help": "Suppress helper logs",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 5,
+      "flag": "--smooth-frames",
+      "help": "Smoothing window in frames",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 1.0,
+      "flag": "--stretch",
+      "help": "Constant stretch value when --emit pitch_map",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [
+        "pitch_ratio",
+        "inv_pitch_ratio",
+        "f0_hz"
+      ],
+      "default": "pitch_ratio",
+      "flag": "--stretch-from",
+      "help": "Source for deriving stretch in stretch-oriented emit modes",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 4.0,
+      "flag": "--stretch-max",
+      "help": "Upper clamp for derived stretch",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 0.25,
+      "flag": "--stretch-min",
+      "help": "Lower clamp for derived stretch",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 1.0,
+      "flag": "--stretch-scale",
+      "help": "Scale factor for derived stretch track",
+      "required": false,
       "source": "src/pvx/cli/pvx.py",
       "tool": "pvx.py"
     },
@@ -656,6 +1027,46 @@
     {
       "action": "",
       "choices": [],
+      "default": "linear",
+      "flag": "--blend-mode",
+      "help": "Cross-synthesis blend style. linear/geometric are symmetric blends; carrier_* modes transfer envelope/mask from modulator to carrier.",
+      "required": false,
+      "source": "src/pvx/cli/pvxmorph.py",
+      "tool": "pvxmorph.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 32,
+      "flag": "--envelope-lifter",
+      "help": "Cepstral lifter cutoff for carrier_*_envelope_* modes (default: 32).",
+      "required": false,
+      "source": "src/pvx/cli/pvxmorph.py",
+      "tool": "pvxmorph.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 1.0,
+      "flag": "--mask-exponent",
+      "help": "Exponent used by carrier_*_mask_* modes (default: 1.0).",
+      "required": false,
+      "source": "src/pvx/cli/pvxmorph.py",
+      "tool": "pvxmorph.py"
+    },
+    {
+      "action": "store_true",
+      "choices": [],
+      "default": null,
+      "flag": "--normalize-energy",
+      "help": "Normalize each output channel RMS toward alpha-blended input RMS.",
+      "required": false,
+      "source": "src/pvx/cli/pvxmorph.py",
+      "tool": "pvxmorph.py"
+    },
+    {
+      "action": "",
+      "choices": [],
       "default": null,
       "flag": "--output",
       "help": "Output file path",
@@ -679,6 +1090,16 @@
       "default": null,
       "flag": "--overwrite",
       "help": "",
+      "required": false,
+      "source": "src/pvx/cli/pvxmorph.py",
+      "tool": "pvxmorph.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--phase-mix",
+      "help": "Phase blend in [0,1]. If omitted, mode-specific defaults apply (A-phase for *_phase_a/carrier_a_*, B-phase for *_phase_b/carrier_b_*, alpha for symmetric modes).",
       "required": false,
       "source": "src/pvx/cli/pvxmorph.py",
       "tool": "pvxmorph.py"
@@ -1162,6 +1583,16 @@
       "action": "store_true",
       "choices": [],
       "default": null,
+      "flag": "--control-stdin",
+      "help": "Alias for --pitch-map-stdin (canonical control-bus CSV stdin path).",
+      "required": false,
+      "source": "src/pvx/core/voc.py",
+      "tool": "pvxvoc.py"
+    },
+    {
+      "action": "store_true",
+      "choices": [],
+      "default": null,
       "flag": "--cpu",
       "help": "Alias for --device cpu.",
       "required": false,
@@ -1621,7 +2052,7 @@
       "choices": [],
       "default": 3,
       "flag": "--order",
-      "help": "Polynomial order for --interp polynomial (default: 3).",
+      "help": "Polynomial order for --interp polynomial (default: 3). Accepts any integer >= 1; effective fit degree is min(order, control_points-1).",
       "required": false,
       "source": "src/pvx/core/voc.py",
       "tool": "pvxvoc.py"
@@ -1926,6 +2357,16 @@
       "default": null,
       "flag": "--rms-dbfs",
       "help": "Target RMS dBFS when --normalize rms",
+      "required": false,
+      "source": "src/pvx/core/voc.py",
+      "tool": "pvxvoc.py"
+    },
+    {
+      "action": "append",
+      "choices": [],
+      "default": [],
+      "flag": "--route",
+      "help": "Control-bus routing expression for map rows. Repeat flag to chain routes. Syntax: target=source, target=const(v), target=inv(source), target=pow(source,exp), target=mul(source,factor), target=add(source,offset), target=affine(source,scale,bias), target=clip(source,lo,hi). Targets: stretch,pitch_ratio. Sources: any numeric column present in the control-map CSV.",
       "required": false,
       "source": "src/pvx/core/voc.py",
       "tool": "pvxvoc.py"
@@ -2293,6 +2734,7 @@
     "--auto-transform",
     "--backend",
     "--bit-depth",
+    "--blend-mode",
     "--cents",
     "--checkpoint-dir",
     "--checkpoint-id",
@@ -2313,6 +2755,7 @@
     "--compressor-threshold-db",
     "--confidence-floor",
     "--context-ms",
+    "--control-stdin",
     "--cpu",
     "--crossfade-ms",
     "--cuda-device",
@@ -2324,6 +2767,8 @@
     "--dry-mix",
     "--dry-run",
     "--duration",
+    "--emit",
+    "--envelope-lifter",
     "--example",
     "--expander-attack-ms",
     "--expander-ratio",
@@ -2334,6 +2779,7 @@
     "--extreme-time-stretch",
     "--f0-max",
     "--f0-min",
+    "--feature-set",
     "--floor",
     "--fmax",
     "--fmin",
@@ -2367,8 +2813,10 @@
     "--manifest-append",
     "--manifest-json",
     "--map",
+    "--mask-exponent",
     "--max-stage-stretch",
     "--metadata-policy",
+    "--mfcc-count",
     "--mode",
     "--multires-ffts",
     "--multires-fusion",
@@ -2380,6 +2828,7 @@
     "--noise-file",
     "--noise-seconds",
     "--normalize",
+    "--normalize-energy",
     "--onset-credit-max",
     "--onset-credit-pull",
     "--onset-time-credit",
@@ -2399,6 +2848,7 @@
     "--percussive-stretch",
     "--phase-engine",
     "--phase-locking",
+    "--phase-mix",
     "--phase-random-seed",
     "--pipeline",
     "--pitch",
@@ -2428,6 +2878,7 @@
     "--resume",
     "--rms-dbfs",
     "--root",
+    "--route",
     "--scale",
     "--scale-cents",
     "--semitones",
@@ -2441,7 +2892,11 @@
     "--stereo-mode",
     "--strength",
     "--stretch",
+    "--stretch-from",
+    "--stretch-max",
+    "--stretch-min",
     "--stretch-mode",
+    "--stretch-scale",
     "--subtype",
     "--suffix",
     "--target-duration",

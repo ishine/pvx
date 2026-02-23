@@ -1,13 +1,8 @@
 # pvx Pipeline Cookbook
 
-_Generated from commit `97bcd59` (commit date: 2026-02-20T12:18:46-05:00)._
+_Generated from commit `2d0fab0` (commit date: 2026-02-23T12:29:02-05:00)._
 
 Curated one-line workflows for practical chaining, mastering, microtonal processing, and batch operation.
-
-`uv` usage note:
-- `python3 some_script.py ...` can be run as `uv run python3 some_script.py ...`
-- `python3 -m module.path ...` can be run as `uv run python3 -m module.path ...`
-- wrapper commands such as `python3 pvxvoc.py ...` can be run as `uv run python3 pvxvoc.py ...`
 
 ## Analysis/QA
 
@@ -24,7 +19,7 @@ Why: Collects objective quality indicators for regression tracking.
 ### A/B report generation
 
 ```bash
-python3 scripts_ab_compare.py --input mix.wav --a-args "--time-stretch 1.1 --transform fft" --b-args "--time-stretch 1.1 --transform dct" --out-dir reports/ab --name fft_vs_dct
+python3 scripts/scripts_ab_compare.py --input mix.wav --a-args "--time-stretch 1.1 --transform fft" --b-args "--time-stretch 1.1 --transform dct" --out-dir reports/ab --name fft_vs_dct
 ```
 
 Why: Creates JSON/Markdown objective reports for fast algorithm and parameter comparisons.
@@ -32,7 +27,7 @@ Why: Creates JSON/Markdown objective reports for fast algorithm and parameter co
 ### Benchmark matrix sweep
 
 ```bash
-python3 scripts_benchmark_matrix.py --input mix.wav --transforms fft,dft,dct --windows hann,kaiser --n-ffts 1024,2048 --devices cpu --out-dir reports/bench
+python3 scripts/scripts_benchmark_matrix.py --input mix.wav --transforms fft,dft,dct --windows hann,kaiser --n-ffts 1024,2048 --devices cpu --out-dir reports/bench
 ```
 
 Why: Produces reproducible CSV/JSON runtime matrices across transform/window/FFT combinations.
@@ -40,7 +35,7 @@ Why: Produces reproducible CSV/JSON runtime matrices across transform/window/FFT
 ### Quality regression check
 
 ```bash
-python3 scripts_quality_regression.py --input mix.wav --output out/reg.wav --render-args "--time-stretch 1.2 --transform fft" --baseline-json reports/baseline.json --report-json reports/regression.json
+python3 scripts/scripts_quality_regression.py --input mix.wav --output out/reg.wav --render-args "--time-stretch 1.2 --transform fft" --baseline-json reports/baseline.json --report-json reports/regression.json
 ```
 
 Why: Compares current renders against baseline objective metrics with configurable tolerances.
@@ -170,7 +165,7 @@ Why: Single-pass CLI chain for serial DSP in Unix pipes.
 ### Morph -> formant -> unison
 
 ```bash
-python3 pvxmorph.py a.wav b.wav --blend-mode carrier_a_envelope_b --alpha 0.75 -o - | python3 pvxformant.py - --mode preserve --stdout | python3 pvxunison.py - --voices 5 --detune-cents 8 --output-dir out --suffix _morph_stack
+python3 pvxmorph.py a.wav b.wav -o - | python3 pvxformant.py - --mode preserve --stdout | python3 pvxunison.py - --voices 5 --detune-cents 8 --output-dir out --suffix _morph_stack
 ```
 
 Why: Builds a richer timbre chain with no intermediate files.
@@ -178,22 +173,10 @@ Why: Builds a richer timbre chain with no intermediate files.
 ### Pitch-follow sidechain map (A controls B)
 
 ```bash
-pvx follow A.wav B.wav --emit pitch_to_stretch --pitch-conf-min 0.75 --output output.wav
+python3 HPS-pitch-track.py A.wav | python3 pvxvoc.py B.wav --pitch-follow-stdin --pitch-conf-min 0.75 --pitch-lowconf-mode hold --time-stretch-factor 1.0 --output output.wav
 ```
 
-Why: Runs track+map+apply in one command without long shell pipes.
-
-Advanced manual route (still supported):
-
-```bash
-pvx pitch-track A.wav --output - | pvx voc B.wav --control-stdin --route stretch=pitch_ratio --route pitch_ratio=const(1.0) --pitch-conf-min 0.75 --output output_manual.wav
-```
-
-Feature-vector sidechain (MFCC + MPEG-7-style descriptor):
-
-```bash
-pvx pitch-track A.wav --feature-set all --mfcc-count 13 --output - | pvx voc B.wav --control-stdin --route pitch_ratio=affine(mfcc_01,0.002,1.0) --route pitch_ratio=clip(pitch_ratio,0.5,2.0) --route stretch=affine(mpeg7_spectral_flux,0.05,1.0) --route stretch=clip(stretch,0.85,1.6) --output output_feature_follow.wav
-```
+Why: Tracks F0 contour from source A and applies it as a dynamic pitch-ratio control map on source B.
 
 ## Spatial
 

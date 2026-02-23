@@ -11,13 +11,17 @@ import sys
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT / "src"
 DOCS_DIR = ROOT / "docs"
 ASSETS_DIR = DOCS_DIR / "assets"
 WINDOW_ASSETS_DIR = ASSETS_DIR / "windows"
+INTERPOLATION_ASSETS_DIR = ASSETS_DIR / "interpolation"
+FUNCTION_ASSETS_DIR = ASSETS_DIR / "functions"
 DOCS_DIR.mkdir(parents=True, exist_ok=True)
 WINDOW_ASSETS_DIR.mkdir(parents=True, exist_ok=True)
+INTERPOLATION_ASSETS_DIR.mkdir(parents=True, exist_ok=True)
+FUNCTION_ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 
 sys.path.insert(0, str(SRC_DIR))
 from pvx.core import voc as voc_core  # noqa: E402
@@ -411,6 +415,526 @@ def write_line_svg(path: Path, ys: np.ndarray, *, title: str, y_min: float, y_ma
     path.write_text(svg, encoding="utf-8")
 
 
+def _svg_plot_points(
+    x_vals: np.ndarray,
+    y_vals: np.ndarray,
+    *,
+    width: int,
+    height: int,
+    margin: int,
+    x_min: float,
+    x_max: float,
+    y_min: float,
+    y_max: float,
+) -> str:
+    x_span = max(1e-12, x_max - x_min)
+    y_span = max(1e-12, y_max - y_min)
+    plot_w = max(1, width - 2 * margin)
+    plot_h = max(1, height - 2 * margin)
+    points: list[str] = []
+    for xv, yv in zip(x_vals, y_vals):
+        px = margin + plot_w * ((float(xv) - x_min) / x_span)
+        py = margin + plot_h * (1.0 - ((float(yv) - y_min) / y_span))
+        points.append(f"{px:.2f},{py:.2f}")
+    return " ".join(points)
+
+
+def write_multiline_svg(
+    path: Path,
+    x_vals: np.ndarray,
+    series: list[tuple[str, np.ndarray, str]],
+    *,
+    title: str,
+    x_label: str,
+    y_label: str,
+    y_min: float | None = None,
+    y_max: float | None = None,
+) -> None:
+    width = 980
+    height = 360
+    margin = 42
+    x = np.asarray(x_vals, dtype=np.float64)
+    if x.size < 2:
+        raise ValueError("x_vals must contain at least 2 samples")
+    x_min = float(np.min(x))
+    x_max = float(np.max(x))
+
+    y_arrays = [np.asarray(yv, dtype=np.float64) for _, yv, _ in series]
+    if not y_arrays:
+        raise ValueError("series must not be empty")
+    y_all = np.concatenate(y_arrays)
+    y_lo = float(np.min(y_all)) if y_min is None else float(y_min)
+    y_hi = float(np.max(y_all)) if y_max is None else float(y_max)
+    if y_hi <= y_lo:
+        y_hi = y_lo + 1.0
+
+    plot_lines: list[str] = []
+    legend_items: list[str] = []
+    for idx, (name, y_vals, color) in enumerate(series):
+        y_arr = np.asarray(y_vals, dtype=np.float64)
+        pts = _svg_plot_points(
+            x,
+            y_arr,
+            width=width,
+            height=height,
+            margin=margin,
+            x_min=x_min,
+            x_max=x_max,
+            y_min=y_lo,
+            y_max=y_hi,
+        )
+        plot_lines.append(
+            f"<polyline fill=\"none\" stroke=\"{color}\" stroke-width=\"2\" points=\"{pts}\" />"
+        )
+        legend_x = margin + 14
+        legend_y = margin + 14 + idx * 16
+        legend_items.append(
+            f"<line x1=\"{legend_x:.1f}\" y1=\"{legend_y:.1f}\" x2=\"{legend_x + 22:.1f}\" y2=\"{legend_y:.1f}\" "
+            f"stroke=\"{color}\" stroke-width=\"2\" />"
+            f"<text x=\"{legend_x + 28:.1f}\" y=\"{legend_y + 4:.1f}\" font-family=\"Arial, Helvetica, sans-serif\" "
+            f"font-size=\"11\" fill=\"#243b53\">{name}</text>"
+        )
+
+    svg = f"""<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{width}\" height=\"{height}\" viewBox=\"0 0 {width} {height}\">
+  <rect x=\"0\" y=\"0\" width=\"{width}\" height=\"{height}\" fill=\"#ffffff\" />
+  <rect x=\"{margin}\" y=\"{margin}\" width=\"{width - 2 * margin}\" height=\"{height - 2 * margin}\" fill=\"#f7fbff\" stroke=\"#c8d9e6\" />
+  {' '.join(plot_lines)}
+  {' '.join(legend_items)}
+  <text x=\"{width / 2:.1f}\" y=\"24\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"16\" fill=\"#102a43\">{title}</text>
+  <text x=\"{width / 2:.1f}\" y=\"{height - 8}\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"12\" fill=\"#334e68\">{x_label}</text>
+  <text x=\"14\" y=\"{height / 2:.1f}\" transform=\"rotate(-90 14,{height / 2:.1f})\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"12\" fill=\"#334e68\">{y_label}</text>
+  <text x=\"{margin}\" y=\"{height - margin + 18}\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"11\" fill=\"#486581\">{x_min:.2f}</text>
+  <text x=\"{width - margin}\" y=\"{height - margin + 18}\" text-anchor=\"end\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"11\" fill=\"#486581\">{x_max:.2f}</text>
+  <text x=\"{margin - 6}\" y=\"{margin + 4}\" text-anchor=\"end\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"11\" fill=\"#486581\">{y_hi:.2f}</text>
+  <text x=\"{margin - 6}\" y=\"{height - margin + 4}\" text-anchor=\"end\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"11\" fill=\"#486581\">{y_lo:.2f}</text>
+</svg>
+"""
+    path.write_text(svg, encoding="utf-8")
+
+
+def _compressor_curve_db(x_db: np.ndarray, threshold_db: float, ratio: float) -> np.ndarray:
+    return np.where(x_db <= threshold_db, x_db, threshold_db + (x_db - threshold_db) / ratio)
+
+
+def _expander_curve_db(x_db: np.ndarray, threshold_db: float, ratio: float) -> np.ndarray:
+    return np.where(x_db >= threshold_db, x_db, threshold_db + (x_db - threshold_db) * ratio)
+
+
+def _limiter_curve_db(x_db: np.ndarray, ceiling_db: float) -> np.ndarray:
+    return np.minimum(x_db, ceiling_db)
+
+
+def _softclip_cubic(x: np.ndarray) -> np.ndarray:
+    y = x - (x**3) / 3.0
+    y = np.where(np.abs(x) >= 1.0, np.sign(x) * (2.0 / 3.0), y)
+    return y / (2.0 / 3.0)
+
+
+def generate_function_assets() -> dict[str, object]:
+    palette = ["#005f73", "#0a9396", "#ee9b00", "#ca6702", "#ae2012", "#9b2226", "#3a0ca3", "#4361ee"]
+    entries: list[dict[str, str]] = []
+
+    semitones = np.linspace(-24.0, 24.0, 801, dtype=np.float64)
+    ratio_semitones = np.power(2.0, semitones / 12.0)
+    semitone_path = FUNCTION_ASSETS_DIR / "pitch_ratio_vs_semitones.svg"
+    write_multiline_svg(
+        semitone_path,
+        semitones,
+        [("ratio", ratio_semitones, palette[0])],
+        title="Pitch ratio vs semitone shift",
+        x_label="semitones",
+        y_label="ratio",
+    )
+    entries.append(
+        {
+            "name": "Pitch ratio from semitones",
+            "path": "assets/functions/pitch_ratio_vs_semitones.svg",
+            "usage": "`r = 2^(semitones/12)` conversion used by pitch-shift flags.",
+        }
+    )
+
+    cents = np.linspace(-1200.0, 1200.0, 801, dtype=np.float64)
+    ratio_cents = np.power(2.0, cents / 1200.0)
+    cents_path = FUNCTION_ASSETS_DIR / "pitch_ratio_vs_cents.svg"
+    write_multiline_svg(
+        cents_path,
+        cents,
+        [("ratio", ratio_cents, palette[1])],
+        title="Pitch ratio vs cent shift",
+        x_label="cents",
+        y_label="ratio",
+    )
+    entries.append(
+        {
+            "name": "Pitch ratio from cents",
+            "path": "assets/functions/pitch_ratio_vs_cents.svg",
+            "usage": "`r = 2^(cents/1200)` conversion for microtonal cent controls.",
+        }
+    )
+
+    x_db = np.linspace(-80.0, 0.0, 1201, dtype=np.float64)
+    comp = _compressor_curve_db(x_db, threshold_db=-24.0, ratio=4.0)
+    expd = _expander_curve_db(x_db, threshold_db=-45.0, ratio=2.0)
+    lim = _limiter_curve_db(x_db, ceiling_db=-1.0)
+    dyn_path = FUNCTION_ASSETS_DIR / "dynamics_transfer_curves.svg"
+    write_multiline_svg(
+        dyn_path,
+        x_db,
+        [
+            ("identity", x_db, "#94a3b8"),
+            ("compressor 4:1 @ -24 dB", comp, palette[2]),
+            ("expander 2:1 @ -45 dB", expd, palette[3]),
+            ("limiter ceiling -1 dB", lim, palette[4]),
+        ],
+        title="Dynamics transfer curves (dB in -> dB out)",
+        x_label="input level (dBFS)",
+        y_label="output level (dBFS)",
+    )
+    entries.append(
+        {
+            "name": "Dynamics transfer functions",
+            "path": "assets/functions/dynamics_transfer_curves.svg",
+            "usage": "Compressor/expander/limiter conceptual transfer curves used in mastering stages.",
+        }
+    )
+
+    x_lin = np.linspace(-1.2, 1.2, 1201, dtype=np.float64)
+    drive = 2.5
+    soft_tanh = np.tanh(drive * x_lin) / np.tanh(drive)
+    soft_arctan = np.arctan(drive * x_lin) / np.arctan(drive)
+    soft_cubic = _softclip_cubic(np.clip(x_lin, -1.5, 1.5))
+    softclip_path = FUNCTION_ASSETS_DIR / "softclip_transfer_functions.svg"
+    write_multiline_svg(
+        softclip_path,
+        x_lin,
+        [
+            ("identity", x_lin, "#94a3b8"),
+            ("tanh", soft_tanh, palette[0]),
+            ("arctan", soft_arctan, palette[5]),
+            ("cubic", soft_cubic, palette[6]),
+        ],
+        title="Soft-clip transfer functions (linear amplitude domain)",
+        x_label="input amplitude",
+        y_label="output amplitude",
+        y_min=-1.2,
+        y_max=1.2,
+    )
+    entries.append(
+        {
+            "name": "Soft-clip transfer functions",
+            "path": "assets/functions/softclip_transfer_functions.svg",
+            "usage": "Shows `tanh`, `arctan`, and `cubic` soft clipping behavior.",
+        }
+    )
+
+    alpha = np.linspace(0.0, 1.0, 801, dtype=np.float64)
+    mag_a = 0.20
+    mag_b = 1.00
+    linear_blend = (1.0 - alpha) * mag_a + alpha * mag_b
+    geometric_blend = np.exp((1.0 - alpha) * np.log(mag_a + 1e-12) + alpha * np.log(mag_b + 1e-12))
+    product_target = np.sqrt(max(mag_a * mag_b, 0.0))
+    product_blend = (1.0 - alpha) * mag_a + alpha * product_target
+    max_mag_blend = (1.0 - alpha) * linear_blend + alpha * max(mag_a, mag_b)
+    min_mag_blend = (1.0 - alpha) * linear_blend + alpha * min(mag_a, mag_b)
+    blend_path = FUNCTION_ASSETS_DIR / "morph_blend_magnitude_curves.svg"
+    write_multiline_svg(
+        blend_path,
+        alpha,
+        [
+            ("linear", linear_blend, palette[0]),
+            ("geometric", geometric_blend, palette[1]),
+            ("product", product_blend, palette[2]),
+            ("max_mag", max_mag_blend, palette[3]),
+            ("min_mag", min_mag_blend, palette[4]),
+        ],
+        title="Morph magnitude curves vs alpha (example magnitudes)",
+        x_label="alpha (0=A, 1=B)",
+        y_label="output magnitude",
+    )
+    entries.append(
+        {
+            "name": "Morph blend magnitude curves",
+            "path": "assets/functions/morph_blend_magnitude_curves.svg",
+            "usage": "Compares `linear`, `geometric`, `product`, `max_mag`, and `min_mag` blend behaviors.",
+        }
+    )
+
+    x_mask = np.linspace(0.0, 2.0, 801, dtype=np.float64)
+    mask_curve_p08 = np.power(np.maximum(x_mask, 0.0), 0.8)
+    mask_curve_p10 = np.power(np.maximum(x_mask, 0.0), 1.0)
+    mask_curve_p14 = np.power(np.maximum(x_mask, 0.0), 1.4)
+    mask_path = FUNCTION_ASSETS_DIR / "mask_exponent_curves.svg"
+    write_multiline_svg(
+        mask_path,
+        x_mask,
+        [
+            ("p=0.8", mask_curve_p08, palette[5]),
+            ("p=1.0", mask_curve_p10, palette[0]),
+            ("p=1.4", mask_curve_p14, palette[6]),
+        ],
+        title="Carrier/modulator mask exponent curves",
+        x_label="normalized modulator magnitude",
+        y_label="mask gain",
+    )
+    entries.append(
+        {
+            "name": "Mask exponent response",
+            "path": "assets/functions/mask_exponent_curves.svg",
+            "usage": "Shows how `--mask-exponent` shapes cross-synthesis mask gain.",
+        }
+    )
+
+    phase_a = 0.0
+    phase_b = 1.8
+    phase_mix = alpha
+    z = (1.0 - phase_mix) * np.exp(1j * phase_a) + phase_mix * np.exp(1j * phase_b)
+    phase_angle = np.angle(z)
+    phase_path = FUNCTION_ASSETS_DIR / "phase_mix_angle_curve.svg"
+    write_multiline_svg(
+        phase_path,
+        phase_mix,
+        [("output phase angle", phase_angle, palette[7])],
+        title="Phase mix curve (example phase pair)",
+        x_label="phase mix (0=A phase, 1=B phase)",
+        y_label="output angle (radians)",
+    )
+    entries.append(
+        {
+            "name": "Phase mix to output angle",
+            "path": "assets/functions/phase_mix_angle_curve.svg",
+            "usage": "Example of complex-vector phase blending used by morph phase mix.",
+        }
+    )
+
+    payload: dict[str, object] = {
+        "commit": COMMIT_HASH,
+        "commit_date": COMMIT_DATE,
+        "plots": entries,
+    }
+    (DOCS_DIR / "function_gallery.json").write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return payload
+
+
+def _natural_cubic_spline_eval(x: np.ndarray, y: np.ndarray, xq: np.ndarray) -> np.ndarray:
+    x = np.asarray(x, dtype=np.float64)
+    y = np.asarray(y, dtype=np.float64)
+    xq = np.asarray(xq, dtype=np.float64)
+    n = int(x.size)
+    if n < 3:
+        return np.interp(xq, x, y)
+
+    h = np.diff(x)
+    if np.any(h <= 0.0):
+        return np.interp(xq, x, y)
+
+    a = h[:-1].copy()
+    b = 2.0 * (h[:-1] + h[1:])
+    c = h[1:].copy()
+    d = 6.0 * ((y[2:] - y[1:-1]) / h[1:] - (y[1:-1] - y[:-2]) / h[:-1])
+
+    c_prime = np.zeros_like(c)
+    d_prime = np.zeros_like(d)
+    if b.size:
+        c_prime[0] = c[0] / b[0] if c.size else 0.0
+        d_prime[0] = d[0] / b[0]
+        for i in range(1, d.size):
+            denom = b[i] - a[i - 1] * c_prime[i - 1]
+            if abs(denom) < 1e-12:
+                return np.interp(xq, x, y)
+            c_prime[i] = c[i] / denom if i < c.size else 0.0
+            d_prime[i] = (d[i] - a[i - 1] * d_prime[i - 1]) / denom
+
+    second = np.zeros(n, dtype=np.float64)
+    if d.size:
+        second[-2] = d_prime[-1]
+        for i in range(d.size - 2, -1, -1):
+            second[i + 1] = d_prime[i] - c_prime[i] * second[i + 2]
+
+    idx = np.searchsorted(x, xq, side="right") - 1
+    idx = np.clip(idx, 0, n - 2)
+    x0 = x[idx]
+    x1 = x[idx + 1]
+    y0 = y[idx]
+    y1 = y[idx + 1]
+    m0 = second[idx]
+    m1 = second[idx + 1]
+    hseg = x1 - x0
+    hseg = np.where(hseg <= 0.0, 1.0, hseg)
+
+    t0 = x1 - xq
+    t1 = xq - x0
+    yq = (
+        (m0 * t0**3 + m1 * t1**3) / (6.0 * hseg)
+        + (y0 - (m0 * hseg**2) / 6.0) * (t0 / hseg)
+        + (y1 - (m1 * hseg**2) / 6.0) * (t1 / hseg)
+    )
+    return yq
+
+
+def _sample_interpolation_curve(
+    mode: str,
+    x_control: np.ndarray,
+    y_control: np.ndarray,
+    x_query: np.ndarray,
+    *,
+    order: int = 3,
+) -> np.ndarray:
+    mode_key = str(mode).strip().lower()
+    if mode_key == "none":
+        idx = np.searchsorted(x_control, x_query, side="right") - 1
+        idx = np.clip(idx, 0, x_control.size - 1)
+        return y_control[idx]
+    if mode_key == "nearest":
+        idx_r = np.searchsorted(x_control, x_query, side="left")
+        idx_l = np.clip(idx_r - 1, 0, x_control.size - 1)
+        idx_r = np.clip(idx_r, 0, x_control.size - 1)
+        dl = np.abs(x_query - x_control[idx_l])
+        dr = np.abs(x_control[idx_r] - x_query)
+        use_left = dl <= dr
+        idx = np.where(use_left, idx_l, idx_r)
+        return y_control[idx]
+    if mode_key == "linear":
+        return np.interp(x_query, x_control, y_control)
+    if mode_key == "cubic":
+        return _natural_cubic_spline_eval(x_control, y_control, x_query)
+    if mode_key == "polynomial":
+        degree = min(max(1, int(order)), x_control.size - 1)
+        coeffs = np.polyfit(x_control, y_control, deg=degree)
+        return np.polyval(coeffs, x_query)
+    raise ValueError(f"Unsupported interpolation mode: {mode}")
+
+
+def _render_interpolation_svg(
+    path: Path,
+    x_dense: np.ndarray,
+    y_dense: np.ndarray,
+    x_control: np.ndarray,
+    y_control: np.ndarray,
+    *,
+    title: str,
+    y_min: float,
+    y_max: float,
+) -> None:
+    width = 840
+    height = 320
+    margin = 36
+    plot_w = max(1, width - 2 * margin)
+    plot_h = max(1, height - 2 * margin)
+    y_span = max(1e-9, y_max - y_min)
+
+    def to_xy(xv: float, yv: float) -> tuple[float, float]:
+        px = margin + plot_w * float(xv)
+        py = margin + plot_h * (1.0 - ((float(yv) - y_min) / y_span))
+        return px, py
+
+    dense_points: list[str] = []
+    for xv, yv in zip(x_dense, y_dense):
+        px, py = to_xy(float(xv), float(yv))
+        dense_points.append(f"{px:.2f},{py:.2f}")
+
+    ctrl_points: list[str] = []
+    circles: list[str] = []
+    for idx, (xv, yv) in enumerate(zip(x_control, y_control)):
+        px, py = to_xy(float(xv), float(yv))
+        ctrl_points.append(f"{px:.2f},{py:.2f}")
+        circles.append(
+            f"<circle cx=\"{px:.2f}\" cy=\"{py:.2f}\" r=\"3.2\" fill=\"#b42318\" />"
+            f"<text x=\"{px + 4:.2f}\" y=\"{py - 6:.2f}\" font-family=\"Arial, Helvetica, sans-serif\" "
+            f"font-size=\"10\" fill=\"#7a271a\">p{idx}</text>"
+        )
+
+    svg = f"""<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{width}\" height=\"{height}\" viewBox=\"0 0 {width} {height}\">
+  <rect x=\"0\" y=\"0\" width=\"{width}\" height=\"{height}\" fill=\"#ffffff\" />
+  <rect x=\"{margin}\" y=\"{margin}\" width=\"{width - 2 * margin}\" height=\"{height - 2 * margin}\" fill=\"#f7fbff\" stroke=\"#c8d9e6\" />
+  <polyline fill=\"none\" stroke=\"#8f1d2c\" stroke-width=\"1.5\" stroke-dasharray=\"5 3\" points=\"{' '.join(ctrl_points)}\" />
+  <polyline fill=\"none\" stroke=\"#005f73\" stroke-width=\"2\" points=\"{' '.join(dense_points)}\" />
+  {''.join(circles)}
+  <text x=\"{width / 2:.1f}\" y=\"22\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"15\" fill=\"#102a43\">{title}</text>
+  <text x=\"{width / 2:.1f}\" y=\"{height - 8}\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"12\" fill=\"#334e68\">normalized control time</text>
+  <text x=\"14\" y=\"{height / 2:.1f}\" transform=\"rotate(-90 14,{height / 2:.1f})\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"12\" fill=\"#334e68\">control value</text>
+  <text x=\"{margin}\" y=\"{height - margin + 18}\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"11\" fill=\"#486581\">0</text>
+  <text x=\"{width - margin}\" y=\"{height - margin + 18}\" text-anchor=\"end\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"11\" fill=\"#486581\">1</text>
+  <text x=\"{margin - 6}\" y=\"{margin + 4}\" text-anchor=\"end\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"11\" fill=\"#486581\">{y_max:.2f}</text>
+  <text x=\"{margin - 6}\" y=\"{height - margin + 4}\" text-anchor=\"end\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"11\" fill=\"#486581\">{y_min:.2f}</text>
+</svg>
+"""
+    path.write_text(svg, encoding="utf-8")
+
+
+def generate_interpolation_assets() -> dict[str, object]:
+    x_control = np.asarray([0.0, 0.16, 0.39, 0.63, 0.82, 1.0], dtype=np.float64)
+    y_control = np.asarray([1.00, 1.48, 0.82, 1.56, 1.18, 1.34], dtype=np.float64)
+    x_dense = np.linspace(0.0, 1.0, 1200, dtype=np.float64)
+
+    specs: list[tuple[str, str, int | None]] = [
+        ("none", "none (stairstep)", None),
+        ("nearest", "nearest", None),
+        ("linear", "linear", None),
+        ("cubic", "cubic", None),
+        ("polynomial", "polynomial order 1", 1),
+        ("polynomial", "polynomial order 2", 2),
+        ("polynomial", "polynomial order 3", 3),
+        ("polynomial", "polynomial order 5", 5),
+    ]
+
+    curves: list[tuple[str, np.ndarray, str, int | None]] = []
+    for mode, label, order in specs:
+        sampled = _sample_interpolation_curve(mode, x_control, y_control, x_dense, order=order or 3)
+        curves.append((mode, sampled, label, order))
+
+    y_stack = np.concatenate([y_control, *(curve for _, curve, _, _ in curves)])
+    y_min = float(np.min(y_stack))
+    y_max = float(np.max(y_stack))
+    pad = max(0.05, 0.08 * (y_max - y_min))
+    y_min -= pad
+    y_max += pad
+
+    plot_entries: list[dict[str, object]] = []
+    for mode, sampled, label, order in curves:
+        file_name = (
+            f"interp_{mode}_order_{int(order)}.svg"
+            if order is not None
+            else f"interp_{mode}.svg"
+        )
+        out_path = INTERPOLATION_ASSETS_DIR / file_name
+        _render_interpolation_svg(
+            out_path,
+            x_dense,
+            sampled,
+            x_control,
+            y_control,
+            title=f"{label} interpolation",
+            y_min=y_min,
+            y_max=y_max,
+        )
+        plot_entries.append(
+            {
+                "mode": mode,
+                "label": label,
+                "order": order,
+                "path": f"assets/interpolation/{file_name}",
+            }
+        )
+
+    payload: dict[str, object] = {
+        "commit": COMMIT_HASH,
+        "commit_date": COMMIT_DATE,
+        "control_points": [
+            {"time_sec": float(tx), "value": float(vx)}
+            for tx, vx in zip(x_control, y_control)
+        ],
+        "plots": plot_entries,
+    }
+    (DOCS_DIR / "interpolation_gallery.json").write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return payload
+
+
 def generate_window_assets_and_metrics(entries: list[dict[str, str]]) -> dict[str, dict[str, float | str]]:
     metrics_by_name: dict[str, dict[str, float | str]] = {}
     for entry in entries:
@@ -467,7 +991,7 @@ def generate_window_assets_and_metrics(entries: list[dict[str, str]]) -> dict[st
     return metrics_by_name
 
 
-def write_math_foundations() -> None:
+def write_math_foundations(interpolation_gallery: dict[str, object], function_gallery: dict[str, object]) -> None:
     lines: list[str] = []
     lines.append("# pvx Mathematical Foundations")
     lines.append("")
@@ -589,7 +1113,42 @@ def write_math_foundations() -> None:
     lines.append("")
     lines.append("Plain English: semitone and cent controls map to the same multiplicative ratio.")
     lines.append("")
-    lines.append("## 5. Microtonal Retune Mapping")
+    lines.append("## 5. Dynamic Control Interpolation (CSV/JSON)")
+    lines.append("")
+    lines.append("When a numeric flag receives a CSV/JSON control track, pvx samples a control function $u(t)$ over render time.")
+    lines.append("")
+    lines.append("Polynomial mode fits a global polynomial of degree $d$:")
+    lines.append("")
+    lines.append("$$")
+    lines.append("u(t)=\\sum_{i=0}^{d} a_i t^i,\\qquad d=\\min(\\texttt{order}, M-1)")
+    lines.append("$$")
+    lines.append("")
+    lines.append("where $M$ is the number of control points. In command-line interface (CLI) usage, `--order` accepts any integer $\\ge 1$.")
+    lines.append("The effective degree is automatically capped to avoid over-specification when there are too few points.")
+    lines.append("")
+    lines.append("Nearest/linear/cubic are local interpolation modes; `none` is sample-and-hold (stairstep).")
+    lines.append("")
+    lines.append("| Interpolation mode | CLI form | Example plot |")
+    lines.append("| --- | --- | --- |")
+    plots = interpolation_gallery.get("plots", []) if isinstance(interpolation_gallery, dict) else []
+    for plot in plots:
+        if not isinstance(plot, dict):
+            continue
+        label = str(plot.get("label", plot.get("mode", "unknown")))
+        mode = str(plot.get("mode", "unknown"))
+        order = plot.get("order")
+        if order is None:
+            cli = f"`--interp {mode}`"
+        else:
+            cli = f"`--interp {mode} --order {int(order)}`"
+        path = str(plot.get("path", "")).strip()
+        if path:
+            plot_cell = f"![{label}]({path})"
+        else:
+            plot_cell = "n/a"
+        lines.append(f"| {label} | {cli} | {plot_cell} |")
+    lines.append("")
+    lines.append("## 6. Microtonal Retune Mapping")
     lines.append("")
     lines.append("For a detected frequency $f$, pvx scale-aware retuning chooses the nearest permitted scale target $f_{\\text{scale}}$ and applies:")
     lines.append("")
@@ -599,7 +1158,7 @@ def write_math_foundations() -> None:
     lines.append("")
     lines.append("Plain English: each frame is shifted only as much as needed to land on the selected microtonal scale degree.")
     lines.append("")
-    lines.append("## 6. Loudness and Dynamics")
+    lines.append("## 7. Loudness and Dynamics")
     lines.append("")
     lines.append("LUFS target gain:")
     lines.append("")
@@ -618,7 +1177,7 @@ def write_math_foundations() -> None:
     lines.append("")
     lines.append("Plain English: level is reduced above threshold $T$ by ratio $R$, then makeup/loudness stages may be applied.")
     lines.append("")
-    lines.append("## 7. Spatial Coherence and Channel Alignment")
+    lines.append("## 8. Spatial Coherence and Channel Alignment")
     lines.append("")
     lines.append("Inter-channel phase difference:")
     lines.append("")
@@ -639,6 +1198,22 @@ def write_math_foundations() -> None:
     lines.append("$$")
     lines.append("")
     lines.append("Plain English: pvx spatial modules prioritize channel coherence, stable image cues, and robust delay alignment for multichannel processing chains.")
+    lines.append("")
+    lines.append("## 9. Function Graph Gallery")
+    lines.append("")
+    lines.append("The plots below visualize core transfer functions and parameter curves used across pvx processing modules.")
+    lines.append("")
+    lines.append("| Function family | Plot | Why this matters |")
+    lines.append("| --- | --- | --- |")
+    function_plots = function_gallery.get("plots", []) if isinstance(function_gallery, dict) else []
+    for plot in function_plots:
+        if not isinstance(plot, dict):
+            continue
+        name = str(plot.get("name", "Function"))
+        path = str(plot.get("path", "")).strip()
+        usage = str(plot.get("usage", ""))
+        image_cell = f"![{name}]({path})" if path else "n/a"
+        lines.append(f"| {name} | {image_cell} | {usage} |")
     lines.append("")
     (DOCS_DIR / "MATHEMATICAL_FOUNDATIONS.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
 
@@ -814,7 +1389,9 @@ def write_window_reference() -> None:
 
 
 def main() -> int:
-    write_math_foundations()
+    interpolation_gallery = generate_interpolation_assets()
+    function_gallery = generate_function_assets()
+    write_math_foundations(interpolation_gallery, function_gallery)
     write_window_reference()
     return 0
 

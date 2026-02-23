@@ -1,6 +1,6 @@
 # pvx Benchmarks
 
-_Generated from commit `97bcd59` (commit date: 2026-02-20T12:18:46-05:00)._
+_Generated from commit `2d0fab0` (commit date: 2026-02-23T12:29:02-05:00)._
 
 Reproducible benchmark summary for core short-time Fourier transform/inverse short-time Fourier transform (STFT/ISTFT) path across central processing unit/Compute Unified Device Architecture/Apple-Silicon-native contexts.
 
@@ -11,15 +11,6 @@ python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install -e .
 pvx --help
-```
-
-`uv` equivalent:
-
-```bash
-uv venv .venv
-source .venv/bin/activate
-uv pip install -e .
-uv run pvx --help
 ```
 
 If `pvx` is not found, add the virtualenv binaries to your shell path (`zsh`):
@@ -33,13 +24,7 @@ pvx --help
 ## Reproduce
 
 ```bash
-python3 scripts_generate_docs_extras.py --run-benchmarks
-```
-
-`uv` equivalent:
-
-```bash
-uv run python3 scripts_generate_docs_extras.py --run-benchmarks
+python3 scripts/scripts_generate_docs_extras.py --run-benchmarks
 ```
 
 ## Benchmark Spec

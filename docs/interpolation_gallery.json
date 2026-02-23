@@ -1,0 +1,80 @@
+{
+  "commit": "2d0fab0",
+  "commit_date": "2026-02-23T12:29:02-05:00",
+  "control_points": [
+    {
+      "time_sec": 0.0,
+      "value": 1.0
+    },
+    {
+      "time_sec": 0.16,
+      "value": 1.48
+    },
+    {
+      "time_sec": 0.39,
+      "value": 0.82
+    },
+    {
+      "time_sec": 0.63,
+      "value": 1.56
+    },
+    {
+      "time_sec": 0.82,
+      "value": 1.18
+    },
+    {
+      "time_sec": 1.0,
+      "value": 1.34
+    }
+  ],
+  "plots": [
+    {
+      "label": "none (stairstep)",
+      "mode": "none",
+      "order": null,
+      "path": "assets/interpolation/interp_none.svg"
+    },
+    {
+      "label": "nearest",
+      "mode": "nearest",
+      "order": null,
+      "path": "assets/interpolation/interp_nearest.svg"
+    },
+    {
+      "label": "linear",
+      "mode": "linear",
+      "order": null,
+      "path": "assets/interpolation/interp_linear.svg"
+    },
+    {
+      "label": "cubic",
+      "mode": "cubic",
+      "order": null,
+      "path": "assets/interpolation/interp_cubic.svg"
+    },
+    {
+      "label": "polynomial order 1",
+      "mode": "polynomial",
+      "order": 1,
+      "path": "assets/interpolation/interp_polynomial_order_1.svg"
+    },
+    {
+      "label": "polynomial order 2",
+      "mode": "polynomial",
+      "order": 2,
+      "path": "assets/interpolation/interp_polynomial_order_2.svg"
+    },
+    {
+      "label": "polynomial order 3",
+      "mode": "polynomial",
+      "order": 3,
+      "path": "assets/interpolation/interp_polynomial_order_3.svg"
+    },
+    {
+      "label": "polynomial order 5",
+      "mode": "polynomial",
+      "order": 5,
+      "path": "assets/interpolation/interp_polynomial_order_5.svg"
+    }
+  ]
+}

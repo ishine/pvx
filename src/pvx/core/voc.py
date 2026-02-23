@@ -5474,7 +5474,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--order",
         type=int,
         default=3,
-        help="Polynomial order for --interp polynomial (default: 3).",
+        help=(
+            "Polynomial order for --interp polynomial (default: 3). "
+            "Accepts any integer >= 1; effective fit degree is min(order, control_points-1)."
+        ),
     )
 
     transient_group = parser.add_argument_group("Transients")

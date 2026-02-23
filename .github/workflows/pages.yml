@@ -34,10 +34,10 @@ jobs:
 
       - name: Build documentation
         run: |
-          python scripts_generate_python_docs.py
-          python scripts_generate_theory_docs.py
-          python scripts_generate_docs_extras.py
-          python scripts_generate_html_docs.py
+          python scripts/scripts_generate_python_docs.py
+          python scripts/scripts_generate_theory_docs.py
+          python scripts/scripts_generate_docs_extras.py
+          python scripts/scripts_generate_html_docs.py
           touch docs/.nojekyll
 
       - name: Setup Pages

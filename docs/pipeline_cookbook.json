@@ -1,6 +1,6 @@
 {
-  "commit": "97bcd59",
-  "commit_date": "2026-02-20T12:18:46-05:00",
+  "commit": "2d0fab0",
+  "commit_date": "2026-02-23T12:29:02-05:00",
   "recipes": [
     {
       "category": "Phase-vocoder core",
@@ -142,19 +142,19 @@
     },
     {
       "category": "Automation",
-      "command": "python3 scripts_ab_compare.py --input mix.wav --a-args \"--time-stretch 1.1 --transform fft\" --b-args \"--time-stretch 1.1 --transform dct\" --out-dir reports/ab --name fft_vs_dct",
+      "command": "python3 scripts/scripts_ab_compare.py --input mix.wav --a-args \"--time-stretch 1.1 --transform fft\" --b-args \"--time-stretch 1.1 --transform dct\" --out-dir reports/ab --name fft_vs_dct",
       "title": "A/B report generation",
       "why": "Creates JSON/Markdown objective reports for fast algorithm and parameter comparisons."
     },
     {
       "category": "Automation",
-      "command": "python3 scripts_benchmark_matrix.py --input mix.wav --transforms fft,dft,dct --windows hann,kaiser --n-ffts 1024,2048 --devices cpu --out-dir reports/bench",
+      "command": "python3 scripts/scripts_benchmark_matrix.py --input mix.wav --transforms fft,dft,dct --windows hann,kaiser --n-ffts 1024,2048 --devices cpu --out-dir reports/bench",
       "title": "Benchmark matrix sweep",
       "why": "Produces reproducible CSV/JSON runtime matrices across transform/window/FFT combinations."
     },
     {
       "category": "Automation",
-      "command": "python3 scripts_quality_regression.py --input mix.wav --output out/reg.wav --render-args \"--time-stretch 1.2 --transform fft\" --baseline-json reports/baseline.json --report-json reports/regression.json",
+      "command": "python3 scripts/scripts_quality_regression.py --input mix.wav --output out/reg.wav --render-args \"--time-stretch 1.2 --transform fft\" --baseline-json reports/baseline.json --report-json reports/regression.json",
       "title": "Quality regression check",
       "why": "Compares current renders against baseline objective metrics with configurable tolerances."
     },

@@ -1,4 +1,4 @@
-"""Tests for scripts_generate_docs_pdf.py helpers."""
+"""Tests for scripts/scripts_generate_docs_pdf.py helpers."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-import scripts_generate_docs_pdf as pdfgen
+from scripts import scripts_generate_docs_pdf as pdfgen
 
 
 class TestDocsPdfHelpers(unittest.TestCase):

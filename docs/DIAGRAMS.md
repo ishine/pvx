@@ -162,6 +162,33 @@ flowchart TD
     G --> H["Assembled output"]
 ```
 
+## 8.1) Control-Rate Interpolation Graph Examples
+
+The same control points produce different trajectories depending on `--interp` and `--order`.
+
+| Mode/order | Graph |
+| --- | --- |
+| `none` | ![none interpolation](assets/interpolation/interp_none.svg) |
+| `nearest` | ![nearest interpolation](assets/interpolation/interp_nearest.svg) |
+| `linear` | ![linear interpolation](assets/interpolation/interp_linear.svg) |
+| `cubic` | ![cubic interpolation](assets/interpolation/interp_cubic.svg) |
+| `polynomial --order 1` | ![polynomial order 1](assets/interpolation/interp_polynomial_order_1.svg) |
+| `polynomial --order 2` | ![polynomial order 2](assets/interpolation/interp_polynomial_order_2.svg) |
+| `polynomial --order 3` | ![polynomial order 3](assets/interpolation/interp_polynomial_order_3.svg) |
+| `polynomial --order 5` | ![polynomial order 5](assets/interpolation/interp_polynomial_order_5.svg) |
+
+## 8.2) Function Graph Gallery
+
+| Function family | Graph |
+| --- | --- |
+| Pitch ratio vs semitones | ![pitch ratio vs semitones](assets/functions/pitch_ratio_vs_semitones.svg) |
+| Pitch ratio vs cents | ![pitch ratio vs cents](assets/functions/pitch_ratio_vs_cents.svg) |
+| Dynamics transfer curves | ![dynamics transfer curves](assets/functions/dynamics_transfer_curves.svg) |
+| Soft clip transfer functions | ![softclip transfer](assets/functions/softclip_transfer_functions.svg) |
+| Morph blend magnitude curves | ![morph blend magnitude curves](assets/functions/morph_blend_magnitude_curves.svg) |
+| Mask exponent response | ![mask exponent response](assets/functions/mask_exponent_curves.svg) |
+| Phase mix curve | ![phase mix curve](assets/functions/phase_mix_angle_curve.svg) |
+
 ## 9) Extreme Stretch: Multistage Strategy
 
 ```mermaid
@@ -411,9 +438,9 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    A["docs/*.md"] --> B["scripts_generate_html_docs.py"]
+    A["docs/*.md"] --> B["scripts/scripts_generate_html_docs.py"]
     B --> C["docs/html/*.html"]
-    C --> D["scripts_generate_docs_pdf.py"]
+    C --> D["scripts/scripts_generate_docs_pdf.py"]
     D --> E["docs/pvx_documentation.pdf"]
 ```
 

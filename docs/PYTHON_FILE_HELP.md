@@ -2,7 +2,7 @@
 
 Comprehensive reference for every Python file in this repository.
 
-Total Python files documented: **204**
+Total Python files documented: **207**
 
 ## Contents
 
@@ -29,14 +29,14 @@ Total Python files documented: **204**
 - [`pvxunison.py`](#pvxunisonpy)
 - [`pvxvoc.py`](#pvxvocpy)
 - [`pvxwarp.py`](#pvxwarppy)
-- [`scripts_ab_compare.py`](#scriptsabcomparepy)
-- [`scripts_benchmark_matrix.py`](#scriptsbenchmarkmatrixpy)
-- [`scripts_generate_docs_extras.py`](#scriptsgeneratedocsextraspy)
-- [`scripts_generate_docs_pdf.py`](#scriptsgeneratedocspdfpy)
-- [`scripts_generate_html_docs.py`](#scriptsgeneratehtmldocspy)
-- [`scripts_generate_python_docs.py`](#scriptsgeneratepythondocspy)
-- [`scripts_generate_theory_docs.py`](#scriptsgeneratetheorydocspy)
-- [`scripts_quality_regression.py`](#scriptsqualityregressionpy)
+- [`scripts/scripts_ab_compare.py`](#scriptsscriptsabcomparepy)
+- [`scripts/scripts_benchmark_matrix.py`](#scriptsscriptsbenchmarkmatrixpy)
+- [`scripts/scripts_generate_docs_extras.py`](#scriptsscriptsgeneratedocsextraspy)
+- [`scripts/scripts_generate_docs_pdf.py`](#scriptsscriptsgeneratedocspdfpy)
+- [`scripts/scripts_generate_html_docs.py`](#scriptsscriptsgeneratehtmldocspy)
+- [`scripts/scripts_generate_python_docs.py`](#scriptsscriptsgeneratepythondocspy)
+- [`scripts/scripts_generate_theory_docs.py`](#scriptsscriptsgeneratetheorydocspy)
+- [`scripts/scripts_quality_regression.py`](#scriptsscriptsqualityregressionpy)
 - [`src/pvx/__init__.py`](#srcpvxinitpy)
 - [`src/pvx/algorithms/__init__.py`](#srcpvxalgorithmsinitpy)
 - [`src/pvx/algorithms/analysis_qa_and_automation/__init__.py`](#srcpvxalgorithmsanalysisqaandautomationinitpy)
@@ -187,6 +187,8 @@ Total Python files documented: **204**
 - [`src/pvx/core/__init__.py`](#srcpvxcoreinitpy)
 - [`src/pvx/core/audio_metrics.py`](#srcpvxcoreaudiometricspy)
 - [`src/pvx/core/common.py`](#srcpvxcorecommonpy)
+- [`src/pvx/core/control_bus.py`](#srcpvxcorecontrolbuspy)
+- [`src/pvx/core/feature_tracking.py`](#srcpvxcorefeaturetrackingpy)
 - [`src/pvx/core/output_policy.py`](#srcpvxcoreoutputpolicypy)
 - [`src/pvx/core/presets.py`](#srcpvxcorepresetspy)
 - [`src/pvx/core/stereo.py`](#srcpvxcorestereopy)
@@ -204,6 +206,7 @@ Total Python files documented: **204**
 - [`tests/test_benchmark_metrics.py`](#teststestbenchmarkmetricspy)
 - [`tests/test_benchmark_runner.py`](#teststestbenchmarkrunnerpy)
 - [`tests/test_cli_regression.py`](#teststestcliregressionpy)
+- [`tests/test_control_bus.py`](#teststestcontrolbuspy)
 - [`tests/test_docs_coverage.py`](#teststestdocscoveragepy)
 - [`tests/test_docs_pdf.py`](#teststestdocspdfpy)
 - [`tests/test_dsp.py`](#teststestdsppy)
@@ -231,7 +234,13 @@ usage: HPS-pitch-track.py [-h] [--output OUTPUT] [--backend {auto,pyin,acf}]
                           [--ratio-min RATIO_MIN] [--ratio-max RATIO_MAX]
                           [--smooth-frames SMOOTH_FRAMES]
                           [--confidence-floor CONFIDENCE_FLOOR]
-                          [--stretch STRETCH]
+                          [--emit {pitch_map,stretch_map,pitch_to_stretch}]
+                          [--stretch-from {pitch_ratio,inv_pitch_ratio,f0_hz}]
+                          [--stretch-scale STRETCH_SCALE]
+                          [--stretch-min STRETCH_MIN]
+                          [--stretch-max STRETCH_MAX] [--stretch STRETCH]
+                          [--feature-set {none,basic,advanced,all}]
+                          [--mfcc-count MFCC_COUNT]
                           [--verbosity {silent,quiet,normal,verbose,debug}]
                           [-v] [--quiet] [--silent]
                           input
@@ -263,7 +272,21 @@ options:
                         Smoothing window for pitch_ratio frames (default: 5).
   --confidence-floor CONFIDENCE_FLOOR
                         Set confidence below this floor to 0.0 (default: 0.0).
-  --stretch STRETCH     Emit constant stretch column value (default: 1.0).
+  --emit {pitch_map,stretch_map,pitch_to_stretch}
+                        Output mode: pitch_map (default), stretch_map, or pitch_to_stretch.
+  --stretch-from {pitch_ratio,inv_pitch_ratio,f0_hz}
+                        Source signal used to derive stretch in stretch-oriented emit modes (default: pitch_ratio).
+  --stretch-scale STRETCH_SCALE
+                        Scale factor for derived stretch tracks (default: 1.0).
+  --stretch-min STRETCH_MIN
+                        Lower clamp for emitted stretch in stretch-oriented modes (default: 0.25).
+  --stretch-max STRETCH_MAX
+                        Upper clamp for emitted stretch in stretch-oriented modes (default: 4.0).
+  --stretch STRETCH     Emit constant stretch column value for --emit pitch_map (default: 1.0).
+  --feature-set {none,basic,advanced,all}
+                        Feature tracking preset emitted as extra CSV columns. none/basic/advanced/all (default: all).
+  --mfcc-count MFCC_COUNT
+                        Number of MFCC columns (mfcc_01..mfcc_N) when feature-set is advanced/all (default: 13).
   --verbosity {silent,quiet,normal,verbose,debug}
                         Console verbosity level
   -v, --verbose         Increase verbosity (repeat for extra detail)
@@ -273,10 +296,10 @@ options:
 Examples:
   pvx pitch-track guide.wav --output guide_pitch.csv
   pvx pitch-track guide.wav --backend pyin --ratio-reference hz --reference-hz 440 --output guide_to_a440.csv
-  pvx pitch-track guide.wav --output - | pvx voc target.wav --pitch-map-stdin --output followed.wav
+  pvx pitch-track guide.wav --emit pitch_to_stretch --output - | pvx voc target.wav --control-stdin --output followed.wav
 
 Notes:
-  - Default output columns: start_sec,end_sec,stretch,pitch_ratio,confidence.
+  - Default output columns include control map fields and feature tracks (for example: rms_db, spectral_flux, voicing_prob, MFCCs, MPEG-7-style descriptors).
   - Use --confidence-floor to gate unreliable pitch estimates.
 ```
 
@@ -354,6 +377,7 @@ options:
 Quick start:
   pvx voc input.wav --stretch 1.2 --output output.wav
   pvx input.wav --stretch 1.2 --output output.wav   # defaults to `voc`
+  pvx follow guide.wav target.wav --output followed.wav --emit pitch_to_stretch
   pvx chain input.wav --pipeline "voc --stretch 1.2 | formant --mode preserve" --output out.wav
   pvx stream input.wav --output out.wav --chunk-seconds 0.2 --time-stretch 2.0
   pvx list
@@ -1172,9 +1196,12 @@ src-layout migration.
 
 ```text
 usage: pvxmorph.py [-h] [-o OUTPUT] [--stdout] [--output-format OUTPUT_FORMAT]
-                   [--alpha ALPHA] [--normalize {none,peak,rms}]
-                   [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
-                   [--target-lufs TARGET_LUFS]
+                   [--alpha ALPHA]
+                   [--blend-mode {linear,geometric,magnitude_b_phase_a,magnitude_a_phase_b,carrier_a_envelope_b,carrier_b_envelope_a,carrier_a_mask_b,carrier_b_mask_a,product,max_mag,min_mag}]
+                   [--phase-mix PHASE_MIX] [--mask-exponent MASK_EXPONENT]
+                   [--envelope-lifter ENVELOPE_LIFTER] [--normalize-energy]
+                   [--normalize {none,peak,rms}] [--peak-dbfs PEAK_DBFS]
+                   [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
                    [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
                    [--compressor-ratio COMPRESSOR_RATIO]
                    [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
@@ -1228,31 +1255,15 @@ options:
   --output-format OUTPUT_FORMAT
                         Output extension/format; for --stdout defaults to wav
   --alpha ALPHA         Morph amount 0..1 (0=A, 1=B)
-  --normalize {none,peak,rms}
-                        Output normalization mode
-  --peak-dbfs PEAK_DBFS
-                        Target peak dBFS when --normalize peak
-  --rms-dbfs RMS_DBFS   Target RMS dBFS when --normalize rms
-  --target-lufs TARGET_LUFS
-                        Integrated loudness target in LUFS
-  --compressor-threshold-db COMPRESSOR_THRESHOLD_DB
-                        Enable compressor above threshold dBFS
-  --compressor-ratio COMPRESSOR_RATIO
-                        Compressor ratio (>=1)
-  --compressor-attack-ms COMPRESSOR_ATTACK_MS
-                        Compressor attack time in ms
-  --compressor-release-ms COMPRESSOR_RELEASE_MS
-                        Compressor release time in ms
-  --compressor-makeup-db COMPRESSOR_MAKEUP_DB
-                        Compressor makeup gain in dB
-  --expander-threshold-db EXPANDER_THRESHOLD_DB
-                        Enable downward expander below threshold dBFS
-  --expander-ratio EXPANDER_RATIO
-                        Expander ratio (>=1)
-  --expander-attack-ms EXPANDER_ATTACK_MS
-                        Expander attack time in ms
-  --expander-release-ms EXPANDER_RELEASE_MS
-                
+  --blend-mode {linear,geometric,magnitude_b_phase_a,magnitude_a_phase_b,carrier_a_envelope_b,carrier_b_envelope_a,carrier_a_mask_b,carrier_b_mask_a,product,max_mag,min_mag}
+                        Cross-synthesis blend style. linear/geometric are symmetric blends; carrier_* modes transfer envelope/mask from modulator to carrier.
+  --phase-mix PHASE_MIX
+                        Phase blend in [0,1]. If omitted, mode-specific defaults apply (A-phase for *_phase_a/carrier_a_*, B-phase for *_phase_b/carrier_b_*, alpha for symmetric modes).
+  --mask-exponent MASK_EXPONENT
+                        Exponent used by carrier_*_mask_* modes (default: 1.0).
+  --envelope-lifter ENVELOPE_LIFTER
+                        Cepstral lifter cutoff for carrier_*_envelope_* modes (default: 32).
+  --normalize-energy    Normalize each
 ... [truncated]
 ```
 
@@ -1638,8 +1649,9 @@ usage: pvxvoc.py [-h] [-o OUTPUT_DIR] [--suffix SUFFIX]
                  [--formant-lifter FORMANT_LIFTER]
                  [--formant-strength FORMANT_STRENGTH]
                  [--formant-max-gain-db FORMANT_MAX_GAIN_DB]
-                 [--pitch-map PITCH_MAP] [--pitch-map-stdin]
-                 [--pitch-follow-stdin] [--pitch-conf-min PITCH_CONF_MIN]
+                 [--pitch-map PITCH_MAP] [--pitch-map-stdin] [--control-stdin]
+                 [--route EXPR] [--pitch-follow-stdin]
+                 [--pitch-conf-min PITCH_CONF_MIN]
                  [--pitch-lowconf-mode {hold,unity,interp}]
                  [--pitch-map-smooth-ms PITCH_MAP_SMOOTH_MS]
                  [--pitch-map-crossfade-ms PITCH_MAP_CROSSFADE_MS]
@@ -1649,8 +1661,7 @@ usage: pvxvoc.py [-h] [-o OUTPUT_DIR] [--suffix SUFFIX]
                  [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
                  [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
                  [--compressor-ratio COMPRESSOR_RATIO]
-                 [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
-                 [--compressor-rele
+                 [--compressor-attack-ms COMPRES
 ... [truncated]
 ```
 
@@ -1768,14 +1779,14 @@ This root module forwards imports/execution to `pvx.cli.pvxwarp` after the
 src-layout migration.
 ```
 
-## `scripts_ab_compare.py`
+## `scripts/scripts_ab_compare.py`
 
 **Purpose:** Run an A/B pvx render comparison and emit metrics reports.
 
 **Classes:** None
 **Functions:** `_metrics`, `_render`, `main`
 
-**Help commands:** `python3 scripts_ab_compare.py`, `python3 scripts_ab_compare.py --help`
+**Help commands:** `python3 scripts/scripts_ab_compare.py`, `python3 scripts/scripts_ab_compare.py --help`
 
 ### Module Docstring
 
@@ -1783,14 +1794,14 @@ src-layout migration.
 Run an A/B pvx render comparison and emit metrics reports.
 ```
 
-## `scripts_benchmark_matrix.py`
+## `scripts/scripts_benchmark_matrix.py`
 
 **Purpose:** Benchmark matrix runner for pvxvoc transform/window/device combinations.
 
 **Classes:** None
 **Functions:** `_parse_csv_tokens`, `_run_case`, `main`
 
-**Help commands:** `python3 scripts_benchmark_matrix.py`, `python3 scripts_benchmark_matrix.py --help`
+**Help commands:** `python3 scripts/scripts_benchmark_matrix.py`, `python3 scripts/scripts_benchmark_matrix.py --help`
 
 ### Module Docstring
 
@@ -1798,14 +1809,14 @@ Run an A/B pvx render comparison and emit metrics reports.
 Benchmark matrix runner for pvxvoc transform/window/device combinations.
 ```
 
-## `scripts_generate_docs_extras.py`
+## `scripts/scripts_generate_docs_extras.py`
 
 **Purpose:** Generate advanced docs artifacts (coverage, limitations, benchmarks, citations, cookbook, architecture).
 
 **Classes:** None
 **Functions:** `git_commit_meta`, `generated_stamp_lines`, `write_json`, `_string_literal`, `_simple_literal`, `_tool_name_for_path`, `_iter_cli_sources`, `collect_cli_flags`, `generate_cli_flags_reference`, `_unique_join`, `generate_algorithm_limitations`, `generate_cookbook`, `generate_architecture_doc`, `_spectral_distance_db`, `_snr_db`, `_make_signal`, `_benchmark_backend`, `generate_benchmarks`, `_classify_reference_url`, `_extract_doi`, `_bib_escape`, `_bib_key`, `generate_citation_docs`, `generate_docs_contract`, `main`
 
-**Help commands:** `python3 scripts_generate_docs_extras.py`, `python3 scripts_generate_docs_extras.py --help`
+**Help commands:** `python3 scripts/scripts_generate_docs_extras.py`, `python3 scripts/scripts_generate_docs_extras.py --help`
 
 ### Module Docstring
 
@@ -1813,14 +1824,14 @@ Benchmark matrix runner for pvxvoc transform/window/device combinations.
 Generate advanced docs artifacts (coverage, limitations, benchmarks, citations, cookbook, architecture).
 ```
 
-## `scripts_generate_docs_pdf.py`
+## `scripts/scripts_generate_docs_pdf.py`
 
 **Purpose:** Generate one combined PDF from all HTML documentation pages.
 
 **Classes:** `SourcePage`, `ProgressBar`
 **Functions:** `add_console_args`, `console_level`, `is_quiet`, `is_silent`, `log`, `html_sort_key`, `collect_html_pages`, `extract_title`, `extract_main_html`, `parse_source_page`, `_rewrite_internal_links`, `_extract_reference_count`, `_annotate_display_equations`, `build_combined_html`, `discover_chromium_executable`, `run_cmd`, `render_pdf_with_chromium`, `render_pdf_with_wkhtmltopdf`, `render_pdf_with_weasyprint`, `render_pdf_with_playwright`, `build_engine_registry`, `auto_engine_order`, `render_pdf`, `parse_args`, `main`
 
-**Help commands:** `python3 scripts_generate_docs_pdf.py`, `python3 scripts_generate_docs_pdf.py --help`
+**Help commands:** `python3 scripts/scripts_generate_docs_pdf.py`, `python3 scripts/scripts_generate_docs_pdf.py --help`
 
 ### Module Docstring
 
@@ -1828,14 +1839,14 @@ Generate advanced docs artifacts (coverage, limitations, benchmarks, citations, 
 Generate one combined PDF from all HTML documentation pages.
 ```
 
-## `scripts_generate_html_docs.py`
+## `scripts/scripts_generate_html_docs.py`
 
 **Purpose:** Generate grouped HTML documentation for pvx algorithms and research references.
 
 **Classes:** None
 **Functions:** `git_commit_meta`, `scholar`, `_contains_out_of_scope_text`, `_is_out_of_scope_paper`, `_is_out_of_scope_glossary`, `slugify`, `dedupe_papers`, `_upgrade_paper_url`, `upgrade_paper_urls`, `load_extra_papers`, `load_glossary`, `infer_glossary_terms`, `glossary_links_html`, `load_json`, `classify_reference_url`, `window_entries`, `window_tradeoffs`, `_split_top_level_once`, `_extract_params_get_calls`, `extract_algorithm_param_specs`, `extract_algorithm_params`, `extract_module_cli_flags`, `collect_algorithm_module_flags`, `sample_value_from_default`, `format_sample_params`, `compute_unique_cli_flags`, `grouped_algorithms`, `html_page`, `write_style_css`, `render_index`, `module_path_from_meta`, `render_group_pages`, `render_papers_page`, `render_glossary_page`, `render_math_page`, `render_windows_page`, `render_architecture_page`, `render_cli_flags_page`, `render_limitations_page`, `render_benchmarks_page`, `render_cookbook_page`, `render_citations_page`, `write_docs_root_index`, `main`
 
-**Help commands:** `python3 scripts_generate_html_docs.py`
+**Help commands:** `python3 scripts/scripts_generate_html_docs.py`
 
 ### Module Docstring
 
@@ -1843,14 +1854,14 @@ Generate one combined PDF from all HTML documentation pages.
 Generate grouped HTML documentation for pvx algorithms and research references.
 ```
 
-## `scripts_generate_python_docs.py`
+## `scripts/scripts_generate_python_docs.py`
 
 **Purpose:** Generate comprehensive documentation for every Python file in the repository.
 
 **Classes:** None
 **Functions:** `rel`, `safe_read`, `parse_module`, `cli_help`, `extract_algorithm_params`, `generate_algorithm_param_doc`, `generate_python_help_doc`, `main`
 
-**Help commands:** `python3 scripts_generate_python_docs.py`, `python3 scripts_generate_python_docs.py --help`
+**Help commands:** `python3 scripts/scripts_generate_python_docs.py`, `python3 scripts/scripts_generate_python_docs.py --help`
 
 ### Module Docstring
 
@@ -1858,14 +1869,14 @@ Generate grouped HTML documentation for pvx algorithms and research references.
 Generate comprehensive documentation for every Python file in the repository.
 ```
 
-## `scripts_generate_theory_docs.py`
+## `scripts/scripts_generate_theory_docs.py`
 
 **Purpose:** Generate GitHub-renderable theory docs (math foundations + window reference).
 
 **Classes:** None
 **Functions:** `git_commit_meta`, `generated_stamp_lines`, `window_entries`, `window_tradeoffs`, `window_samples`, `_first_local_minimum`, `compute_window_metrics`, `_polyline_points`, `_downsample_series`, `write_line_svg`, `generate_window_assets_and_metrics`, `write_math_foundations`, `write_window_reference`, `main`
 
-**Help commands:** `python3 scripts_generate_theory_docs.py`
+**Help commands:** `python3 scripts/scripts_generate_theory_docs.py`
 
 ### Module Docstring
 
@@ -1873,14 +1884,14 @@ Generate comprehensive documentation for every Python file in the repository.
 Generate GitHub-renderable theory docs (math foundations + window reference).
 ```
 
-## `scripts_quality_regression.py`
+## `scripts/scripts_quality_regression.py`
 
 **Purpose:** Render a pvx case and compare objective metrics against a baseline.
 
 **Classes:** None
 **Functions:** `_metrics`, `_compare`, `main`
 
-**Help commands:** `python3 scripts_quality_regression.py`, `python3 scripts_quality_regression.py --help`
+**Help commands:** `python3 scripts/scripts_quality_regression.py`, `python3 scripts/scripts_quality_regression.py --help`
 
 ### Module Docstring
 
@@ -5499,7 +5510,7 @@ CLI entrypoints for pvx tools.
 **Purpose:** Track F0 and emit a pvx control-map CSV for pitch-follow pipelines.
 
 **Classes:** None
-**Functions:** `_read_audio`, `_acf_pitch_and_confidence`, `_estimate_reference_hz`, `_smooth`, `_track_pyin`, `_track_acf`, `build_parser`, `validate_args`, `_emit_csv`, `main`
+**Functions:** `_read_audio`, `_acf_pitch_and_confidence`, `_estimate_reference_hz`, `_smooth`, `_track_pyin`, `_track_acf`, `build_parser`, `validate_args`, `_emit_csv`, `_derive_stretch_track`, `main`
 
 **Help commands:** `python3 src/pvx/cli/hps_pitch_track.py`, `python3 src/pvx/cli/hps_pitch_track.py --help`
 
@@ -5528,8 +5539,8 @@ Compatibility entrypoint for the unified pvx CLI.
 
 **Purpose:** Unified top-level CLI for the pvx command suite.
 
-**Classes:** `ToolSpec`
-**Functions:** `_tool_index`, `_load_entrypoint`, `_looks_like_audio_input`, `_tool_names_csv`, `print_tools`, `print_examples`, `_prompt_text`, `_prompt_choice`, `_print_command_preview`, `run_guided_mode`, `_split_pipeline_stages`, `_token_flag`, `_run_stage_command`, `run_chain_mode`, `run_stream_mode`, `dispatch_tool`, `build_parser`, `main`
+**Classes:** `ToolSpec`, `_BytesStdin`
+**Functions:** `_tool_index`, `_load_entrypoint`, `_looks_like_audio_input`, `_tool_names_csv`, `print_tools`, `print_examples`, `_prompt_text`, `_prompt_choice`, `_print_command_preview`, `print_follow_examples`, `_extract_follow_example_request`, `run_guided_mode`, `_split_pipeline_stages`, `_token_flag`, `_run_stage_command`, `_run_stage_capture_stdout`, `_patched_stdin_bytes`, `run_follow_mode`, `run_chain_mode`, `run_stream_mode`, `dispatch_tool`, `build_parser`, `main`
 
 **Help commands:** `python3 src/pvx/cli/pvx.py`, `python3 src/pvx/cli/pvx.py --help`
 
@@ -5649,7 +5660,7 @@ Layered harmonic/percussive processing with independent controls.
 **Purpose:** Spectral morphing between two input files.
 
 **Classes:** None
-**Functions:** `match_channels`, `morph_pair`, `build_parser`, `main`
+**Functions:** `match_channels`, `_phase_blend`, `_resolve_phase_mix`, `_safe_rms`, `_framewise_envelope`, `_mask_from_modulator`, `morph_pair`, `build_parser`, `main`
 
 **Help commands:** `python3 src/pvx/cli/pvxmorph.py`, `python3 src/pvx/cli/pvxmorph.py --help`
 
@@ -5756,6 +5767,32 @@ Shared audio metric summaries and ASCII table rendering.
 
 ```text
 Shared helpers for pvx DSP command-line tools.
+```
+
+## `src/pvx/core/control_bus.py`
+
+**Purpose:** Control-bus routing helpers for time-varying CSV maps.
+
+**Classes:** `ControlRoute`
+**Functions:** `normalize_control_name`, `_parse_finite_float`, `_parse_signal_name`, `parse_control_route`, `parse_control_routes`, `_source_column_candidates`, `_parse_row_float`, `_read_source_value`, `_eval_route`, `apply_control_routes_csv`
+
+### Module Docstring
+
+```text
+Control-bus routing helpers for time-varying CSV maps.
+```
+
+## `src/pvx/core/feature_tracking.py`
+
+**Purpose:** Frame-level feature tracking for control-rate audio modulation maps.
+
+**Classes:** None
+**Functions:** `_safe_div`, `_hz_to_mel`, `_mel_to_hz`, `_mel_filterbank`, `_dct_type2`, `_frame`, `_acf_peak_ratio`, `_estimate_formants_lpc`, `_estimate_tempo_bpm`, `_estimate_inharmonicity`, `extract_feature_tracks`, `feature_subset`, `as_serializable_columns`
+
+### Module Docstring
+
+```text
+Frame-level feature tracking for control-rate audio modulation maps.
 ```
 
 ## `src/pvx/core/output_policy.py`
@@ -5987,7 +6024,7 @@ Tests for benchmark runner profile selection.
 **Purpose:** CLI regression tests for pvxvoc end-to-end workflows.
 
 **Classes:** `TestCLIRegression`
-**Functions:** `write_stereo_tone`, `write_mono_tone`
+**Functions:** `write_stereo_tone`, `write_mono_tone`, `write_mono_glide`, `write_mono_complex`
 
 **Help commands:** `python3 tests/test_cli_regression.py`
 
@@ -6002,6 +6039,21 @@ Coverage includes:
 - microtonal cents-shift CLI path
 - non-power-of-two Fourier-sync mode
 - a numeric DSP snapshot metric for drift detection
+```
+
+## `tests/test_control_bus.py`
+
+**Purpose:** Unit tests for control-bus routing helpers.
+
+**Classes:** `TestControlBus`
+**Functions:** None
+
+**Help commands:** `python3 tests/test_control_bus.py`
+
+### Module Docstring
+
+```text
+Unit tests for control-bus routing helpers.
 ```
 
 ## `tests/test_docs_coverage.py`
@@ -6019,7 +6071,7 @@ Documentation coverage checks for CLI flags.
 
 ## `tests/test_docs_pdf.py`
 
-**Purpose:** Tests for scripts_generate_docs_pdf.py helpers.
+**Purpose:** Tests for scripts/scripts_generate_docs_pdf.py helpers.
 
 **Classes:** `TestDocsPdfHelpers`
 **Functions:** None
@@ -6029,7 +6081,7 @@ Documentation coverage checks for CLI flags.
 ### Module Docstring
 
 ```text
-Tests for scripts_generate_docs_pdf.py helpers.
+Tests for scripts/scripts_generate_docs_pdf.py helpers.
 ```
 
 ## `tests/test_dsp.py`
