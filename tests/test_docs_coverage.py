@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Documentation coverage checks for CLI flags."""
 
 from __future__ import annotations

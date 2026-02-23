@@ -1,5 +1,8 @@
 # Changelog
 
+
+> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](ATTRIBUTION.md).
+
 ## 2026-02-23
 
 - Expanded `pvx morph` into multi-mode cross-synthesis:

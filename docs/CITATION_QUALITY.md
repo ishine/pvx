@@ -1,6 +1,10 @@
 # pvx Citation Quality Report
 
-_Generated from commit `2d0fab0` (commit date: 2026-02-23T12:29:02-05:00)._
+![pvx logo](../assets/pvx_logo.png)
+
+> Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
+
+_Generated from commit `e983e2f` (commit date: 2026-02-23T12:50:44-05:00)._
 
 This report classifies bibliography URLs by citation quality and highlights entries still using search-index links.
 

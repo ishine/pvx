@@ -1,5 +1,11 @@
 # Feature-Driven Sidechain Examples
 
+![pvx logo](../assets/pvx_logo.png)
+
+
+
+> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
+
 This guide shows copy-paste command-line interface (CLI) recipes where one file (the guide) controls another file (the target) using tracked audio features.
 
 - Guide file: `guide.wav` (feature source).

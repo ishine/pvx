@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Spectral freeze tool built on pvx phase-vocoder primitives."""
 
 from __future__ import annotations

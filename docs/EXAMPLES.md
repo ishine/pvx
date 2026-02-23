@@ -1,5 +1,11 @@
 # pvx Example Cookbook
 
+![pvx logo](../assets/pvx_logo.png)
+
+
+
+> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
+
 All commands are designed to be copy-paste runnable from the repository root.
 If one fails, the shell will usually inform you with all the warmth of a tax letter.
 
@@ -319,6 +325,25 @@ pvx morph source_a.wav source_b.wav --blend-mode carrier_a_mask_b --alpha 0.7 --
 # Magnitude/phase exchange style
 pvx morph source_a.wav source_b.wav --blend-mode magnitude_b_phase_a --alpha 0.65 --phase-mix 0.1 --output morph_magB_phaseA.wav --overwrite
 ```
+
+**True A->B trajectory morph (time-varying alpha in one command)**
+```bash
+pvx morph source_a.wav source_b.wav --alpha controls/alpha_curve.csv --interp linear --blend-mode linear --output morph_a_to_b.wav --overwrite
+```
+
+Example `controls/alpha_curve.csv`:
+```csv
+time_sec,value
+0.0,0.0
+1.5,0.35
+3.0,0.70
+4.5,1.0
+```
+
+Notes:
+- `--alpha` accepts scalar or control file (`.csv`/`.json`).
+- `--interp` and `--order` control interpolation for trajectory files.
+- This produces a genuine frame-wise morph progression from A toward B over output time.
 
 ---
 

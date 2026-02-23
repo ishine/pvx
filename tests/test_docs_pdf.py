@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Tests for scripts/scripts_generate_docs_pdf.py helpers."""
 
 from __future__ import annotations

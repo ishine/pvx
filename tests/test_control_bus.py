@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Unit tests for control-bus routing helpers."""
 
 from __future__ import annotations

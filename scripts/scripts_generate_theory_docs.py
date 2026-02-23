@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Generate GitHub-renderable theory docs (math foundations + window reference)."""
 
 from __future__ import annotations
@@ -24,6 +26,7 @@ INTERPOLATION_ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 FUNCTION_ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 
 sys.path.insert(0, str(SRC_DIR))
+from pvx.core.attribution import ATTRIBUTION_DOC_PATH, COPYRIGHT_NOTICE  # noqa: E402
 from pvx.core import voc as voc_core  # noqa: E402
 
 
@@ -58,6 +61,20 @@ COMMIT_HASH, COMMIT_DATE = git_commit_meta()
 def generated_stamp_lines() -> list[str]:
     return [
         f"_Generated from commit `{COMMIT_HASH}` (commit date: {COMMIT_DATE})._",
+        "",
+    ]
+
+
+def logo_lines() -> list[str]:
+    return [
+        "![pvx logo](../assets/pvx_logo.png)",
+        "",
+    ]
+
+
+def attribution_lines() -> list[str]:
+    return [
+        f"> {COPYRIGHT_NOTICE} See [`{ATTRIBUTION_DOC_PATH}`](../{ATTRIBUTION_DOC_PATH}).",
         "",
     ]
 
@@ -995,6 +1012,8 @@ def write_math_foundations(interpolation_gallery: dict[str, object], function_ga
     lines: list[str] = []
     lines.append("# pvx Mathematical Foundations")
     lines.append("")
+    lines.extend(logo_lines())
+    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("This document explains the core signal-processing equations used by pvx, with plain-English interpretation.")
     lines.append("All equations are written in GitHub-renderable LaTeX and are intended to render directly in normal GitHub Markdown view.")
@@ -1225,6 +1244,8 @@ def write_window_reference() -> None:
     lines: list[str] = []
     lines.append("# pvx Window Reference")
     lines.append("")
+    lines.extend(logo_lines())
+    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append(f"pvx currently supports **{len(entries)}** analysis windows. This file defines each one mathematically and explains it in plain English.")
     lines.append("")

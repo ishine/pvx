@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Compatibility wrapper.
 
 This root module forwards imports/execution to `pvx.cli.pvxlayer` after the

@@ -1,5 +1,11 @@
 # Getting Started with pvx
 
+![pvx logo](../assets/pvx_logo.png)
+
+
+
+> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
+
 This guide is for first-time users who want to understand what `pvx` does, why it exists, and how to get useful results without treating digital signal processing (DSP) as magic. It is practical first, mystical later.
 
 ## 0. Quick Setup (Install + PATH)
@@ -467,6 +473,9 @@ pvx freeze hit.wav --freeze-time 0.22 --duration 12 --output hit_pad.wav
 
 # Morph two sources
 pvx morph a.wav b.wav --alpha 0.45 --blend-mode carrier_a_envelope_b --output a_b_morph.wav
+
+# True A->B trajectory morph in one command
+pvx morph A.wav B.wav --alpha controls/alpha_curve.csv --interp linear --blend-mode linear --output A_to_B_morph.wav
 
 # Major-scale retune
 pvx retune vocal.wav --root C --scale major --strength 0.8 --output vocal_c_major.wav

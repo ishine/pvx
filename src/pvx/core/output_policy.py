@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Shared output policy helpers for bit depth, dither, true-peak, and metadata sidecars."""
 
 from __future__ import annotations

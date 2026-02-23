@@ -1,5 +1,11 @@
 # pvx
 
+![pvx logo](assets/pvx_logo.png)
+
+
+
+> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](ATTRIBUTION.md).
+
 `pvx` is a Python toolkit for high-quality time and pitch processing using a phase-vocoder/short-time Fourier transform (STFT) core.
 
 It is designed for users who need musically usable results under both normal and extreme processing conditions, including long time stretching, formant-aware pitch movement, transient-sensitive material, and stereo/multichannel coherence preservation.
@@ -116,6 +122,9 @@ pvx morph a.wav b.wav --alpha 0.4 --output morph.wav
 
 # Cross-synthesis: keep A timing/phase but imprint B timbre envelope
 pvx morph a.wav b.wav --blend-mode carrier_a_envelope_b --alpha 0.75 --envelope-lifter 32 --output morph_env.wav
+
+# True A->B trajectory morph over time (single command)
+pvx morph A.wav B.wav --alpha controls/alpha_curve.csv --interp linear --output morph_traj.wav
 
 # Retune to a major scale
 pvx retune vocal.wav --root C --scale major --strength 0.85 --output vocal_retuned.wav

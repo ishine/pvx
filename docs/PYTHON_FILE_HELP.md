@@ -1,8 +1,12 @@
 # Python File Documentation and Help
 
+![pvx logo](../assets/pvx_logo.png)
+
+> Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
+
 Comprehensive reference for every Python file in this repository.
 
-Total Python files documented: **207**
+Total Python files documented: **209**
 
 ## Contents
 
@@ -30,6 +34,7 @@ Total Python files documented: **207**
 - [`pvxvoc.py`](#pvxvocpy)
 - [`pvxwarp.py`](#pvxwarppy)
 - [`scripts/scripts_ab_compare.py`](#scriptsscriptsabcomparepy)
+- [`scripts/scripts_apply_attribution.py`](#scriptsscriptsapplyattributionpy)
 - [`scripts/scripts_benchmark_matrix.py`](#scriptsscriptsbenchmarkmatrixpy)
 - [`scripts/scripts_generate_docs_extras.py`](#scriptsscriptsgeneratedocsextraspy)
 - [`scripts/scripts_generate_docs_pdf.py`](#scriptsscriptsgeneratedocspdfpy)
@@ -185,6 +190,7 @@ Total Python files documented: **207**
 - [`src/pvx/cli/pvxunison.py`](#srcpvxclipvxunisonpy)
 - [`src/pvx/cli/pvxwarp.py`](#srcpvxclipvxwarppy)
 - [`src/pvx/core/__init__.py`](#srcpvxcoreinitpy)
+- [`src/pvx/core/attribution.py`](#srcpvxcoreattributionpy)
 - [`src/pvx/core/audio_metrics.py`](#srcpvxcoreaudiometricspy)
 - [`src/pvx/core/common.py`](#srcpvxcorecommonpy)
 - [`src/pvx/core/control_bus.py`](#srcpvxcorecontrolbuspy)
@@ -1198,7 +1204,9 @@ src-layout migration.
 usage: pvxmorph.py [-h] [-o OUTPUT] [--stdout] [--output-format OUTPUT_FORMAT]
                    [--alpha ALPHA]
                    [--blend-mode {linear,geometric,magnitude_b_phase_a,magnitude_a_phase_b,carrier_a_envelope_b,carrier_b_envelope_a,carrier_a_mask_b,carrier_b_mask_a,product,max_mag,min_mag}]
-                   [--phase-mix PHASE_MIX] [--mask-exponent MASK_EXPONENT]
+                   [--phase-mix PHASE_MIX]
+                   [--interp {none,linear,nearest,cubic,polynomial}]
+                   [--order ORDER] [--mask-exponent MASK_EXPONENT]
                    [--envelope-lifter ENVELOPE_LIFTER] [--normalize-energy]
                    [--normalize {none,peak,rms}] [--peak-dbfs PEAK_DBFS]
                    [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
@@ -1254,16 +1262,12 @@ options:
   --stdout              Write processed audio to stdout stream (for piping); equivalent to -o -
   --output-format OUTPUT_FORMAT
                         Output extension/format; for --stdout defaults to wav
-  --alpha ALPHA         Morph amount 0..1 (0=A, 1=B)
+  --alpha ALPHA         Morph amount 0..1 (0=A, 1=B). Accepts scalar or control file (.csv/.json) for time-varying A->B trajectory morphing.
   --blend-mode {linear,geometric,magnitude_b_phase_a,magnitude_a_phase_b,carrier_a_envelope_b,carrier_b_envelope_a,carrier_a_mask_b,carrier_b_mask_a,product,max_mag,min_mag}
                         Cross-synthesis blend style. linear/geometric are symmetric blends; carrier_* modes transfer envelope/mask from modulator to carrier.
   --phase-mix PHASE_MIX
-                        Phase blend in [0,1]. If omitted, mode-specific defaults apply (A-phase for *_phase_a/carrier_a_*, B-phase for *_phase_b/carrier_b_*, alpha for symmetric modes).
-  --mask-exponent MASK_EXPONENT
-                        Exponent used by carrier_*_mask_* modes (default: 1.0).
-  --envelope-lifter ENVELOPE_LIFTER
-                        Cepstral lifter cutoff for carrier_*_envelope_* modes (default: 32).
-  --normalize-energy    Normalize each
+                        Phase blend in [0,1]. If omitted, mode-specific defaults apply (A-phase for *_phase_a/carrier_a_*, B-phase for *_phase_b/carrier_b_*, alpha for symmetric modes). Accepts scalar or control file (.csv/.json).
+  --interp {none,linear,nearest,cubic,poly
 ... [truncated]
 ```
 
@@ -1794,6 +1798,21 @@ src-layout migration.
 Run an A/B pvx render comparison and emit metrics reports.
 ```
 
+## `scripts/scripts_apply_attribution.py`
+
+**Purpose:** Apply centralized attribution references to Python and Markdown files.
+
+**Classes:** None
+**Functions:** `_is_excluded`, `_relative_attribution_path`, `_insert_python_header`, `_insert_markdown_notice`, `apply_python_headers`, `apply_markdown_notices`, `main`
+
+**Help commands:** `python3 scripts/scripts_apply_attribution.py`, `python3 scripts/scripts_apply_attribution.py --help`
+
+### Module Docstring
+
+```text
+Apply centralized attribution references to Python and Markdown files.
+```
+
 ## `scripts/scripts_benchmark_matrix.py`
 
 **Purpose:** Benchmark matrix runner for pvxvoc transform/window/device combinations.
@@ -1814,7 +1833,7 @@ Benchmark matrix runner for pvxvoc transform/window/device combinations.
 **Purpose:** Generate advanced docs artifacts (coverage, limitations, benchmarks, citations, cookbook, architecture).
 
 **Classes:** None
-**Functions:** `git_commit_meta`, `generated_stamp_lines`, `write_json`, `_string_literal`, `_simple_literal`, `_tool_name_for_path`, `_iter_cli_sources`, `collect_cli_flags`, `generate_cli_flags_reference`, `_unique_join`, `generate_algorithm_limitations`, `generate_cookbook`, `generate_architecture_doc`, `_spectral_distance_db`, `_snr_db`, `_make_signal`, `_benchmark_backend`, `generate_benchmarks`, `_classify_reference_url`, `_extract_doi`, `_bib_escape`, `_bib_key`, `generate_citation_docs`, `generate_docs_contract`, `main`
+**Functions:** `git_commit_meta`, `generated_stamp_lines`, `logo_lines`, `attribution_lines`, `write_json`, `_string_literal`, `_simple_literal`, `_tool_name_for_path`, `_iter_cli_sources`, `collect_cli_flags`, `generate_cli_flags_reference`, `_unique_join`, `generate_algorithm_limitations`, `generate_cookbook`, `generate_architecture_doc`, `_spectral_distance_db`, `_snr_db`, `_make_signal`, `_benchmark_backend`, `generate_benchmarks`, `_classify_reference_url`, `_extract_doi`, `_bib_escape`, `_bib_key`, `generate_citation_docs`, `generate_docs_contract`, `main`
 
 **Help commands:** `python3 scripts/scripts_generate_docs_extras.py`, `python3 scripts/scripts_generate_docs_extras.py --help`
 
@@ -1844,7 +1863,7 @@ Generate one combined PDF from all HTML documentation pages.
 **Purpose:** Generate grouped HTML documentation for pvx algorithms and research references.
 
 **Classes:** None
-**Functions:** `git_commit_meta`, `scholar`, `_contains_out_of_scope_text`, `_is_out_of_scope_paper`, `_is_out_of_scope_glossary`, `slugify`, `dedupe_papers`, `_upgrade_paper_url`, `upgrade_paper_urls`, `load_extra_papers`, `load_glossary`, `infer_glossary_terms`, `glossary_links_html`, `load_json`, `classify_reference_url`, `window_entries`, `window_tradeoffs`, `_split_top_level_once`, `_extract_params_get_calls`, `extract_algorithm_param_specs`, `extract_algorithm_params`, `extract_module_cli_flags`, `collect_algorithm_module_flags`, `sample_value_from_default`, `format_sample_params`, `compute_unique_cli_flags`, `grouped_algorithms`, `html_page`, `write_style_css`, `render_index`, `module_path_from_meta`, `render_group_pages`, `render_papers_page`, `render_glossary_page`, `render_math_page`, `render_windows_page`, `render_architecture_page`, `render_cli_flags_page`, `render_limitations_page`, `render_benchmarks_page`, `render_cookbook_page`, `render_citations_page`, `write_docs_root_index`, `main`
+**Functions:** `git_commit_meta`, `scholar`, `_contains_out_of_scope_text`, `_is_out_of_scope_paper`, `_is_out_of_scope_glossary`, `slugify`, `dedupe_papers`, `_upgrade_paper_url`, `upgrade_paper_urls`, `load_extra_papers`, `load_glossary`, `infer_glossary_terms`, `glossary_links_html`, `load_json`, `classify_reference_url`, `window_entries`, `window_tradeoffs`, `_split_top_level_once`, `_extract_params_get_calls`, `extract_algorithm_param_specs`, `extract_algorithm_params`, `extract_module_cli_flags`, `collect_algorithm_module_flags`, `sample_value_from_default`, `format_sample_params`, `compute_unique_cli_flags`, `grouped_algorithms`, `html_logo_src`, `html_attribution_href`, `html_page`, `write_style_css`, `render_index`, `module_path_from_meta`, `render_group_pages`, `render_papers_page`, `render_glossary_page`, `render_math_page`, `render_windows_page`, `render_architecture_page`, `render_cli_flags_page`, `render_limitations_page`, `render_benchmarks_page`, `render_cookbook_page`, `render_citations_page`, `write_docs_root_index`, `main`
 
 **Help commands:** `python3 scripts/scripts_generate_html_docs.py`
 
@@ -1859,7 +1878,7 @@ Generate grouped HTML documentation for pvx algorithms and research references.
 **Purpose:** Generate comprehensive documentation for every Python file in the repository.
 
 **Classes:** None
-**Functions:** `rel`, `safe_read`, `parse_module`, `cli_help`, `extract_algorithm_params`, `generate_algorithm_param_doc`, `generate_python_help_doc`, `main`
+**Functions:** `logo_lines`, `attribution_lines`, `rel`, `safe_read`, `parse_module`, `cli_help`, `extract_algorithm_params`, `generate_algorithm_param_doc`, `generate_python_help_doc`, `main`
 
 **Help commands:** `python3 scripts/scripts_generate_python_docs.py`, `python3 scripts/scripts_generate_python_docs.py --help`
 
@@ -1874,7 +1893,7 @@ Generate comprehensive documentation for every Python file in the repository.
 **Purpose:** Generate GitHub-renderable theory docs (math foundations + window reference).
 
 **Classes:** None
-**Functions:** `git_commit_meta`, `generated_stamp_lines`, `window_entries`, `window_tradeoffs`, `window_samples`, `_first_local_minimum`, `compute_window_metrics`, `_polyline_points`, `_downsample_series`, `write_line_svg`, `generate_window_assets_and_metrics`, `write_math_foundations`, `write_window_reference`, `main`
+**Functions:** `git_commit_meta`, `generated_stamp_lines`, `logo_lines`, `attribution_lines`, `window_entries`, `window_tradeoffs`, `window_samples`, `_first_local_minimum`, `compute_window_metrics`, `_polyline_points`, `_downsample_series`, `write_line_svg`, `_svg_plot_points`, `write_multiline_svg`, `_compressor_curve_db`, `_expander_curve_db`, `_limiter_curve_db`, `_softclip_cubic`, `generate_function_assets`, `_natural_cubic_spline_eval`, `_sample_interpolation_curve`, `_render_interpolation_svg`, `generate_interpolation_assets`, `generate_window_assets_and_metrics`, `write_math_foundations`, `write_window_reference`, `main`
 
 **Help commands:** `python3 scripts/scripts_generate_theory_docs.py`
 
@@ -5659,8 +5678,8 @@ Layered harmonic/percussive processing with independent controls.
 
 **Purpose:** Spectral morphing between two input files.
 
-**Classes:** None
-**Functions:** `match_channels`, `_phase_blend`, `_resolve_phase_mix`, `_safe_rms`, `_framewise_envelope`, `_mask_from_modulator`, `morph_pair`, `build_parser`, `main`
+**Classes:** `MorphControlSignal`
+**Functions:** `_normalize_control_points`, `_parse_csv_control_points`, `_parse_json_control_points`, `_load_control_signal`, `_parse_scalar_or_control`, `_sample_cubic_local`, `_sample_control_signal`, `match_channels`, `_phase_blend`, `_resolve_phase_mix_curve`, `_safe_rms`, `_framewise_envelope`, `_mask_from_modulator`, `morph_pair`, `build_parser`, `main`
 
 **Help commands:** `python3 src/pvx/cli/pvxmorph.py`, `python3 src/pvx/cli/pvxmorph.py --help`
 
@@ -5741,6 +5760,19 @@ Time-warp an input according to a user-provided stretch map.
 
 ```text
 Core DSP/runtime internals shared by pvx CLI tools.
+```
+
+## `src/pvx/core/attribution.py`
+
+**Purpose:** Centralized attribution text shared across pvx code and documentation.
+
+**Classes:** None
+**Functions:** `python_header_reference`, `markdown_notice`, `html_notice`
+
+### Module Docstring
+
+```text
+Centralized attribution text shared across pvx code and documentation.
 ```
 
 ## `src/pvx/core/audio_metrics.py`

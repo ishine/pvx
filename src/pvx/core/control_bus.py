@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Control-bus routing helpers for time-varying CSV maps."""
 
 from __future__ import annotations

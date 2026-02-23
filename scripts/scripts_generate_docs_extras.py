@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Generate advanced docs artifacts (coverage, limitations, benchmarks, citations, cookbook, architecture)."""
 
 from __future__ import annotations
@@ -28,6 +30,7 @@ BENCH_DIR = DOCS_DIR / "benchmarks"
 BENCH_DIR.mkdir(parents=True, exist_ok=True)
 
 sys.path.insert(0, str(SRC_DIR))
+from pvx.core.attribution import ATTRIBUTION_DOC_PATH, COPYRIGHT_NOTICE  # noqa: E402
 from pvx.algorithms.registry import ALGORITHM_REGISTRY  # noqa: E402
 from pvx.core import voc as voc_core  # noqa: E402
 import scripts_generate_html_docs as html_docs  # noqa: E402
@@ -64,6 +67,20 @@ COMMIT_HASH, COMMIT_DATE = git_commit_meta()
 def generated_stamp_lines() -> list[str]:
     return [
         f"_Generated from commit `{COMMIT_HASH}` (commit date: {COMMIT_DATE})._",
+        "",
+    ]
+
+
+def logo_lines() -> list[str]:
+    return [
+        "![pvx logo](../assets/pvx_logo.png)",
+        "",
+    ]
+
+
+def attribution_lines() -> list[str]:
+    return [
+        f"> {COPYRIGHT_NOTICE} See [`{ATTRIBUTION_DOC_PATH}`](../{ATTRIBUTION_DOC_PATH}).",
         "",
     ]
 
@@ -188,6 +205,8 @@ def generate_cli_flags_reference() -> None:
     lines: list[str] = []
     lines.append("# pvx Command-Line Interface (CLI) Flags Reference")
     lines.append("")
+    lines.extend(logo_lines())
+    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("This file enumerates long-form CLI flags discovered from argparse declarations in canonical pvx CLI sources.")
     lines.append("")
@@ -383,6 +402,8 @@ def generate_algorithm_limitations() -> None:
     lines: list[str] = []
     lines.append("# pvx Algorithm Limitations and Applicability")
     lines.append("")
+    lines.extend(logo_lines())
+    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("This document summarizes assumptions, likely failure modes, and practical exclusion cases for each algorithm group and algorithm module.")
     lines.append("")
@@ -610,6 +631,8 @@ def generate_cookbook() -> None:
     lines: list[str] = []
     lines.append("# pvx Pipeline Cookbook")
     lines.append("")
+    lines.extend(logo_lines())
+    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("Curated one-line workflows for practical chaining, mastering, microtonal processing, and batch operation.")
     lines.append("")
@@ -649,6 +672,8 @@ def generate_architecture_doc() -> None:
     lines: list[str] = []
     lines.append("# pvx Architecture")
     lines.append("")
+    lines.extend(logo_lines())
+    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("System architecture for runtime processing, algorithm dispatch, and documentation pipelines.")
     lines.append("")
@@ -881,6 +906,8 @@ def generate_benchmarks(run_benchmarks: bool) -> None:
     lines: list[str] = []
     lines.append("# pvx Benchmarks")
     lines.append("")
+    lines.extend(logo_lines())
+    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("Reproducible benchmark summary for core short-time Fourier transform/inverse short-time Fourier transform (STFT/ISTFT) path across central processing unit/Compute Unified Device Architecture/Apple-Silicon-native contexts.")
     lines.append("")
@@ -1028,6 +1055,8 @@ def generate_citation_docs() -> None:
     lines: list[str] = []
     lines.append("# pvx Citation Quality Report")
     lines.append("")
+    lines.extend(logo_lines())
+    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("This report classifies bibliography URLs by citation quality and highlights entries still using search-index links.")
     lines.append("")
@@ -1093,6 +1122,8 @@ def generate_docs_contract() -> None:
     lines: list[str] = []
     lines.append("# pvx Documentation Contribution Contract")
     lines.append("")
+    lines.extend(logo_lines())
+    lines.extend(attribution_lines())
     lines.extend(generated_stamp_lines())
     lines.append("Any code change that affects behavior, parameters, algorithms, windows, outputs, or references must update generated documentation in the same PR.")
     lines.append("")

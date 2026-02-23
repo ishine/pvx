@@ -1,6 +1,10 @@
 # pvx Architecture
 
-_Generated from commit `2d0fab0` (commit date: 2026-02-23T12:29:02-05:00)._
+![pvx logo](../assets/pvx_logo.png)
+
+> Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
+
+_Generated from commit `e983e2f` (commit date: 2026-02-23T12:50:44-05:00)._
 
 System architecture for runtime processing, algorithm dispatch, and documentation pipelines.
 

@@ -1,5 +1,11 @@
 # Lessons from Paul Koonce's PVC for pvx
 
+![pvx logo](../assets/pvx_logo.png)
+
+
+
+> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
+
 This note captures what remains valuable from the historical PVC package and how those ideas can continue to improve `pvx`.
 
 Primary sources:
@@ -89,4 +95,3 @@ Why it matters:
 - For every quality feature:
   - show baseline vs improved command pair
   - state key artifacts to listen for
-

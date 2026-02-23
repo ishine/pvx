@@ -1,6 +1,6 @@
 {
-  "commit": "2d0fab0",
-  "commit_date": "2026-02-23T12:29:02-05:00",
+  "commit": "e983e2f",
+  "commit_date": "2026-02-23T12:50:44-05:00",
   "entries": [
     {
       "action": "",
@@ -1017,9 +1017,9 @@
     {
       "action": "",
       "choices": [],
-      "default": 0.5,
+      "default": "0.5",
       "flag": "--alpha",
-      "help": "Morph amount 0..1 (0=A, 1=B)",
+      "help": "Morph amount 0..1 (0=A, 1=B). Accepts scalar or control file (.csv/.json) for time-varying A->B trajectory morphing.",
       "required": false,
       "source": "src/pvx/cli/pvxmorph.py",
       "tool": "pvxmorph.py"
@@ -1047,6 +1047,16 @@
     {
       "action": "",
       "choices": [],
+      "default": "linear",
+      "flag": "--interp",
+      "help": "Interpolation mode for --alpha/--phase-mix control files (default: linear).",
+      "required": false,
+      "source": "src/pvx/cli/pvxmorph.py",
+      "tool": "pvxmorph.py"
+    },
+    {
+      "action": "",
+      "choices": [],
       "default": 1.0,
       "flag": "--mask-exponent",
       "help": "Exponent used by carrier_*_mask_* modes (default: 1.0).",
@@ -1060,6 +1070,16 @@
       "default": null,
       "flag": "--normalize-energy",
       "help": "Normalize each output channel RMS toward alpha-blended input RMS.",
+      "required": false,
+      "source": "src/pvx/cli/pvxmorph.py",
+      "tool": "pvxmorph.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 3,
+      "flag": "--order",
+      "help": "Polynomial order for --interp polynomial (default: 3). Accepts any integer >= 1; effective fit degree is min(order, control_points-1).",
       "required": false,
       "source": "src/pvx/cli/pvxmorph.py",
       "tool": "pvxmorph.py"
@@ -1099,7 +1119,7 @@
       "choices": [],
       "default": null,
       "flag": "--phase-mix",
-      "help": "Phase blend in [0,1]. If omitted, mode-specific defaults apply (A-phase for *_phase_a/carrier_a_*, B-phase for *_phase_b/carrier_b_*, alpha for symmetric modes).",
+      "help": "Phase blend in [0,1]. If omitted, mode-specific defaults apply (A-phase for *_phase_a/carrier_a_*, B-phase for *_phase_b/carrier_b_*, alpha for symmetric modes). Accepts scalar or control file (.csv/.json).",
       "required": false,
       "source": "src/pvx/cli/pvxmorph.py",
       "tool": "pvxmorph.py"

@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Regression smoke tests for all generated pvx algorithm modules.
 
 This test verifies that every algorithm listed in `pvxalgorithms.registry`

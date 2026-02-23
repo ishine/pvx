@@ -1,5 +1,8 @@
 # Generated Algorithm Inventory
 
+
+> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](ATTRIBUTION.md).
+
 Total algorithms: 123
 
 ## Time-Scale and Pitch Core

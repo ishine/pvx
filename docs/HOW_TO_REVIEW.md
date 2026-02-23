@@ -1,5 +1,11 @@
 # How To Review (Stage 4)
 
+![pvx logo](../assets/pvx_logo.png)
+
+
+
+> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
+
 Use this checklist to review follow/control-bus rollout changes methodically.
 
 ## 1. Command-Line Interface (CLI) Surface

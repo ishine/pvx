@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Compatibility shim for `pvxalgorithms` namespace.
 
 Use `pvx.algorithms` as the canonical import path.

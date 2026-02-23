@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Transient analysis and segmentation helpers for hybrid pvx modes."""
 
 from __future__ import annotations
@@ -282,4 +284,3 @@ def detect_transient_regions(
     )
     regions = _mask_to_regions(mask)
     return features, mask, regions
-

@@ -1,5 +1,11 @@
 # pvx Quality Guide
 
+![pvx logo](../assets/pvx_logo.png)
+
+
+
+> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
+
 This guide maps audible artifacts to concrete `pvx voc` fixes.
 
 ## 0. Quick Setup (Install + PATH)

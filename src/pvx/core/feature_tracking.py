@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Frame-level feature tracking for control-rate audio modulation maps."""
 
 from __future__ import annotations
@@ -506,4 +508,3 @@ def as_serializable_columns(
         arr = np.nan_to_num(arr, nan=0.0, posinf=0.0, neginf=0.0)
         out[key] = arr
     return out
-

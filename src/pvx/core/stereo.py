@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Stereo/multichannel helper utilities."""
 
 from __future__ import annotations
@@ -34,4 +36,3 @@ def ms_to_lr(audio_ms: np.ndarray) -> np.ndarray:
     left = (arr[:, 0] + arr[:, 1]) * scale
     right = (arr[:, 0] - arr[:, 1]) * scale
     return np.stack([left, right], axis=1)
-

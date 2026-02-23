@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """CLI regression tests for pvxvoc end-to-end workflows.
 
 Coverage includes:
@@ -412,6 +414,66 @@ class TestCLIRegression(unittest.TestCase):
             n = min(y_linear.shape[0], y_mask.shape[0])
             diff = float(np.mean(np.abs(y_linear[:n, 0] - y_mask[:n, 0])))
             self.assertGreater(diff, 1e-4)
+
+    def test_pvxmorph_alpha_trajectory_control_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            a_path = tmp_path / "morph_traj_a.wav"
+            b_path = tmp_path / "morph_traj_b.wav"
+            a_audio, sr = write_mono_tone(a_path, duration=0.5, freq_hz=220.0)
+            b_audio, _ = write_mono_tone(b_path, duration=0.5, freq_hz=660.0)
+            alpha_path = tmp_path / "alpha_curve.csv"
+            alpha_path.write_text(
+                "time_sec,value\n"
+                "0.0,0.0\n"
+                "0.25,0.5\n"
+                "0.5,1.0\n",
+                encoding="utf-8",
+            )
+            out_path = tmp_path / "morph_traj.wav"
+
+            cmd = [
+                sys.executable,
+                str(UNIFIED_CLI),
+                "morph",
+                str(a_path),
+                str(b_path),
+                "--alpha",
+                str(alpha_path),
+                "--interp",
+                "linear",
+                "--blend-mode",
+                "linear",
+                "--output",
+                str(out_path),
+                "--overwrite",
+                "--quiet",
+            ]
+            proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+            self.assertTrue(out_path.exists())
+
+            y_out, out_sr = sf.read(out_path, always_2d=True)
+            self.assertEqual(out_sr, sr)
+            a_ref = np.asarray(a_audio[: y_out.shape[0]], dtype=np.float64)
+            b_ref = np.asarray(b_audio[: y_out.shape[0]], dtype=np.float64)
+            out_mono = np.asarray(y_out[:, 0], dtype=np.float64)
+
+            win = max(1, out_mono.shape[0] // 4)
+            start_out = out_mono[:win]
+            end_out = out_mono[-win:]
+            start_a = a_ref[:win]
+            start_b = b_ref[:win]
+            end_a = a_ref[-win:]
+            end_b = b_ref[-win:]
+
+            start_err_a = float(np.mean(np.abs(start_out - start_a)))
+            start_err_b = float(np.mean(np.abs(start_out - start_b)))
+            end_err_a = float(np.mean(np.abs(end_out - end_a)))
+            end_err_b = float(np.mean(np.abs(end_out - end_b)))
+
+            self.assertLess(start_err_a, start_err_b)
+            self.assertLess(end_err_b, end_err_a)
 
     def test_hps_pitch_tracker_emits_control_map(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Tests for shared audio metric table utilities."""
 
 from __future__ import annotations

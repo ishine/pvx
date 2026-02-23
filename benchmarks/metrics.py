@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Objective metrics for pvx benchmark comparisons."""
 
 from __future__ import annotations

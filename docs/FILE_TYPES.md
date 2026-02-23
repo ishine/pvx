@@ -1,5 +1,11 @@
 # Supported File Types
 
+![pvx logo](../assets/pvx_logo.png)
+
+
+
+> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
+
 `pvx` uses `python-soundfile` (`soundfile`) backed by `libsndfile` for audio input/output (I/O).  
 This means some format support is runtime/platform dependent.
 

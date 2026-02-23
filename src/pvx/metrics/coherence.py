@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Inter-channel coherence drift metrics."""
 
 from __future__ import annotations
@@ -105,4 +107,3 @@ def stereo_coherence_drift_score(
         return 0.0
     report = interchannel_coherence_drift(ref[:, :2], cand[:, :2], n_fft=n_fft, hop_size=hop_size)
     return float(report["overall_drift_rad"])
-

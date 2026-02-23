@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Track F0 and emit a pvx control-map CSV for pitch-follow pipelines."""
 
 from __future__ import annotations

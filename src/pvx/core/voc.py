@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Multi-channel phase vocoder CLI for time and pitch manipulation."""
 
 from __future__ import annotations

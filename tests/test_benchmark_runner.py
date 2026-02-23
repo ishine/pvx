@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Tests for benchmark runner profile selection."""
 
 from __future__ import annotations

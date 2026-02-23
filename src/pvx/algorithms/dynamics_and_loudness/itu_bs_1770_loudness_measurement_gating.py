@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """ITU BS.1770 loudness measurement/gating.
 
 Comprehensive module help:

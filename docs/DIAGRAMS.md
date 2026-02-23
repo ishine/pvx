@@ -1,5 +1,11 @@
 # pvx Diagram Atlas
 
+![pvx logo](../assets/pvx_logo.png)
+
+
+
+> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
+
 This document provides expanded architecture and digital signal processing (DSP) flow diagrams for pvx.
 Diagrams are a mix of Mermaid (GitHub-rendered) and ASCII (terminal-friendly).
 

@@ -1,5 +1,11 @@
 # pvx Application Programming Interface (API) Overview
 
+![pvx logo](../assets/pvx_logo.png)
+
+
+
+> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
+
 This guide shows how to use `pvx` as a Python library instead of shell commands.
 
 ## 0) Quick Setup (Install + PATH)

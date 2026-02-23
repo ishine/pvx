@@ -1,5 +1,11 @@
 # Follow Workflow Migration
 
+![pvx logo](../assets/pvx_logo.png)
+
+
+
+> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
+
 This note describes how to migrate from long pitch-follow shell pipelines to the unified `pvx follow` helper.
 
 ## Why This Change
@@ -48,4 +54,3 @@ pvx pitch-track A.wav --output - \
 2. Keep existing manual pipelines unchanged until they are touched for other reasons.
 3. Add regression tests for representative follow jobs (already covered in `tests/test_cli_regression.py`).
 4. Keep manual route examples in documentation for advanced control-bus users.
-

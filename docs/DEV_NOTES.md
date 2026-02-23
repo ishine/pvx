@@ -1,5 +1,11 @@
 # Development (DEV) Notes: `pvxvoc` Call Flow and Insertion Points (Phase 0 Recon)
 
+![pvx logo](../assets/pvx_logo.png)
+
+
+
+> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
+
 This note documents the current processing path and exact insertion points for:
 - hybrid transient engine (phase vocoder (PV) + waveform similarity overlap-add (WSOLA))
 - stereo/multichannel coherence modes

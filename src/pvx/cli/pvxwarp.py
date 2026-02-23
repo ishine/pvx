@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Time-warp an input according to a user-provided stretch map."""
 
 from __future__ import annotations

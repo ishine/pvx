@@ -1,10 +1,14 @@
 # pvx Command-Line Interface (CLI) Flags Reference
 
-_Generated from commit `2d0fab0` (commit date: 2026-02-23T12:29:02-05:00)._
+![pvx logo](../assets/pvx_logo.png)
+
+> Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
+
+_Generated from commit `e983e2f` (commit date: 2026-02-23T12:50:44-05:00)._
 
 This file enumerates long-form CLI flags discovered from argparse declarations in canonical pvx CLI sources.
 
-Total tool+flag entries: **260**
+Total tool+flag entries: **262**
 Total unique long flags: **197**
 
 ## Unique Long Flags
@@ -155,15 +159,17 @@ Total unique long flags: **197**
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
-| `--alpha` | False | `0.5` | `` | `` | Morph amount 0..1 (0=A, 1=B) | `src/pvx/cli/pvxmorph.py` |
+| `--alpha` | False | `0.5` | `` | `` | Morph amount 0..1 (0=A, 1=B). Accepts scalar or control file (.csv/.json) for time-varying A->B trajectory morphing. | `src/pvx/cli/pvxmorph.py` |
 | `--blend-mode` | False | `linear` | `` | `` | Cross-synthesis blend style. linear/geometric are symmetric blends; carrier_* modes transfer envelope/mask from modulator to carrier. | `src/pvx/cli/pvxmorph.py` |
 | `--envelope-lifter` | False | `32` | `` | `` | Cepstral lifter cutoff for carrier_*_envelope_* modes (default: 32). | `src/pvx/cli/pvxmorph.py` |
+| `--interp` | False | `linear` | `` | `` | Interpolation mode for --alpha/--phase-mix control files (default: linear). | `src/pvx/cli/pvxmorph.py` |
 | `--mask-exponent` | False | `1.0` | `` | `` | Exponent used by carrier_*_mask_* modes (default: 1.0). | `src/pvx/cli/pvxmorph.py` |
 | `--normalize-energy` | False | `` | `` | `store_true` | Normalize each output channel RMS toward alpha-blended input RMS. | `src/pvx/cli/pvxmorph.py` |
+| `--order` | False | `3` | `` | `` | Polynomial order for --interp polynomial (default: 3). Accepts any integer >= 1; effective fit degree is min(order, control_points-1). | `src/pvx/cli/pvxmorph.py` |
 | `--output` | False | `` | `` | `` | Output file path | `src/pvx/cli/pvxmorph.py` |
 | `--output-format` | False | `` | `` | `` | Output extension/format; for --stdout defaults to wav | `src/pvx/cli/pvxmorph.py` |
 | `--overwrite` | False | `` | `` | `store_true` |  | `src/pvx/cli/pvxmorph.py` |
-| `--phase-mix` | False | `` | `` | `` | Phase blend in [0,1]. If omitted, mode-specific defaults apply (A-phase for *_phase_a/carrier_a_*, B-phase for *_phase_b/carrier_b_*, alpha for symmetric modes). | `src/pvx/cli/pvxmorph.py` |
+| `--phase-mix` | False | `` | `` | `` | Phase blend in [0,1]. If omitted, mode-specific defaults apply (A-phase for *_phase_a/carrier_a_*, B-phase for *_phase_b/carrier_b_*, alpha for symmetric modes). Accepts scalar or control file (.csv/.json). | `src/pvx/cli/pvxmorph.py` |
 | `--stdout` | False | `` | `` | `store_true` | Write processed audio to stdout stream (for piping); equivalent to -o - | `src/pvx/cli/pvxmorph.py` |
 
 ## `pvxretune.py`

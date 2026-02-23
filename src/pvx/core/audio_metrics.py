@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Shared audio metric summaries and ASCII table rendering."""
 
 from __future__ import annotations

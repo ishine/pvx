@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Conform timing and pitch to a user-provided segment map."""
 
 from __future__ import annotations

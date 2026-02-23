@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Unified top-level CLI for the pvx command suite."""
 
 from __future__ import annotations
@@ -139,7 +141,7 @@ EXAMPLE_COMMANDS: dict[str, tuple[str, str]] = {
     ),
     "morph": (
         "Source morph",
-        "pvx morph source_a.wav source_b.wav --alpha 0.4 --output morph.wav",
+        "pvx morph source_a.wav source_b.wav --alpha controls/alpha_curve.csv --interp linear --output morph_traj.wav",
     ),
     "map": (
         "Time/pitch map conform",
@@ -451,7 +453,7 @@ def run_guided_mode() -> int:
         input_a = _prompt_text("Input A path", "a.wav")
         input_b = _prompt_text("Input B path", "b.wav")
         output_path = _prompt_text("Output path", "morph.wav")
-        alpha = _prompt_text("Morph alpha (0..1)", "0.50")
+        alpha = _prompt_text("Morph alpha (0..1 or CSV/JSON control file)", "0.50")
         forwarded = [
             input_a,
             input_b,

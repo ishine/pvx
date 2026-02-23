@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Reproducible quality benchmark: pvx vs Rubber Band vs librosa baseline."""
 
 from __future__ import annotations

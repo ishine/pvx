@@ -1,5 +1,11 @@
 # pvx vs Rubber Band (Technical Comparison)
 
+![pvx logo](../assets/pvx_logo.png)
+
+
+
+> Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
+
 This document is intentionally non-marketing. Both tools are strong; each has tradeoffs.
 
 ## 1. Scope and Design Philosophy

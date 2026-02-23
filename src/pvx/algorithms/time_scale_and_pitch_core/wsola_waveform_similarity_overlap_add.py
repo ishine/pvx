@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """WSOLA (Waveform Similarity Overlap-Add).
 
 Comprehensive module help:

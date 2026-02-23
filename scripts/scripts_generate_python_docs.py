@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
+
 """Generate comprehensive documentation for every Python file in the repository."""
 
 from __future__ import annotations
@@ -14,6 +16,7 @@ DOCS_DIR = ROOT / "docs"
 DOCS_DIR.mkdir(parents=True, exist_ok=True)
 SRC_DIR = ROOT / "src"
 sys.path.insert(0, str(SRC_DIR))
+from pvx.core.attribution import ATTRIBUTION_DOC_PATH, COPYRIGHT_NOTICE
 
 PY_FILES = sorted(
     p for p in ROOT.rglob("*.py") if ".venv" not in p.parts and "__pycache__" not in p.parts
@@ -36,6 +39,21 @@ CLI_HELP_CANDIDATES = {
     ROOT / "pvxlayer.py",
     ROOT / "HPS-pitch-track.py",
 }
+
+
+def logo_lines() -> list[str]:
+    return [
+        "![pvx logo](../assets/pvx_logo.png)",
+        "",
+    ]
+
+
+def attribution_lines() -> list[str]:
+    return [
+        f"> {COPYRIGHT_NOTICE} See [`{ATTRIBUTION_DOC_PATH}`](../{ATTRIBUTION_DOC_PATH}).",
+        "",
+    ]
+
 
 def rel(path: Path) -> str:
     return str(path.relative_to(ROOT))
@@ -157,6 +175,8 @@ def generate_algorithm_param_doc() -> None:
     lines: list[str] = []
     lines.append("# pvx Algorithm Parameter Reference")
     lines.append("")
+    lines.extend(logo_lines())
+    lines.extend(attribution_lines())
     lines.append("This file lists per-algorithm parameter keys consumed by `pvx.algorithms.base.run_algorithm()` dispatch.")
     lines.append("Legacy import alias `pvxalgorithms.base.run_algorithm()` is still available for compatibility.")
     lines.append("Use these keys as `**params` when calling module `process(audio, sample_rate, **params)`. ")
@@ -178,6 +198,8 @@ def generate_python_help_doc() -> None:
     lines: list[str] = []
     lines.append("# Python File Documentation and Help")
     lines.append("")
+    lines.extend(logo_lines())
+    lines.extend(attribution_lines())
     lines.append("Comprehensive reference for every Python file in this repository.")
     lines.append("")
     lines.append(f"Total Python files documented: **{len(PY_FILES)}**")
