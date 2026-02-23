@@ -71,6 +71,11 @@ from pvx.core.output_policy import (
     validate_output_policy_args,
     write_metadata_sidecar,
 )
+from pvx.core.control_bus import (
+    ControlRoute,
+    apply_control_routes_csv,
+    parse_control_routes,
+)
 from pvx.core.stereo import lr_to_ms, ms_to_lr, validate_ref_channel
 from pvx.core.transients import detect_transient_regions, map_mask_to_output, smooth_binary_mask
 from pvx.core.wsola import wsola_time_stretch
@@ -419,8 +424,8 @@ _EXAMPLE_COMMANDS: dict[str, tuple[str, str]] = {
         "pvx voc input.wav --device cuda --stretch 1.1 --output out_gpu.wav",
     ),
     "pipeline": (
-        "Tracker sidechain pipeline",
-        "python3 HPS-pitch-track.py A.wav | pvx voc B.wav --pitch-follow-stdin --pitch-conf-min 0.75 --output B_follow.wav",
+        "Tracker sidechain pipeline (pitch -> stretch, no awk)",
+        "pvx pitch-track A.wav --emit pitch_to_stretch --output - | pvx voc B.wav --control-stdin --pitch-conf-min 0.75 --output B_follow.wav",
     ),
     "csv": (
         "Segment map workflow",
@@ -3753,6 +3758,14 @@ def load_control_segments(
         assert map_path is not None
         payload = Path(map_path).read_text(encoding="utf-8")
 
+    routes: list[ControlRoute] = list(getattr(args, "_control_routes", []) or [])
+    if routes:
+        payload = apply_control_routes_csv(
+            payload,
+            routes=routes,
+            source_label="stdin control-map" if use_stdin else f"control-map {map_path}",
+        )
+
     segments = parse_control_segments_csv(
         payload,
         default_stretch=default_stretch,
@@ -4942,6 +4955,14 @@ def validate_args(args: argparse.Namespace, parser: argparse.ArgumentParser) -> 
 
     if args.pitch_follow_stdin:
         args.pitch_map_stdin = True
+    if bool(getattr(args, "control_stdin", False)):
+        args.pitch_map_stdin = True
+
+    route_exprs = list(getattr(args, "route", []) or [])
+    try:
+        args._control_routes = parse_control_routes(route_exprs)
+    except ValueError as exc:
+        parser.error(str(exc))
 
     if args.n_fft <= 0:
         parser.error("--n-fft must be > 0")
@@ -4980,6 +5001,8 @@ def validate_args(args: argparse.Namespace, parser: argparse.ArgumentParser) -> 
             parser.error(f"Dynamic control file not found: {ref.path}")
     if args.pitch_map_stdin and args.pitch_map is not None and str(args.pitch_map) != "-":
         parser.error("--pitch-map-stdin cannot be combined with --pitch-map path")
+    if args._control_routes and not (args.pitch_map is not None or args.pitch_map_stdin):
+        parser.error("--route requires --pitch-map, --pitch-map-stdin, or --control-stdin")
     if args.target_f0 is not None and args.target_f0 <= 0:
         parser.error("--target-f0 must be > 0")
     if args.f0_min <= 0 or args.f0_max <= 0 or args.f0_min >= args.f0_max:
@@ -5095,6 +5118,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  pvx voc vocal.wav --preset vocal --pitch -2 --output vocal_tuned.wav\n"
             "  pvx voc speech.wav --transient-mode hybrid --stretch 1.25 --output speech_hybrid.wav\n"
             "  pvx voc stereo.wav --stereo-mode mid_side_lock --coherence-strength 0.9 --stretch 1.2 --output stereo_lock.wav\n"
+            "  pvx pitch-track A.wav --emit pitch_to_stretch --output - | pvx voc B.wav --control-stdin --output B_follow.wav\n"
             "  pvx voc input.wav --stretch controls/stretch.csv --interp linear --output output.wav\n"
             "  pvx voc input.wav --example all\n"
         ),
@@ -5597,6 +5621,24 @@ def build_parser() -> argparse.ArgumentParser:
         help="Read control-map CSV from stdin.",
     )
     pitch_group.add_argument(
+        "--control-stdin",
+        action="store_true",
+        help="Alias for --pitch-map-stdin (canonical control-bus CSV stdin path).",
+    )
+    pitch_group.add_argument(
+        "--route",
+        action="append",
+        default=[],
+        metavar="EXPR",
+        help=(
+            "Control-bus routing expression for map rows. Repeat flag to chain routes. "
+            "Syntax: target=source, target=const(v), target=inv(source), target=pow(source,exp), "
+            "target=mul(source,factor), target=add(source,offset), target=affine(source,scale,bias), "
+            "target=clip(source,lo,hi). Targets: stretch,pitch_ratio. "
+            "Sources: any numeric column present in the control-map CSV."
+        ),
+    )
+    pitch_group.add_argument(
         "--pitch-follow-stdin",
         action="store_true",
         help="Shortcut for --pitch-map-stdin (sidechain pitch-follow workflows).",
@@ -5778,7 +5820,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--output-dir cannot be used with --stdout")
     if args.output is not None and len(input_paths) != 1:
         parser.error("--output requires exactly one resolved input")
-    control_map_stdin = bool(args.pitch_map_stdin) or str(args.pitch_map) == "-"
+    control_map_stdin = bool(args.pitch_map_stdin) or bool(getattr(args, "control_stdin", False)) or str(args.pitch_map) == "-"
     if control_map_stdin and len(input_paths) != 1:
         parser.error("Control-map stdin mode requires exactly one input file")
     if control_map_stdin and stdin_count:

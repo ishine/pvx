@@ -4,8 +4,10 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import difflib
 import importlib
+import io
 import shlex
 import sys
 import tempfile
@@ -153,7 +155,23 @@ EXAMPLE_COMMANDS: dict[str, tuple[str, str]] = {
     ),
     "pipeline": (
         "Pitch-follow pipeline",
-        "pvx pitch-track guide.wav | pvx voc target.wav --pitch-follow-stdin --output followed.wav",
+        "pvx pitch-track guide.wav --emit pitch_to_stretch --output - | pvx voc target.wav --control-stdin --output followed.wav",
+    ),
+    "follow": (
+        "Single-command sidechain follow",
+        "pvx follow guide.wav target.wav --output followed.wav --emit pitch_to_stretch --pitch-conf-min 0.75",
+    ),
+    "follow-feature": (
+        "Feature-driven follow (MFCC + MPEG-7 spectral flux)",
+        "pvx follow guide.wav target.wav --feature-set all --mfcc-count 13 --emit pitch_map --stretch 1.0 --route pitch_ratio=affine(mfcc_01,0.002,1.0) --route pitch_ratio=clip(pitch_ratio,0.5,2.0) --route stretch=affine(mpeg7_spectral_flux,0.05,1.0) --route stretch=clip(stretch,0.85,1.6) --output followed_feature.wav",
+    ),
+    "follow-formant": (
+        "Feature-driven follow (formant and onset)",
+        "pvx follow guide.wav target.wav --feature-set all --emit pitch_map --stretch 1.0 --route pitch_ratio=affine(formant_f1_hz,0.0016,0.2) --route pitch_ratio=clip(pitch_ratio,0.7,1.5) --route stretch=affine(onset_norm,-0.35,1.2) --route stretch=clip(stretch,0.8,1.3) --output followed_formant_onset.wav",
+    ),
+    "follow-noise-aware": (
+        "Feature-driven follow (noise-aware hiss/hum control)",
+        "pvx follow guide.wav target.wav --feature-set all --emit pitch_map --stretch 1.0 --route stretch=affine(hiss_ratio,-0.6,1.2) --route stretch=clip(stretch,0.8,1.2) --route pitch_ratio=affine(hum_60_ratio,-0.4,1.15) --route pitch_ratio=clip(pitch_ratio,0.9,1.2) --output followed_noise_aware.wav",
     ),
     "chain": (
         "Managed multi-stage chain",
@@ -164,6 +182,32 @@ EXAMPLE_COMMANDS: dict[str, tuple[str, str]] = {
         "pvx stream input.wav --output output_stream.wav --chunk-seconds 0.2 --time-stretch 2.0 --preset extreme_ambient",
     ),
 }
+
+
+FOLLOW_EXAMPLE_COMMANDS: dict[str, tuple[str, str]] = {
+    "basic": (
+        "Pitch-to-stretch sidechain",
+        "pvx follow guide.wav target.wav --emit pitch_to_stretch --pitch-conf-min 0.75 --output followed.wav",
+    ),
+    "pitch": (
+        "Pitch-map follow with fixed stretch",
+        "pvx follow guide.wav target.wav --emit pitch_map --stretch 1.0 --output followed_pitch.wav",
+    ),
+    "mfcc_flux": (
+        "MFCC + MPEG-7 flux dual control",
+        "pvx follow guide.wav target.wav --feature-set all --mfcc-count 13 --emit pitch_map --stretch 1.0 --route pitch_ratio=affine(mfcc_01,0.002,1.0) --route pitch_ratio=clip(pitch_ratio,0.5,2.0) --route stretch=affine(mpeg7_spectral_flux,0.05,1.0) --route stretch=clip(stretch,0.85,1.6) --output followed_mfcc_flux.wav",
+    ),
+    "formant_onset": (
+        "Formant + onset dual control",
+        "pvx follow guide.wav target.wav --feature-set all --emit pitch_map --stretch 1.0 --route pitch_ratio=affine(formant_f1_hz,0.0016,0.2) --route pitch_ratio=clip(pitch_ratio,0.7,1.5) --route stretch=affine(onset_norm,-0.35,1.2) --route stretch=clip(stretch,0.8,1.3) --output followed_formant_onset.wav",
+    ),
+    "noise_aware": (
+        "Noise-aware hiss/hum routing",
+        "pvx follow guide.wav target.wav --feature-set all --emit pitch_map --stretch 1.0 --route stretch=affine(hiss_ratio,-0.6,1.2) --route stretch=clip(stretch,0.8,1.2) --route pitch_ratio=affine(hum_60_ratio,-0.4,1.15) --route pitch_ratio=clip(pitch_ratio,0.9,1.2) --output followed_noise_aware.wav",
+    ),
+}
+
+FOLLOW_EXAMPLE_CHOICES: tuple[str, ...] = ("all", *tuple(FOLLOW_EXAMPLE_COMMANDS.keys()))
 
 _AUDIO_EXTENSIONS: set[str] = {
     ".wav",
@@ -250,6 +294,7 @@ def print_tools() -> None:
     print("  list         Show this command table")
     print("  examples     Show copy-paste examples (use `pvx examples <name>`)")
     print("  guided       Interactive command builder")
+    print("  follow       Track one file and control another in one command")
     print("  chain        Run a managed multi-stage one-line tool chain")
     print("  stream       Chunked stream wrapper around `pvx voc`")
     print("  help <tool>  Show subcommand help")
@@ -294,6 +339,40 @@ def _print_command_preview(command: str, forwarded_args: list[str]) -> None:
     print("Generated command:")
     print(cmd)
     print("")
+
+
+def print_follow_examples(which: str = "basic") -> None:
+    key = str(which).strip().lower()
+    if key == "all":
+        print("pvx follow example commands")
+        print("")
+        for name, (title, command) in FOLLOW_EXAMPLE_COMMANDS.items():
+            print(f"[{name}] {title}")
+            print(command)
+            print("")
+        return
+    if key not in FOLLOW_EXAMPLE_COMMANDS:
+        raise ValueError(
+            f"Unknown follow example '{which}'. Use one of: {', '.join(FOLLOW_EXAMPLE_CHOICES)}"
+        )
+    title, command = FOLLOW_EXAMPLE_COMMANDS[key]
+    print(f"[{key}] {title}")
+    print(command)
+
+
+def _extract_follow_example_request(args: list[str]) -> str | None:
+    tokens = [str(token).strip() for token in list(args or [])]
+    for idx, token in enumerate(tokens):
+        if token == "--example":
+            if idx + 1 < len(tokens):
+                candidate = tokens[idx + 1]
+                if candidate and not candidate.startswith("-"):
+                    return candidate
+            return "basic"
+        if token.startswith("--example="):
+            candidate = token.split("=", 1)[1].strip()
+            return candidate or "basic"
+    return None
 
 
 def run_guided_mode() -> int:
@@ -404,6 +483,250 @@ def _run_stage_command(stage_name: str, stage_args: list[str]) -> int:
     except SystemExit as exc:
         code = exc.code if isinstance(exc.code, int) else 1
         return int(code)
+
+
+def _run_stage_capture_stdout(stage_name: str, stage_args: list[str]) -> tuple[int, str]:
+    capture = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(capture):
+            code = int(dispatch_tool(stage_name, stage_args))
+    except SystemExit as exc:
+        code = exc.code if isinstance(exc.code, int) else 1
+    except Exception as exc:
+        print(f"[error] {stage_name}: {exc}", file=sys.stderr)
+        code = 1
+    return int(code), capture.getvalue()
+
+
+class _BytesStdin:
+    def __init__(self, payload: bytes) -> None:
+        self.buffer = io.BytesIO(payload)
+
+    def isatty(self) -> bool:
+        return False
+
+
+@contextlib.contextmanager
+def _patched_stdin_bytes(payload: bytes):
+    original_stdin = sys.stdin
+    sys.stdin = _BytesStdin(payload)  # type: ignore[assignment]
+    try:
+        yield
+    finally:
+        sys.stdin = original_stdin
+
+
+def run_follow_mode(forwarded_args: list[str]) -> int:
+    example_request = _extract_follow_example_request(forwarded_args)
+    if example_request is not None:
+        try:
+            print_follow_examples(example_request)
+            return 0
+        except ValueError as exc:
+            print(f"pvx follow: error: {exc}", file=sys.stderr)
+            return 2
+
+    parser = argparse.ArgumentParser(
+        prog="pvx follow",
+        description=(
+            "Single-command sidechain helper: track guide pitch/f0 and apply the resulting control map "
+            "to a target via `pvx voc --control-stdin`."
+        ),
+    )
+    parser.add_argument("guide", help="Guide/input A used for pitch tracking")
+    parser.add_argument("target", help="Target/input B to be processed by pvx voc")
+    parser.add_argument("--output", "--out", dest="output", required=True, help="Output audio path")
+    parser.add_argument(
+        "--emit",
+        choices=["pitch_map", "stretch_map", "pitch_to_stretch"],
+        default="pitch_to_stretch",
+        help="Control map emit mode for the guide track (default: pitch_to_stretch)",
+    )
+    parser.add_argument("--backend", choices=["auto", "pyin", "acf"], default="auto", help="Pitch tracker backend")
+    parser.add_argument("--fmin", type=float, default=50.0, help="Minimum tracked f0 in Hz")
+    parser.add_argument("--fmax", type=float, default=1200.0, help="Maximum tracked f0 in Hz")
+    parser.add_argument("--frame-length", type=int, default=2048, help="Tracker frame length in samples")
+    parser.add_argument("--hop-size", type=int, default=256, help="Tracker hop size in samples")
+    parser.add_argument(
+        "--ratio-reference",
+        choices=["median", "mean", "first", "hz"],
+        default="median",
+        help="Reference mode for pitch_ratio derivation in tracking",
+    )
+    parser.add_argument("--reference-hz", type=float, default=None, help="Reference Hz when --ratio-reference hz")
+    parser.add_argument("--ratio-min", type=float, default=0.25, help="Minimum pitch_ratio clamp")
+    parser.add_argument("--ratio-max", type=float, default=4.0, help="Maximum pitch_ratio clamp")
+    parser.add_argument("--smooth-frames", type=int, default=5, help="Smoothing window in frames")
+    parser.add_argument("--confidence-floor", type=float, default=0.0, help="Minimum tracker confidence")
+    parser.add_argument(
+        "--feature-set",
+        choices=["none", "basic", "advanced", "all"],
+        default="all",
+        help="Feature columns emitted by pitch tracker (default: all)",
+    )
+    parser.add_argument(
+        "--mfcc-count",
+        type=int,
+        default=13,
+        help="MFCC column count emitted by pitch tracker (default: 13)",
+    )
+    parser.add_argument(
+        "--stretch-from",
+        choices=["pitch_ratio", "inv_pitch_ratio", "f0_hz"],
+        default="pitch_ratio",
+        help="Source for deriving stretch in stretch-oriented emit modes",
+    )
+    parser.add_argument("--stretch-scale", type=float, default=1.0, help="Scale factor for derived stretch track")
+    parser.add_argument("--stretch-min", type=float, default=0.25, help="Lower clamp for derived stretch")
+    parser.add_argument("--stretch-max", type=float, default=4.0, help="Upper clamp for derived stretch")
+    parser.add_argument("--stretch", type=float, default=1.0, help="Constant stretch value when --emit pitch_map")
+    parser.add_argument(
+        "--pitch-conf-min",
+        type=float,
+        default=0.75,
+        help="Minimum accepted map confidence for pvx voc (default: 0.75)",
+    )
+    parser.add_argument(
+        "--pitch-lowconf-mode",
+        choices=["hold", "unity", "interp"],
+        default="hold",
+        help="Low-confidence handling mode in pvx voc (default: hold)",
+    )
+    parser.add_argument(
+        "--pitch-map-smooth-ms",
+        type=float,
+        default=0.0,
+        help="Additional map smoothing in pvx voc (milliseconds)",
+    )
+    parser.add_argument(
+        "--pitch-map-crossfade-ms",
+        type=float,
+        default=20.0,
+        help="Map segment crossfade in pvx voc (milliseconds, default: 20)",
+    )
+    parser.add_argument(
+        "--route",
+        action="append",
+        default=[],
+        metavar="EXPR",
+        help=(
+            "Optional pvx voc control route expression. Repeat to chain. "
+            "Example: --route stretch=pitch_ratio --route pitch_ratio=const(1.0)"
+        ),
+    )
+    parser.add_argument("--overwrite", action="store_true", help="Overwrite existing output")
+    parser.add_argument("--quiet", action="store_true", help="Reduce helper logs and hide progress bars")
+    parser.add_argument("--silent", action="store_true", help="Suppress helper logs")
+    parser.add_argument(
+        "--example",
+        nargs="?",
+        const="basic",
+        default=None,
+        choices=list(FOLLOW_EXAMPLE_CHOICES),
+        metavar="NAME",
+        help=(
+            "Print follow example command(s) and exit. "
+            "Use `--example` for basic or `--example all` for the full set."
+        ),
+    )
+    args, passthrough = parser.parse_known_args(forwarded_args)
+    if args.example is not None:
+        print_follow_examples(str(args.example))
+        return 0
+
+    passthrough_flags = {_token_flag(token) for token in passthrough if token.startswith("-")}
+    forbidden_passthrough = {"--output", "--out", "--stdout", "--pitch-map", "--pitch-map-stdin", "--control-stdin"}
+    bad_flags = sorted(passthrough_flags & forbidden_passthrough)
+    if bad_flags:
+        parser.error(
+            f"Do not pass {bad_flags} via passthrough in `pvx follow`; "
+            "follow mode manages control-map and output routing."
+        )
+    if int(args.mfcc_count) < 0 or int(args.mfcc_count) > 40:
+        parser.error("--mfcc-count must be in [0, 40]")
+
+    track_args: list[str] = [
+        str(args.guide),
+        "--output",
+        "-",
+        "--emit",
+        str(args.emit),
+        "--backend",
+        str(args.backend),
+        "--fmin",
+        f"{float(args.fmin):.12g}",
+        "--fmax",
+        f"{float(args.fmax):.12g}",
+        "--frame-length",
+        str(int(args.frame_length)),
+        "--hop-size",
+        str(int(args.hop_size)),
+        "--ratio-reference",
+        str(args.ratio_reference),
+        "--ratio-min",
+        f"{float(args.ratio_min):.12g}",
+        "--ratio-max",
+        f"{float(args.ratio_max):.12g}",
+        "--smooth-frames",
+        str(int(args.smooth_frames)),
+        "--confidence-floor",
+        f"{float(args.confidence_floor):.12g}",
+        "--feature-set",
+        str(args.feature_set),
+        "--mfcc-count",
+        str(int(args.mfcc_count)),
+        "--stretch-from",
+        str(args.stretch_from),
+        "--stretch-scale",
+        f"{float(args.stretch_scale):.12g}",
+        "--stretch-min",
+        f"{float(args.stretch_min):.12g}",
+        "--stretch-max",
+        f"{float(args.stretch_max):.12g}",
+        "--stretch",
+        f"{float(args.stretch):.12g}",
+    ]
+    if args.reference_hz is not None:
+        track_args.extend(["--reference-hz", f"{float(args.reference_hz):.12g}"])
+    if args.quiet:
+        track_args.append("--quiet")
+    if args.silent:
+        track_args.append("--silent")
+
+    code, control_csv = _run_stage_capture_stdout("pitch-track", track_args)
+    if code != 0:
+        return int(code)
+    if not control_csv.strip():
+        print("[error] follow: pitch tracker emitted an empty control map", file=sys.stderr)
+        return 1
+
+    voc_args: list[str] = [
+        str(args.target),
+        "--control-stdin",
+        "--pitch-conf-min",
+        f"{float(args.pitch_conf_min):.12g}",
+        "--pitch-lowconf-mode",
+        str(args.pitch_lowconf_mode),
+        "--pitch-map-smooth-ms",
+        f"{float(args.pitch_map_smooth_ms):.12g}",
+        "--pitch-map-crossfade-ms",
+        f"{float(args.pitch_map_crossfade_ms):.12g}",
+        "--output",
+        str(args.output),
+    ]
+    for route in list(args.route or []):
+        voc_args.extend(["--route", str(route)])
+    if args.overwrite:
+        voc_args.append("--overwrite")
+    if args.quiet:
+        voc_args.append("--quiet")
+    if args.silent:
+        voc_args.append("--silent")
+    voc_args.extend(passthrough)
+
+    payload = control_csv.encode("utf-8")
+    with _patched_stdin_bytes(payload):
+        return _run_stage_command("voc", voc_args)
 
 
 def run_chain_mode(forwarded_args: list[str]) -> int:
@@ -622,6 +945,7 @@ def build_parser() -> argparse.ArgumentParser:
             "Quick start:\n"
             "  pvx voc input.wav --stretch 1.2 --output output.wav\n"
             "  pvx input.wav --stretch 1.2 --output output.wav   # defaults to `voc`\n"
+            "  pvx follow guide.wav target.wav --output followed.wav --emit pitch_to_stretch\n"
             "  pvx chain input.wav --pipeline \"voc --stretch 1.2 | formant --mode preserve\" --output out.wav\n"
             "  pvx stream input.wav --output out.wav --chunk-seconds 0.2 --time-stretch 2.0\n"
             "  pvx list\n"
@@ -658,7 +982,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     command = str(command_raw).strip().lower()
-    helper_commands = {"list", "ls", "tools", "examples", "example", "guided", "guide", "chain", "stream", "help"}
+    helper_commands = {"list", "ls", "tools", "examples", "example", "guided", "guide", "follow", "chain", "stream", "help"}
 
     if command in {"list", "ls", "tools"}:
         print_tools()
@@ -673,6 +997,11 @@ def main(argv: list[str] | None = None) -> int:
     if command in {"guided", "guide"}:
         try:
             return run_guided_mode()
+        except ValueError as exc:
+            parser.error(str(exc))
+    if command == "follow":
+        try:
+            return run_follow_mode(forwarded)
         except ValueError as exc:
             parser.error(str(exc))
     if command == "chain":
@@ -699,6 +1028,9 @@ def main(argv: list[str] | None = None) -> int:
                 return 0
             if target in {"guided", "guide"}:
                 print("Run `pvx guided` from an interactive terminal.")
+                return 0
+            if target == "follow":
+                print("Run `pvx follow --help` for one-command sidechain control mapping.")
                 return 0
             if target == "chain":
                 print("Run `pvx chain --help` for managed one-line tool chaining.")

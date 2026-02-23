@@ -43,6 +43,28 @@ def write_mono_tone(path: Path, sr: int = 24000, duration: float = 0.5, freq_hz:
     return audio.astype(np.float64), sr
 
 
+def write_mono_glide(path: Path, sr: int = 24000, duration: float = 0.6, f0_start: float = 180.0, f0_end: float = 360.0) -> tuple[np.ndarray, int]:
+    t = np.arange(int(sr * duration), dtype=np.float64) / float(sr)
+    freq = np.linspace(float(f0_start), float(f0_end), num=t.size, dtype=np.float64)
+    phase = 2.0 * np.pi * np.cumsum(freq) / float(sr)
+    audio = 0.35 * np.sin(phase)
+    sf.write(path, audio, sr)
+    return audio.astype(np.float64), sr
+
+
+def write_mono_complex(path: Path, sr: int = 24000, duration: float = 0.5) -> tuple[np.ndarray, int]:
+    t = np.arange(int(sr * duration), dtype=np.float64) / float(sr)
+    audio = (
+        0.22 * np.sin(2 * np.pi * 110.0 * t)
+        + 0.18 * np.sin(2 * np.pi * 330.0 * t)
+        + 0.12 * np.sin(2 * np.pi * 880.0 * t)
+    )
+    env = np.linspace(0.3, 1.0, num=t.size, dtype=np.float64)
+    audio = 0.35 * env * audio
+    sf.write(path, audio, sr)
+    return audio.astype(np.float64), sr
+
+
 class TestCLIRegression(unittest.TestCase):
     def test_unified_cli_lists_tools(self) -> None:
         cmd = [sys.executable, str(UNIFIED_CLI), "list"]
@@ -51,6 +73,7 @@ class TestCLIRegression(unittest.TestCase):
         self.assertIn("voc", proc.stdout)
         self.assertIn("freeze", proc.stdout)
         self.assertIn("pitch-track", proc.stdout)
+        self.assertIn("follow", proc.stdout)
 
     def test_unified_cli_dispatches_voc(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -191,6 +214,91 @@ class TestCLIRegression(unittest.TestCase):
             expected_len = int(round(input_audio.shape[0] * 1.2))
             self.assertAlmostEqual(output_audio.shape[0], expected_len, delta=24)
 
+    def test_unified_cli_follow_runs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            guide_path = tmp_path / "follow_guide.wav"
+            target_path = tmp_path / "follow_target.wav"
+            write_mono_glide(guide_path, duration=0.65, f0_start=140.0, f0_end=360.0)
+            input_audio, sr = write_stereo_tone(target_path, duration=0.65)
+            out_path = tmp_path / "follow_out.wav"
+
+            cmd = [
+                sys.executable,
+                str(UNIFIED_CLI),
+                "follow",
+                str(guide_path),
+                str(target_path),
+                "--backend",
+                "acf",
+                "--emit",
+                "pitch_to_stretch",
+                "--stretch-scale",
+                "2.0",
+                "--stretch-min",
+                "1.5",
+                "--stretch-max",
+                "2.5",
+                "--pitch-conf-min",
+                "0.1",
+                "--output",
+                str(out_path),
+                "--overwrite",
+                "--quiet",
+            ]
+            proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+            self.assertTrue(out_path.exists())
+
+            output_audio, out_sr = sf.read(out_path, always_2d=True)
+            self.assertEqual(out_sr, sr)
+            self.assertEqual(output_audio.shape[1], 2)
+            self.assertGreater(abs(output_audio.shape[0] - input_audio.shape[0]), 32)
+
+    def test_unified_cli_follow_rejects_output_passthrough(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            guide_path = tmp_path / "follow_err_guide.wav"
+            target_path = tmp_path / "follow_err_target.wav"
+            write_mono_tone(guide_path, duration=0.2, freq_hz=220.0)
+            write_mono_tone(target_path, duration=0.2, freq_hz=330.0)
+            out_path = tmp_path / "follow_err_out.wav"
+
+            cmd = [
+                sys.executable,
+                str(UNIFIED_CLI),
+                "follow",
+                str(guide_path),
+                str(target_path),
+                "--output",
+                str(out_path),
+                "--stdout",
+            ]
+            proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertIn("Do not pass", proc.stderr)
+
+    def test_unified_cli_help_follow_target(self) -> None:
+        cmd = [sys.executable, str(UNIFIED_CLI), "help", "follow"]
+        proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+        self.assertIn("pvx follow --help", proc.stdout)
+
+    def test_unified_cli_follow_example_basic(self) -> None:
+        cmd = [sys.executable, str(UNIFIED_CLI), "follow", "--example"]
+        proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+        self.assertIn("[basic]", proc.stdout)
+        self.assertIn("pvx follow guide.wav target.wav", proc.stdout)
+
+    def test_unified_cli_follow_example_all(self) -> None:
+        cmd = [sys.executable, str(UNIFIED_CLI), "follow", "--example", "all"]
+        proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+        self.assertIn("pvx follow example commands", proc.stdout)
+        self.assertIn("[mfcc_flux]", proc.stdout)
+        self.assertIn("[noise_aware]", proc.stdout)
+
     def test_common_tool_accepts_explicit_output_path(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
@@ -213,6 +321,97 @@ class TestCLIRegression(unittest.TestCase):
             proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
             self.assertEqual(proc.returncode, 0, msg=proc.stderr)
             self.assertTrue(out_path.exists())
+
+    def test_pvxmorph_carrier_envelope_mode_runs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            a_path = tmp_path / "morph_a.wav"
+            b_path = tmp_path / "morph_b.wav"
+            write_mono_tone(a_path, duration=0.35, freq_hz=220.0)
+            write_mono_complex(b_path, duration=0.35)
+            out_path = tmp_path / "morph_env.wav"
+
+            cmd = [
+                sys.executable,
+                str(UNIFIED_CLI),
+                "morph",
+                str(a_path),
+                str(b_path),
+                "--alpha",
+                "0.75",
+                "--blend-mode",
+                "carrier_a_envelope_b",
+                "--envelope-lifter",
+                "28",
+                "--normalize-energy",
+                "--output",
+                str(out_path),
+                "--overwrite",
+                "--quiet",
+            ]
+            proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+            self.assertTrue(out_path.exists())
+            output_audio, out_sr = sf.read(out_path, always_2d=True)
+            self.assertEqual(out_sr, 24000)
+            self.assertEqual(output_audio.shape[1], 1)
+            self.assertGreater(output_audio.shape[0], 0)
+
+    def test_pvxmorph_blend_modes_produce_different_audio(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            a_path = tmp_path / "morph_cmp_a.wav"
+            b_path = tmp_path / "morph_cmp_b.wav"
+            write_mono_complex(a_path, duration=0.4)
+            write_mono_tone(b_path, duration=0.4, freq_hz=540.0)
+            out_linear = tmp_path / "morph_linear.wav"
+            out_mask = tmp_path / "morph_mask.wav"
+
+            cmd_linear = [
+                sys.executable,
+                str(UNIFIED_CLI),
+                "morph",
+                str(a_path),
+                str(b_path),
+                "--alpha",
+                "0.6",
+                "--blend-mode",
+                "linear",
+                "--output",
+                str(out_linear),
+                "--overwrite",
+                "--quiet",
+            ]
+            cmd_mask = [
+                sys.executable,
+                str(UNIFIED_CLI),
+                "morph",
+                str(a_path),
+                str(b_path),
+                "--alpha",
+                "0.6",
+                "--blend-mode",
+                "carrier_a_mask_b",
+                "--mask-exponent",
+                "1.4",
+                "--output",
+                str(out_mask),
+                "--overwrite",
+                "--quiet",
+            ]
+            proc_linear = subprocess.run(cmd_linear, cwd=ROOT, capture_output=True, text=True)
+            proc_mask = subprocess.run(cmd_mask, cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(proc_linear.returncode, 0, msg=proc_linear.stderr)
+            self.assertEqual(proc_mask.returncode, 0, msg=proc_mask.stderr)
+            self.assertTrue(out_linear.exists())
+            self.assertTrue(out_mask.exists())
+
+            y_linear, sr_linear = sf.read(out_linear, always_2d=True)
+            y_mask, sr_mask = sf.read(out_mask, always_2d=True)
+            self.assertEqual(sr_linear, sr_mask)
+            n = min(y_linear.shape[0], y_mask.shape[0])
+            diff = float(np.mean(np.abs(y_linear[:n, 0] - y_mask[:n, 0])))
+            self.assertGreater(diff, 1e-4)
 
     def test_hps_pitch_tracker_emits_control_map(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -240,6 +439,78 @@ class TestCLIRegression(unittest.TestCase):
             self.assertIn("pitch_ratio", first)
             self.assertIn("confidence", first)
             self.assertGreater(float(first["pitch_ratio"]), 0.0)
+
+    def test_hps_pitch_tracker_emit_pitch_to_stretch_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            in_path = tmp_path / "pitch_glide.wav"
+            write_mono_glide(in_path, duration=0.7, f0_start=160.0, f0_end=360.0)
+
+            cmd = [
+                sys.executable,
+                str(HPS_CLI),
+                str(in_path),
+                "--backend",
+                "acf",
+                "--emit",
+                "pitch_to_stretch",
+                "--stretch-scale",
+                "1.0",
+                "--stretch-min",
+                "0.4",
+                "--stretch-max",
+                "2.5",
+                "--quiet",
+            ]
+            proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+
+            rows = list(csv.DictReader(io.StringIO(proc.stdout)))
+            self.assertGreater(len(rows), 10)
+            stretch_values = np.asarray([float(row["stretch"]) for row in rows], dtype=np.float64)
+            pitch_values = np.asarray([float(row["pitch_ratio"]) for row in rows], dtype=np.float64)
+            self.assertGreater(float(np.std(stretch_values)), 1e-3)
+            self.assertTrue(np.allclose(pitch_values, 1.0, atol=1e-9))
+
+    def test_hps_pitch_tracker_emits_feature_vector_columns(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            in_path = tmp_path / "pitch_features.wav"
+            write_mono_glide(in_path, duration=0.5, f0_start=150.0, f0_end=340.0)
+
+            cmd = [
+                sys.executable,
+                str(HPS_CLI),
+                str(in_path),
+                "--backend",
+                "acf",
+                "--feature-set",
+                "all",
+                "--mfcc-count",
+                "8",
+                "--quiet",
+            ]
+            proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+            rows = list(csv.DictReader(io.StringIO(proc.stdout)))
+            self.assertGreater(len(rows), 8)
+            first = rows[0]
+            for key in (
+                "rms_db",
+                "spectral_flux",
+                "onset_strength",
+                "voicing_prob",
+                "pitch_stability",
+                "formant_f1_hz",
+                "tempo_bpm",
+                "speech_prob",
+                "music_prob",
+                "mpeg7_spectral_centroid_hz",
+                "mpeg7_audio_spectrum_envelope_01",
+                "mfcc_01",
+                "mfcc_08",
+            ):
+                self.assertIn(key, first)
 
     def test_cli_pitch_map_stdin_pipeline(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -285,6 +556,128 @@ class TestCLIRegression(unittest.TestCase):
             self.assertEqual(output_audio.shape[1], 2)
             self.assertGreater(output_audio.shape[0], 0)
             self.assertNotEqual(output_audio.shape[0], input_audio.shape[0])
+
+    def test_cli_control_route_affine_feature_source(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            guide_path = tmp_path / "guide_feature.wav"
+            target_path = tmp_path / "target_feature.wav"
+            write_mono_glide(guide_path, duration=0.65, f0_start=170.0, f0_end=300.0)
+            input_audio, sr = write_stereo_tone(target_path, duration=0.65)
+
+            track_cmd = [
+                sys.executable,
+                str(HPS_CLI),
+                str(guide_path),
+                "--backend",
+                "acf",
+                "--feature-set",
+                "all",
+                "--mfcc-count",
+                "6",
+                "--quiet",
+            ]
+            track = subprocess.run(track_cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(track.returncode, 0, msg=track.stderr)
+            self.assertIn("mfcc_01", track.stdout)
+
+            out_path = tmp_path / "feature_route_out.wav"
+            # `clip(affine(...))` is expressed as chained routes.
+            voc_cmd = [
+                sys.executable,
+                str(CLI),
+                str(target_path),
+                "--control-stdin",
+                "--route",
+                "pitch_ratio=affine(mfcc_01,0.002,1.0)",
+                "--route",
+                "pitch_ratio=clip(pitch_ratio,0.5,2.0)",
+                "--route",
+                "stretch=affine(rms,2.0,0.8)",
+                "--route",
+                "stretch=clip(stretch,0.9,1.8)",
+                "--pitch-conf-min",
+                "0.0",
+                "--output",
+                str(out_path),
+                "--overwrite",
+                "--quiet",
+            ]
+            voc = subprocess.run(voc_cmd, cwd=ROOT, input=track.stdout, capture_output=True, text=True)
+            self.assertEqual(voc.returncode, 0, msg=voc.stderr)
+            self.assertTrue(out_path.exists())
+            output_audio, out_sr = sf.read(out_path, always_2d=True)
+            self.assertEqual(out_sr, sr)
+            self.assertEqual(output_audio.shape[1], 2)
+            self.assertGreater(abs(output_audio.shape[0] - input_audio.shape[0]), 24)
+
+    def test_cli_control_stdin_route_pipeline_without_awk(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            guide_path = tmp_path / "guide.wav"
+            target_path = tmp_path / "target.wav"
+            write_mono_glide(guide_path, duration=0.7, f0_start=180.0, f0_end=320.0)
+            input_audio, sr = write_stereo_tone(target_path, duration=0.7)
+
+            track_cmd = [
+                sys.executable,
+                str(HPS_CLI),
+                str(guide_path),
+                "--backend",
+                "acf",
+                "--ratio-reference",
+                "hz",
+                "--reference-hz",
+                "440",
+                "--quiet",
+            ]
+            track = subprocess.run(track_cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(track.returncode, 0, msg=track.stderr)
+            self.assertIn("pitch_ratio", track.stdout)
+
+            out_path = tmp_path / "route_follow.wav"
+            voc_cmd = [
+                sys.executable,
+                str(CLI),
+                str(target_path),
+                "--control-stdin",
+                "--route",
+                "stretch=pitch_ratio",
+                "--route",
+                "pitch_ratio=const(1.0)",
+                "--pitch-conf-min",
+                "0.1",
+                "--output",
+                str(out_path),
+                "--overwrite",
+                "--quiet",
+            ]
+            voc = subprocess.run(voc_cmd, cwd=ROOT, input=track.stdout, capture_output=True, text=True)
+            self.assertEqual(voc.returncode, 0, msg=voc.stderr)
+            self.assertTrue(out_path.exists())
+
+            output_audio, out_sr = sf.read(out_path, always_2d=True)
+            self.assertEqual(out_sr, sr)
+            self.assertEqual(output_audio.shape[1], 2)
+            self.assertGreater(output_audio.shape[0], 0)
+            self.assertLess(output_audio.shape[0], int(round(input_audio.shape[0] * 0.9)))
+
+    def test_cli_route_requires_control_map_source(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            in_path = tmp_path / "route_err.wav"
+            write_mono_tone(in_path, duration=0.3, freq_hz=220.0)
+            cmd = [
+                sys.executable,
+                str(CLI),
+                str(in_path),
+                "--route",
+                "stretch=pitch_ratio",
+                "--quiet",
+            ]
+            proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertIn("--route requires", proc.stderr)
 
     def test_cli_dynamic_stretch_csv_linear(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

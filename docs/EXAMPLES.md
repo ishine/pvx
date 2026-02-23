@@ -12,6 +12,15 @@ python3 -m pip install -e .
 pvx --help
 ```
 
+Same setup with `uv`:
+
+```bash
+uv venv .venv
+source .venv/bin/activate
+uv pip install -e .
+uv run pvx --help
+```
+
 If `pvx` is not found, add the virtualenv `bin` directory to your path environment variable (`PATH`) (`zsh`):
 
 ```bash
@@ -26,10 +35,17 @@ No-`PATH` fallback for every example command:
 python3 pvx.py <tool> ...
 ```
 
+No-`PATH` fallback with `uv`:
+
+```bash
+uv run python3 pvx.py <tool> ...
+```
+
 Preferred invocation:
 - use unified subcommands via `pvx` (for example: `pvx voc`, `pvx freeze`, `pvx morph`)
 - legacy wrappers remain valid (`python3 pvxvoc.py`, `python3 pvxfreeze.py`, etc.)
 - quick conversion rule: replace `python3 pvxvoc.py` with `pvx voc`, `python3 pvxharmonize.py` with `pvx harmonize`, and so on
+- `uv` conversion rule: prefix examples with `uv run` (`pvx ...` -> `uv run pvx ...`, `python3 ...` -> `uv run python3 ...`)
 
 Assumptions:
 - input files exist in your working directory
@@ -273,11 +289,11 @@ pvx voc vocal_note.wav --target-f0 440 --pitch-mode formant-preserving --output 
 
 **Command**
 ```bash
-pvx morph source_a.wav source_b.wav --alpha 0.35 --output morph_35.wav --overwrite
+pvx morph source_a.wav source_b.wav --alpha 0.35 --blend-mode linear --output morph_35.wav --overwrite
 ```
 
 **Explanation**
-- Interpolates spectral content between A and B.
+- Interpolates spectral content between A and B (`linear` mode).
 
 **Before/After**
 - Before: two distinct sources.
@@ -285,10 +301,24 @@ pvx morph source_a.wav source_b.wav --alpha 0.35 --output morph_35.wav --overwri
 
 **Parameters that matter most**
 - `--alpha`
+- `--blend-mode`
+- `--phase-mix` (optional phase control)
 
 **Artifacts to listen for**
 - phasing if sources differ strongly in timing
 - hollow midrange from spectral mismatch
+
+**Cross-synthesis variants**
+```bash
+# Envelope transfer: carrier A with modulator B spectral envelope
+pvx morph source_a.wav source_b.wav --blend-mode carrier_a_envelope_b --alpha 0.8 --envelope-lifter 36 --output morph_env_ab.wav --overwrite
+
+# Spectral-mask transfer: carrier A masked by modulator B
+pvx morph source_a.wav source_b.wav --blend-mode carrier_a_mask_b --alpha 0.7 --mask-exponent 1.2 --output morph_mask_ab.wav --overwrite
+
+# Magnitude/phase exchange style
+pvx morph source_a.wav source_b.wav --blend-mode magnitude_b_phase_a --alpha 0.65 --phase-mix 0.1 --output morph_magB_phaseA.wav --overwrite
+```
 
 ---
 
@@ -405,24 +435,46 @@ start_sec,end_sec,stretch
 
 **Command**
 ```bash
-pvx pitch-track A.wav | pvx voc B.wav --pitch-follow-stdin --pitch-conf-min 0.75 --output B_follow.wav
+pvx follow A.wav B.wav --emit pitch_to_stretch --pitch-conf-min 0.75 --output B_follow.wav
 ```
 
 **Explanation**
-- Tracks F0 in A and applies contour as ratio map to B.
+- Runs the full sidechain flow in one command: track A, build control map, apply to B.
 
 **Before/After**
 - Before: B has its own pitch motion.
-- After: B follows A’s pitch trajectory where confidence is sufficient.
+- After: B follows A’s timing contour where confidence is sufficient.
 
 **Parameters that matter most**
-- tracker backend and frame settings
+- `--backend` and tracker frame settings
 - `--pitch-conf-min`
 - `--pitch-lowconf-mode`
 
 **Artifacts to listen for**
 - warbling from noisy tracker segments
 - abrupt ratio jumps at low-confidence transitions
+
+**Advanced variant (feature vector sidechain with MFCC + MPEG-7-style flux)**
+```bash
+pvx pitch-track A.wav --feature-set all --mfcc-count 13 --output - \
+  | pvx voc B.wav --control-stdin \
+      --route pitch_ratio=affine(mfcc_01,0.002,1.0) \
+      --route pitch_ratio=clip(pitch_ratio,0.5,2.0) \
+      --route stretch=affine(mpeg7_spectral_flux,0.05,1.0) \
+      --route stretch=clip(stretch,0.85,1.6) \
+      --output B_feature_follow.wav
+```
+
+More feature-follow and feature-vector routing recipes:
+- `docs/FEATURE_SIDECHAIN_EXAMPLES.md`
+
+Built-in `pvx follow` recipe printer:
+
+```bash
+pvx follow --example
+pvx follow --example all
+pvx follow --example noise_aware
+```
 
 ---
 
@@ -1491,7 +1543,7 @@ pvx voc stereo_vocal.wav --stretch 1.0 --pitch 2 --pitch-mode formant-preserving
 
 **Command**
 ```bash
-pvx pitch-track A.wav | pvx voc B.wav --pitch-follow-stdin --pitch-conf-min 0.75 --pitch-lowconf-mode hold --pitch-map-crossfade-ms 20 --output B_pitch_follow.wav
+pvx pitch-track A.wav --output - | pvx voc B.wav --control-stdin --pitch-conf-min 0.75 --pitch-lowconf-mode hold --pitch-map-crossfade-ms 20 --output B_pitch_follow.wav
 ```
 
 **Explanation**

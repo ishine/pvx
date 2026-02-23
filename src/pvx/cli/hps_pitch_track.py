@@ -13,6 +13,10 @@ import numpy as np
 import soundfile as sf
 
 from pvx.core.common import add_console_args, build_examples_epilog, build_status_bar, log_message
+from pvx.core.feature_tracking import as_serializable_columns, extract_feature_tracks, feature_subset
+
+EMIT_CHOICES: tuple[str, ...] = ("pitch_map", "stretch_map", "pitch_to_stretch")
+STRETCH_FROM_CHOICES: tuple[str, ...] = ("pitch_ratio", "inv_pitch_ratio", "f0_hz")
 
 
 def _read_audio(path: Path) -> tuple[np.ndarray, int]:
@@ -152,10 +156,13 @@ def build_parser() -> argparse.ArgumentParser:
             [
                 "pvx pitch-track guide.wav --output guide_pitch.csv",
                 "pvx pitch-track guide.wav --backend pyin --ratio-reference hz --reference-hz 440 --output guide_to_a440.csv",
-                "pvx pitch-track guide.wav --output - | pvx voc target.wav --pitch-map-stdin --output followed.wav",
+                "pvx pitch-track guide.wav --emit pitch_to_stretch --output - | pvx voc target.wav --control-stdin --output followed.wav",
             ],
             notes=[
-                "Default output columns: start_sec,end_sec,stretch,pitch_ratio,confidence.",
+                (
+                    "Default output columns include control map fields and feature tracks "
+                    "(for example: rms_db, spectral_flux, voicing_prob, MFCCs, MPEG-7-style descriptors)."
+                ),
                 "Use --confidence-floor to gate unreliable pitch estimates.",
             ],
         ),
@@ -214,10 +221,55 @@ def build_parser() -> argparse.ArgumentParser:
         help="Set confidence below this floor to 0.0 (default: 0.0).",
     )
     parser.add_argument(
+        "--emit",
+        choices=list(EMIT_CHOICES),
+        default="pitch_map",
+        help="Output mode: pitch_map (default), stretch_map, or pitch_to_stretch.",
+    )
+    parser.add_argument(
+        "--stretch-from",
+        choices=list(STRETCH_FROM_CHOICES),
+        default="pitch_ratio",
+        help="Source signal used to derive stretch in stretch-oriented emit modes (default: pitch_ratio).",
+    )
+    parser.add_argument(
+        "--stretch-scale",
+        type=float,
+        default=1.0,
+        help="Scale factor for derived stretch tracks (default: 1.0).",
+    )
+    parser.add_argument(
+        "--stretch-min",
+        type=float,
+        default=0.25,
+        help="Lower clamp for emitted stretch in stretch-oriented modes (default: 0.25).",
+    )
+    parser.add_argument(
+        "--stretch-max",
+        type=float,
+        default=4.0,
+        help="Upper clamp for emitted stretch in stretch-oriented modes (default: 4.0).",
+    )
+    parser.add_argument(
         "--stretch",
         type=float,
         default=1.0,
-        help="Emit constant stretch column value (default: 1.0).",
+        help="Emit constant stretch column value for --emit pitch_map (default: 1.0).",
+    )
+    parser.add_argument(
+        "--feature-set",
+        choices=["none", "basic", "advanced", "all"],
+        default="all",
+        help=(
+            "Feature tracking preset emitted as extra CSV columns. "
+            "none/basic/advanced/all (default: all)."
+        ),
+    )
+    parser.add_argument(
+        "--mfcc-count",
+        type=int,
+        default=13,
+        help="Number of MFCC columns (mfcc_01..mfcc_N) when feature-set is advanced/all (default: 13).",
     )
     add_console_args(parser)
     return parser
@@ -240,8 +292,16 @@ def validate_args(args: argparse.Namespace, parser: argparse.ArgumentParser) -> 
         parser.error("--confidence-floor must be >= 0")
     if args.stretch <= 0.0:
         parser.error("--stretch must be > 0")
+    if args.stretch_scale <= 0.0:
+        parser.error("--stretch-scale must be > 0")
+    if args.stretch_min <= 0.0:
+        parser.error("--stretch-min must be > 0")
+    if args.stretch_max <= args.stretch_min:
+        parser.error("--stretch-max must be > --stretch-min")
     if args.reference_hz is not None and args.reference_hz <= 0.0:
         parser.error("--reference-hz must be > 0")
+    if args.mfcc_count < 0 or args.mfcc_count > 40:
+        parser.error("--mfcc-count must be in [0, 40]")
 
 
 def _emit_csv(
@@ -253,7 +313,8 @@ def _emit_csv(
     f0_hz: np.ndarray,
     confidence: np.ndarray,
     pitch_ratio: np.ndarray,
-    stretch: float,
+    stretch: np.ndarray,
+    extra_columns: dict[str, np.ndarray] | None = None,
 ) -> int:
     stream: io.TextIOBase
     close_stream = False
@@ -265,8 +326,10 @@ def _emit_csv(
         close_stream = True
 
     row_count = 0
+    extra_columns = dict(extra_columns or {})
+    ordered_extra = [name for name in extra_columns.keys() if str(name).strip()]
     writer = csv.writer(stream)
-    writer.writerow(["start_sec", "end_sec", "stretch", "pitch_ratio", "confidence", "f0_hz"])
+    writer.writerow(["start_sec", "end_sec", "stretch", "pitch_ratio", "confidence", "f0_hz", *ordered_extra])
     frame_dur = hop_size / float(sample_rate)
     total_dur = input_samples / float(sample_rate)
     for idx in range(f0_hz.size):
@@ -278,10 +341,14 @@ def _emit_csv(
             [
                 f"{start_sec:.9f}",
                 f"{end_sec:.9f}",
-                f"{stretch:.9f}",
+                f"{stretch[idx]:.9f}",
                 f"{pitch_ratio[idx]:.9f}",
                 f"{confidence[idx]:.9f}",
                 f"{f0_hz[idx]:.9f}",
+                *[
+                    f"{float(np.asarray(extra_columns[name], dtype=np.float64)[idx]):.9f}"
+                    for name in ordered_extra
+                ],
             ]
         )
         row_count += 1
@@ -289,6 +356,42 @@ def _emit_csv(
     if close_stream:
         stream.close()
     return row_count
+
+
+def _derive_stretch_track(
+    *,
+    emit_mode: str,
+    stretch_from: str,
+    pitch_ratio: np.ndarray,
+    f0_hz: np.ndarray,
+    confidence: np.ndarray,
+    reference_hz: float,
+    constant_stretch: float,
+    stretch_scale: float,
+    stretch_min: float,
+    stretch_max: float,
+) -> np.ndarray:
+    if emit_mode == "pitch_map":
+        return np.full_like(pitch_ratio, float(constant_stretch), dtype=np.float64)
+
+    source_mode = "pitch_ratio" if emit_mode == "pitch_to_stretch" else str(stretch_from)
+    if source_mode == "pitch_ratio":
+        base = np.asarray(pitch_ratio, dtype=np.float64)
+    elif source_mode == "inv_pitch_ratio":
+        ratio = np.asarray(pitch_ratio, dtype=np.float64)
+        safe = np.maximum(ratio, 1e-8)
+        base = 1.0 / safe
+    else:
+        voiced = (np.asarray(f0_hz, dtype=np.float64) > 0.0) & np.isfinite(f0_hz)
+        if confidence.size == voiced.size:
+            voiced &= np.asarray(confidence, dtype=np.float64) > 0.0
+        base = np.ones_like(f0_hz, dtype=np.float64)
+        if np.any(voiced):
+            base[voiced] = np.asarray(f0_hz, dtype=np.float64)[voiced] / max(1e-9, float(reference_hz))
+
+    stretch = np.asarray(base, dtype=np.float64) * float(stretch_scale)
+    stretch = np.clip(stretch, float(stretch_min), float(stretch_max))
+    return np.asarray(stretch, dtype=np.float64)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -367,6 +470,36 @@ def main(argv: list[str] | None = None) -> int:
     pitch_ratio = _smooth(pitch_ratio, int(args.smooth_frames))
     pitch_ratio = np.clip(pitch_ratio, args.ratio_min, args.ratio_max)
 
+    stretch_track = _derive_stretch_track(
+        emit_mode=str(args.emit),
+        stretch_from=str(args.stretch_from),
+        pitch_ratio=pitch_ratio,
+        f0_hz=f0_hz,
+        confidence=confidence,
+        reference_hz=reference_hz,
+        constant_stretch=float(args.stretch),
+        stretch_scale=float(args.stretch_scale),
+        stretch_min=float(args.stretch_min),
+        stretch_max=float(args.stretch_max),
+    )
+    emitted_pitch_ratio = np.asarray(pitch_ratio, dtype=np.float64)
+    if str(args.emit) in {"stretch_map", "pitch_to_stretch"}:
+        emitted_pitch_ratio = np.ones_like(emitted_pitch_ratio, dtype=np.float64)
+
+    tracked_features = extract_feature_tracks(
+        audio=audio,
+        sr=sr,
+        frame_length=int(args.frame_length),
+        hop_size=int(args.hop_size),
+        f0_hz=np.asarray(f0_hz, dtype=np.float64),
+        confidence=np.asarray(confidence, dtype=np.float64),
+        mfcc_count=int(args.mfcc_count),
+        fmin=float(args.fmin),
+        fmax=float(args.fmax),
+    )
+    tracked_features = feature_subset(tracked_features, subset=str(args.feature_set))
+    tracked_features = as_serializable_columns(tracked_features, n_rows=int(f0_hz.size))
+
     rows = _emit_csv(
         output=args.output,
         sample_rate=sr,
@@ -374,8 +507,9 @@ def main(argv: list[str] | None = None) -> int:
         input_samples=mono.size,
         f0_hz=f0_hz,
         confidence=confidence,
-        pitch_ratio=pitch_ratio,
-        stretch=float(args.stretch),
+        pitch_ratio=emitted_pitch_ratio,
+        stretch=stretch_track,
+        extra_columns=tracked_features,
     )
     status.finish("done")
 
@@ -383,8 +517,10 @@ def main(argv: list[str] | None = None) -> int:
     log_message(
         args,
         (
-            f"[done] hps-pitch-track backend={used_backend}, frames={f0_hz.size}, voiced={voiced_count}, "
-            f"ref_hz={reference_hz:.3f}, rows={rows}"
+            f"[done] hps-pitch-track backend={used_backend}, emit={args.emit}, "
+            f"frames={f0_hz.size}, voiced={voiced_count}, ref_hz={reference_hz:.3f}, "
+            f"stretch_range=[{float(np.min(stretch_track)):.3f},{float(np.max(stretch_track)):.3f}], "
+            f"features={len(tracked_features)}, rows={rows}"
         ),
         min_level="normal",
     )

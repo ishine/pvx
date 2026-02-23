@@ -1,5 +1,85 @@
 # Changelog
 
+## 2026-02-23
+
+- Expanded `pvx morph` into multi-mode cross-synthesis:
+  - new blend modes in `/Users/cleider/dev/pvx/src/pvx/cli/pvxmorph.py`:
+    - `linear`, `geometric`
+    - `magnitude_b_phase_a`, `magnitude_a_phase_b`
+    - `carrier_a_envelope_b`, `carrier_b_envelope_a`
+    - `carrier_a_mask_b`, `carrier_b_mask_a`
+    - `product`, `max_mag`, `min_mag`
+  - new controls:
+    - `--blend-mode`
+    - `--phase-mix`
+    - `--mask-exponent`
+    - `--envelope-lifter`
+    - `--normalize-energy`
+  - added CLI regression coverage in `/Users/cleider/dev/pvx/tests/test_cli_regression.py` for envelope/mask cross-synthesis modes.
+  - refreshed user docs examples in:
+    - `/Users/cleider/dev/pvx/README.md`
+    - `/Users/cleider/dev/pvx/docs/GETTING_STARTED.md`
+    - `/Users/cleider/dev/pvx/docs/EXAMPLES.md`
+    - `/Users/cleider/dev/pvx/docs/PIPELINE_COOKBOOK.md`
+
+- Expanded feature-tracking/control-bus sidechain capabilities:
+  - added frame-level feature extraction module:
+    - `/Users/cleider/dev/pvx/src/pvx/core/feature_tracking.py`
+  - `pvx pitch-track` now emits broad feature vectors (configurable via `--feature-set` and `--mfcc-count`), including:
+    - pitch/voicing, loudness/dynamics, spectral features, formants, rhythm, stereo cues, noise/artifact proxies
+    - MFCC columns (`mfcc_01..mfcc_N`)
+    - MPEG-7-style descriptors (`mpeg7_*`, including coarse audio spectrum envelope bands)
+  - control-bus routes now support richer mapping operators:
+    - `mul(source,factor)`, `add(source,offset)`, `affine(source,scale,bias)`, `clip(source,lo,hi)`
+  - control-bus source resolution now supports any numeric CSV column name (not only fixed built-in names).
+  - `pvx follow` now exposes tracker feature controls (`--feature-set`, `--mfcc-count`) for feature-driven sidechain workflows.
+
+- Continued follow/control-bus UX phase with richer built-in examples:
+  - expanded unified CLI examples in:
+    - `/Users/cleider/dev/pvx/src/pvx/cli/pvx.py`
+    - new `pvx examples` entries:
+      - `follow-feature`
+      - `follow-formant`
+      - `follow-noise-aware`
+  - `pvx follow` now supports named example output:
+    - `pvx follow --example` (basic)
+    - `pvx follow --example all`
+    - `pvx follow --example mfcc_flux|formant_onset|noise_aware|pitch`
+  - added follow example regression coverage in:
+    - `/Users/cleider/dev/pvx/tests/test_cli_regression.py`
+  - updated docs to surface feature-follow examples and `pvx follow --example` workflows:
+    - `/Users/cleider/dev/pvx/README.md`
+    - `/Users/cleider/dev/pvx/docs/GETTING_STARTED.md`
+    - `/Users/cleider/dev/pvx/docs/EXAMPLES.md`
+    - `/Users/cleider/dev/pvx/docs/FEATURE_SIDECHAIN_EXAMPLES.md`
+
+- Completed remaining follow/control-bus rollout phases (Phase 3-6):
+  - Phase 3 (one-command orchestrator):
+    - added unified helper command `pvx follow` in:
+      - `/Users/cleider/dev/pvx/src/pvx/cli/pvx.py`
+    - `pvx follow` now runs pitch tracking + control-map handoff + vocoder apply in one command.
+    - supports:
+      - tracker controls (`--backend`, `--fmin`, `--fmax`, `--frame-length`, `--hop-size`, `--emit`, `--stretch-*`)
+      - vocoder map policy controls (`--pitch-conf-min`, `--pitch-lowconf-mode`, `--pitch-map-*`)
+      - optional control routes (`--route ...`) and passthrough of additional `pvx voc` flags
+  - Phase 4 (regression coverage):
+    - added dedicated control-bus unit tests:
+      - `/Users/cleider/dev/pvx/tests/test_control_bus.py`
+    - expanded CLI regression suite:
+      - `/Users/cleider/dev/pvx/tests/test_cli_regression.py`
+      - added `pvx follow` success path, help target, and invalid passthrough rejection tests
+  - Phase 5 (docs + UX migration guidance):
+    - added migration guide:
+      - `/Users/cleider/dev/pvx/docs/FOLLOW_MIGRATION.md`
+    - updated user docs to promote `pvx follow` as the shortest sidechain workflow:
+      - `/Users/cleider/dev/pvx/README.md`
+      - `/Users/cleider/dev/pvx/docs/GETTING_STARTED.md`
+      - `/Users/cleider/dev/pvx/docs/EXAMPLES.md`
+      - `/Users/cleider/dev/pvx/docs/PIPELINE_COOKBOOK.md`
+  - Phase 6 (rollout artifacts):
+    - updated reviewer checklist and validation flow:
+      - `/Users/cleider/dev/pvx/docs/HOW_TO_REVIEW.md`
+
 ## 2026-02-19
 
 - Stage 3 (pipeline ergonomics + output policy hardening) implemented:

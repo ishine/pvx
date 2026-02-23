@@ -11,6 +11,15 @@ python3 -m pip install -e .
 pvx --help
 ```
 
+Same setup with `uv`:
+
+```bash
+uv venv .venv
+source .venv/bin/activate
+uv pip install -e .
+uv run pvx --help
+```
+
 If `pvx` is not found, add the project virtualenv to your path environment variable (`PATH`) (`zsh`):
 
 ```bash
@@ -23,6 +32,27 @@ No-`PATH` fallback:
 
 ```bash
 python3 pvx.py voc input.wav --stretch 1.2 --output output.wav
+```
+
+No-`PATH` fallback with `uv`:
+
+```bash
+uv run python3 pvx.py voc input.wav --stretch 1.2 --output output.wav
+```
+
+## 0.2 Running Any Command with uv
+
+`uv` can run every command in this guide without changing the DSP arguments.
+
+- `pvx ...` -> `uv run pvx ...`
+- `python3 some_script.py ...` -> `uv run python3 some_script.py ...`
+- `python3 -m module.path ...` -> `uv run python3 -m module.path ...`
+
+Example:
+
+```bash
+pvx voc input.wav --stretch 1.25 --output out.wav
+uv run pvx voc input.wav --stretch 1.25 --output out.wav
 ```
 
 If you are already muttering at your shell, that is normal.
@@ -222,7 +252,7 @@ Key tradeoff:
 | Noise reduction pre-pass | `pvx denoise field.wav --reduction-db 8 --output-dir out --suffix _den` |
 | Room tail reduction | `pvx deverb room.wav --strength 0.5 --output-dir out --suffix _dry` |
 | CSV time/pitch choreography | `pvx conform source.wav --map map_conform.csv --output-dir out` |
-| Automated quality comparison | `python3 benchmarks/run_bench.py --quick --out-dir benchmarks/out --gate --baseline benchmarks/baseline_small.json` |
+| Automated quality comparison | `uv run python3 benchmarks/run_bench.py --quick --out-dir benchmarks/out --gate --baseline benchmarks/baseline_small.json` |
 
 ## 6. Step-by-Step Walkthrough (One Small WAV)
 
@@ -329,14 +359,49 @@ Legacy presets remain available: `vocal`, `ambient`, `extreme`.
 If you do not want long Unix pipe chains, use managed helpers:
 
 ```bash
+pvx follow guide.wav target.wav --output target_follow.wav --emit pitch_to_stretch --pitch-conf-min 0.75
 pvx chain sample.wav --pipeline "voc --stretch 1.2 | formant --mode preserve" --output sample_chain.wav
 pvx stream sample.wav --output sample_stream.wav --chunk-seconds 0.2 --time-stretch 2.0
 pvx stream sample.wav --mode wrapper --output sample_stream_wrapper.wav --chunk-seconds 0.2 --time-stretch 2.0
 ```
 
+- `pvx follow` replaces long sidechain pipes for pitch/control-map-driven workflows.
 - `pvx chain` runs serial stages with managed intermediate files.
 - `pvx stream` defaults to a stateful chunk processor for smoother long-form continuity.
 - `pvx stream --mode wrapper` keeps legacy segmented-wrapper behavior.
+
+## 10.1 Feature Tracking for Sidechain Control
+
+`pvx pitch-track` now emits feature vectors (not just pitch map fields), including:
+- pitch/voicing (`f0_hz`, `pitch_ratio`, `confidence`, `voicing_prob`, `pitch_stability`)
+- loudness/dynamics (`rms`, `rms_db`, `short_lufs_db`, `crest_factor_db`)
+- spectral features (`spectral_centroid_hz`, `spectral_flatness`, `spectral_flux`, `rolloff_hz`)
+- formants and cepstra (`formant_f1_hz..formant_f3_hz`, `mfcc_01..mfcc_N`)
+- rhythm markers (`tempo_bpm`, `beat_phase`, `downbeat_phase`, `onset_strength`, `transient_mask`)
+- MPEG-7-style descriptors (`mpeg7_*` columns, including audio spectrum envelope bands)
+
+Use with control-bus routes:
+
+```bash
+pvx pitch-track guide.wav --feature-set all --mfcc-count 13 --output - \
+  | pvx voc target.wav --control-stdin \
+      --route pitch_ratio=affine(mfcc_01,0.002,1.0) \
+      --route pitch_ratio=clip(pitch_ratio,0.5,2.0) \
+      --route stretch=affine(spectral_flux,0.03,1.0) \
+      --route stretch=clip(stretch,0.85,1.5) \
+      --output target_feature_follow.wav
+```
+
+For a larger gallery (single-feature, multi-feature, MFCC/MPEG-7 vector, and multi-guide workflows), see:
+- `docs/FEATURE_SIDECHAIN_EXAMPLES.md`
+
+You can also print built-in command snippets directly from the command-line interface (CLI):
+
+```bash
+pvx follow --example
+pvx follow --example all
+pvx follow --example formant_onset
+```
 
 ## 11. Output Policy Controls
 
@@ -372,7 +437,7 @@ pvx voc mix.wav --stretch 1.2 --stereo-mode mid_side_lock --coherence-strength 0
 pvx freeze hit.wav --freeze-time 0.22 --duration 12 --output hit_pad.wav
 
 # Morph two sources
-pvx morph a.wav b.wav --alpha 0.45 --output a_b_morph.wav
+pvx morph a.wav b.wav --alpha 0.45 --blend-mode carrier_a_envelope_b --output a_b_morph.wav
 
 # Major-scale retune
 pvx retune vocal.wav --root C --scale major --strength 0.8 --output vocal_c_major.wav

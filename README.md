@@ -36,6 +36,15 @@ python3 -m pip install -e .
 pvx voc input.wav --stretch 1.20 --output output.wav
 ```
 
+Same flow with `uv`:
+
+```bash
+uv venv .venv
+source .venv/bin/activate
+uv pip install -e .
+uv run pvx voc input.wav --stretch 1.20 --output output.wav
+```
+
 If `pvx` is not found after install:
 
 ```bash
@@ -50,6 +59,12 @@ No `PATH` fallback:
 
 ```bash
 python3 pvx.py voc input.wav --stretch 1.20 --output output.wav
+```
+
+`uv` fallback (no `PATH` changes):
+
+```bash
+uv run python3 pvx.py voc input.wav --stretch 1.20 --output output.wav
 ```
 
 What you should hear:
@@ -98,6 +113,9 @@ pvx freeze hit.wav --freeze-time 0.25 --duration 12 --output hit_freeze.wav
 
 # Morph two sounds
 pvx morph a.wav b.wav --alpha 0.4 --output morph.wav
+
+# Cross-synthesis: keep A timing/phase but imprint B timbre envelope
+pvx morph a.wav b.wav --blend-mode carrier_a_envelope_b --alpha 0.75 --envelope-lifter 32 --output morph_env.wav
 
 # Retune to a major scale
 pvx retune vocal.wav --root C --scale major --strength 0.85 --output vocal_retuned.wav
@@ -224,6 +242,15 @@ python3 -m pip install -e .
 pvx voc input.wav --stretch 1.20 --output output.wav
 ```
 
+Same quick start with `uv`:
+
+```bash
+uv venv .venv
+source .venv/bin/activate
+uv pip install -e .
+uv run pvx voc input.wav --stretch 1.20 --output output.wav
+```
+
 If `pvx` is not found after install, add the virtualenv binaries to your shell path environment variable (`PATH`):
 
 ```bash
@@ -238,12 +265,25 @@ If you do not want to modify the path environment variable (`PATH`), run the sam
 python3 pvx.py voc input.wav --stretch 1.20 --output output.wav
 ```
 
+Equivalent with `uv`:
+
+```bash
+uv run python3 pvx.py voc input.wav --stretch 1.20 --output output.wav
+```
+
 What this does:
 - reads `input.wav`
 - stretches duration by 20%
 - writes `output.wav`
 
 If you prefer direct script wrappers, legacy commands are still supported (`python3 pvxvoc.py ...`, `python3 pvxfreeze.py ...`, etc.).
+
+With `uv`, run wrappers the same way:
+
+```bash
+uv run python3 pvxvoc.py input.wav --stretch 1.2 --output output.wav
+uv run python3 pvxfreeze.py input.wav --freeze-time 0.25 --duration 8 --output freeze.wav
+```
 
 ## Unified CLI (Primary Entry Point)
 
@@ -254,6 +294,7 @@ pvx list
 pvx help voc
 pvx examples basic
 pvx guided
+pvx follow --example all
 pvx chain --example
 pvx stream --example
 ```
@@ -413,7 +454,7 @@ Start
 | Sound-design freeze pad | `pvx freeze` | `pvx freeze hit.wav --freeze-time 0.12 --duration 10 --output-dir out` |
 | Tempo stretch with transient care | `pvx voc` | `pvx voc drums.wav --stretch 1.2 --transient-preserve --phase-locking identity --output drums_120.wav` |
 | Harmonic layering | `pvx harmonize` | `pvx harmonize lead.wav --intervals 0,4,7 --gains 1,0.8,0.7 --output-dir out` |
-| Cross-source morphing | `pvx morph` | `pvx morph a.wav b.wav --alpha 0.5 --output morph.wav` |
+| Cross-source morphing / cross-synthesis | `pvx morph` | `pvx morph a.wav b.wav --blend-mode carrier_a_envelope_b --alpha 0.7 --output morph.wav` |
 
 More complete examples and use-case playbooks (72+ runnable recipes): `docs/EXAMPLES.md`
 
@@ -519,6 +560,12 @@ Run a tiny benchmark (cycle-consistency metrics):
 python3 benchmarks/run_bench.py --quick --out-dir benchmarks/out
 ```
 
+With `uv`:
+
+```bash
+uv run python3 benchmarks/run_bench.py --quick --out-dir benchmarks/out
+```
+
 This uses the tuned deterministic profile by default (`--pvx-bench-profile tuned`).
 Use `--pvx-bench-profile legacy` to compare against the prior pvx benchmark settings.
 
@@ -554,6 +601,12 @@ Run with regression gate against committed baseline:
 
 ```bash
 python3 benchmarks/run_bench.py --quick --out-dir benchmarks/out --strict-corpus --determinism-runs 2 --baseline benchmarks/baseline_small.json --gate --gate-row-level --gate-signatures
+```
+
+`uv` equivalent:
+
+```bash
+uv run python3 benchmarks/run_bench.py --quick --out-dir benchmarks/out --strict-corpus --determinism-runs 2 --baseline benchmarks/baseline_small.json --gate --gate-row-level --gate-signatures
 ```
 
 ## Visual Documentation
@@ -629,6 +682,64 @@ pvx voc input.wav --stretch 1.1 --stdout \
   | pvx deverb - --strength 0.4 --output cleaned.wav
 ```
 
+### Can I route control maps in pipes without `awk`?
+Yes. The shortest path is the one-command helper:
+
+```bash
+pvx follow A.wav B.wav --output B_follow.wav --emit pitch_to_stretch --pitch-conf-min 0.75
+```
+
+Under the hood, this runs pitch tracking on `A.wav`, emits a control map, and feeds it to `pvx voc` on `B.wav`.
+
+Manual pipe form is still available for explicit control-bus routing:
+
+Pitch-to-stretch sidechain:
+
+```bash
+pvx pitch-track A.wav --emit pitch_to_stretch --output - \
+  | pvx voc B.wav --control-stdin --output B_follow.wav
+```
+
+Explicit route example (map `pitch_ratio` -> `stretch`, force `pitch_ratio` to unity):
+
+```bash
+pvx pitch-track A.wav --output - \
+  | pvx voc B.wav --control-stdin --route stretch=pitch_ratio --route pitch_ratio=const(1.0) --output B_time_follow.wav
+```
+
+`pvx pitch-track` can now emit a broad feature vector for control-map routing, including:
+- pitch and voicing: `f0_hz`, `pitch_ratio`, `confidence`, `voicing_prob`, `pitch_stability`, `note_boundary`
+- loudness/dynamics: `rms`, `rms_db`, `short_lufs_db`, `crest_factor_db`, `clip_ratio`, `transientness`
+- spectral shape: `spectral_centroid_hz`, `spectral_spread_hz`, `spectral_flatness`, `spectral_flux`, `rolloff_hz`
+- timbre/descriptors: `mfcc_01..mfcc_N`, `formant_f1_hz..formant_f3_hz`, `harmonic_ratio`, `inharmonicity`
+- rhythm: `tempo_bpm`, `beat_phase`, `downbeat_phase`, `onset_strength`, `transient_mask`
+- stereo/noise/artifact proxies: `ild_db`, `itd_ms`, `hum_50_ratio`, `hum_60_ratio`, `hiss_ratio`
+- MPEG-7-style descriptors: `mpeg7_*` columns including centroid/spread/flatness/flux/rolloff/attack-time/temporal-centroid and coarse audio spectrum envelope bands.
+
+Feature-routing examples:
+
+```bash
+# MFCC-driven pitch modulation on B
+pvx pitch-track A.wav --feature-set all --mfcc-count 13 --output - \
+  | pvx voc B.wav --control-stdin --route pitch_ratio=affine(mfcc_01,0.002,1.0) --route pitch_ratio=clip(pitch_ratio,0.5,2.0) --output B_mfcc_pitch.wav
+
+# MPEG-7 spectral flux drives stretch with clipping
+pvx pitch-track A.wav --feature-set all --output - \
+  | pvx voc B.wav --control-stdin --route stretch=affine(mpeg7_spectral_flux,0.05,1.0) --route stretch=clip(stretch,0.8,1.6) --route pitch_ratio=const(1.0) --output B_flux_stretch.wav
+```
+
+Expanded cookbook with many more single-feature, multi-feature, feature-vector, and multi-guide recipes:
+
+- [`docs/FEATURE_SIDECHAIN_EXAMPLES.md`](docs/FEATURE_SIDECHAIN_EXAMPLES.md)
+
+Built-in `pvx follow` example printer:
+
+```bash
+pvx follow --example
+pvx follow --example all
+pvx follow --example mfcc_flux
+```
+
 ### Does pvx support microtonal workflows?
 Yes. Use ratio/cents/semitone controls and CSV map modes.
 
@@ -688,6 +799,7 @@ Practical next steps inspired by PVC tradition:
 - Rubber Band comparison notes: `docs/RUBBERBAND_COMPARISON.md`
 - Benchmark guide: `docs/BENCHMARKS.md`
 - Window reference: `docs/WINDOW_REFERENCE.md`
+- Follow workflow migration guide: `docs/FOLLOW_MIGRATION.md`
 - Maintainer review checklist: `docs/HOW_TO_REVIEW.md`
 - Generated HTML docs: `docs/html/index.html`
 - PDF bundle: `docs/pvx_documentation.pdf`
@@ -699,6 +811,15 @@ python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install -e .
 pvx --help
+```
+
+Or with `uv`:
+
+```bash
+uv venv .venv
+source .venv/bin/activate
+uv pip install -e .
+uv run pvx --help
 ```
 
 Persist `pvx` on your shell path (`zsh`):
@@ -713,6 +834,12 @@ Optional CUDA:
 
 ```bash
 python3 -m pip install cupy-cuda12x
+```
+
+`uv` equivalent:
+
+```bash
+uv pip install cupy-cuda12x
 ```
 
 ### Installation and Runtime Matrix
@@ -734,6 +861,12 @@ Fallback without `PATH` updates:
 
 ```bash
 python3 pvx.py voc input.wav --stretch 1.2 --output output.wav
+```
+
+Fallback with `uv`:
+
+```bash
+uv run python3 pvx.py voc input.wav --stretch 1.2 --output output.wav
 ```
 
 Legacy wrappers remain available for backward compatibility.

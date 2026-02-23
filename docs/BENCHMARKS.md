@@ -13,6 +13,15 @@ python3 -m pip install -e .
 pvx --help
 ```
 
+`uv` equivalent:
+
+```bash
+uv venv .venv
+source .venv/bin/activate
+uv pip install -e .
+uv run pvx --help
+```
+
 If `pvx` is not found, add the virtualenv binaries to your shell path (`zsh`):
 
 ```bash
@@ -25,6 +34,12 @@ pvx --help
 
 ```bash
 python3 scripts_generate_docs_extras.py --run-benchmarks
+```
+
+`uv` equivalent:
+
+```bash
+uv run python3 scripts_generate_docs_extras.py --run-benchmarks
 ```
 
 ## Benchmark Spec
