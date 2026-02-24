@@ -1010,10 +1010,20 @@ def generate_window_assets_and_metrics(entries: list[dict[str, str]]) -> dict[st
             "freq_plot": f"assets/windows/{name}_freq.svg",
         }
 
+    # Round metrics to avoid drift
+    rounded_metrics: dict[str, dict[str, float | str]] = {}
+    for win_name, m in metrics_by_name.items():
+        rounded_metrics[win_name] = {}
+        for k, v in m.items():
+            if isinstance(v, float):
+                rounded_metrics[win_name][k] = round(v, 10)
+            else:
+                rounded_metrics[win_name][k] = v
+
     metrics_payload = {
         "commit": COMMIT_HASH,
         "commit_date": COMMIT_DATE,
-        "windows": metrics_by_name,
+        "windows": rounded_metrics,
     }
     (DOCS_DIR / "window_metrics.json").write_text(
         json.dumps(metrics_payload, indent=2, sort_keys=True) + "\n",
