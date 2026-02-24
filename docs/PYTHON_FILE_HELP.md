@@ -495,8 +495,8 @@ usage: pvxconform.py [-h] [-o OUTPUT_DIR] [--output OUTPUT] [--suffix SUFFIX]
                      [--dry-run]
                      [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
                      [--quiet] [--silent] [--normalize {none,peak,rms}]
-                     [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
-                     [--target-lufs TARGET_LUFS]
+                     [--peak-dbfs PEAK_DBFS] [--peak-scale PEAK_SCALE]
+                     [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
                      [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
                      [--compressor-ratio COMPRESSOR_RATIO]
                      [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
@@ -544,9 +544,9 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -o, --output-dir OUTPUT_DIR
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
                         Output directory
-  --output, --out OUTPUT
+  --output OUTPUT, --out OUTPUT
                         Explicit output file path (single-input mode only). Alias: --out
   --suffix SUFFIX       Output filename suffix (default: _conform)
   --output-format OUTPUT_FORMAT
@@ -563,8 +563,8 @@ options:
                         Output normalization mode
   --peak-dbfs PEAK_DBFS
                         Target peak dBFS when --normalize peak
-  --rms-dbfs RMS_DBFS   Target RMS dBFS when --normalize rms
-  --target-lufs
+  --peak-scale PEAK_SCALE
+
 ... [truncated]
 ```
 
@@ -594,8 +594,8 @@ usage: pvxdenoise.py [-h] [-o OUTPUT_DIR] [--output OUTPUT] [--suffix SUFFIX]
                      [--dry-run]
                      [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
                      [--quiet] [--silent] [--normalize {none,peak,rms}]
-                     [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
-                     [--target-lufs TARGET_LUFS]
+                     [--peak-dbfs PEAK_DBFS] [--peak-scale PEAK_SCALE]
+                     [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
                      [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
                      [--compressor-ratio COMPRESSOR_RATIO]
                      [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
@@ -644,9 +644,9 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -o, --output-dir OUTPUT_DIR
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
                         Output directory
-  --output, --out OUTPUT
+  --output OUTPUT, --out OUTPUT
                         Explicit output file path (single-input mode only). Alias: --out
   --suffix SUFFIX       Output filename suffix (default: _denoise)
   --output-format OUTPUT_FORMAT
@@ -663,10 +663,9 @@ options:
                         Output normalization mode
   --peak-dbfs PEAK_DBFS
                         Target peak dBFS when --normalize peak
-  --rms-dbfs RMS_DBFS   Target RMS dBFS when --normalize rms
-  --target-lufs TARGET_LUFS
-                        Integrated loudness target in LUFS
-  --compressor-threshold-db COMPRESSOR_THRESHOL
+  --peak-scale PEAK_SCALE
+                        Target linear peak amplitude (0.0-1.0) when --normalize peak (overrides --peak-dbfs)
+  --rms-dbfs RMS
 ... [truncated]
 ```
 
@@ -696,8 +695,8 @@ usage: pvxdeverb.py [-h] [-o OUTPUT_DIR] [--output OUTPUT] [--suffix SUFFIX]
                     [--dry-run]
                     [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
                     [--quiet] [--silent] [--normalize {none,peak,rms}]
-                    [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
-                    [--target-lufs TARGET_LUFS]
+                    [--peak-dbfs PEAK_DBFS] [--peak-scale PEAK_SCALE]
+                    [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
                     [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
                     [--compressor-ratio COMPRESSOR_RATIO]
                     [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
@@ -744,9 +743,9 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -o, --output-dir OUTPUT_DIR
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
                         Output directory
-  --output, --out OUTPUT
+  --output OUTPUT, --out OUTPUT
                         Explicit output file path (single-input mode only). Alias: --out
   --suffix SUFFIX       Output filename suffix (default: _deverb)
   --output-format OUTPUT_FORMAT
@@ -763,13 +762,12 @@ options:
                         Output normalization mode
   --peak-dbfs PEAK_DBFS
                         Target peak dBFS when --normalize peak
+  --peak-scale PEAK_SCALE
+                        Target linear peak amplitude (0.0-1.0) when --normalize peak (overrides --peak-dbfs)
   --rms-dbfs RMS_DBFS   Target RMS dBFS when --normalize rms
   --target-lufs TARGET_LUFS
                         Integrated loudness target in LUFS
-  --compressor-threshold-db COMPRESSOR_THRESHOLD_DB
-                        Enable compressor above threshold dBFS
-  --compressor-ratio COMPRESSOR_RATIO
-                        Compressor rat
+  --compress
 ... [truncated]
 ```
 
@@ -799,8 +797,8 @@ usage: pvxformant.py [-h] [-o OUTPUT_DIR] [--output OUTPUT] [--suffix SUFFIX]
                      [--dry-run]
                      [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
                      [--quiet] [--silent] [--normalize {none,peak,rms}]
-                     [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
-                     [--target-lufs TARGET_LUFS]
+                     [--peak-dbfs PEAK_DBFS] [--peak-scale PEAK_SCALE]
+                     [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
                      [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
                      [--compressor-ratio COMPRESSOR_RATIO]
                      [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
@@ -853,9 +851,9 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -o, --output-dir OUTPUT_DIR
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
                         Output directory
-  --output, --out OUTPUT
+  --output OUTPUT, --out OUTPUT
                         Explicit output file path (single-input mode only). Alias: --out
   --suffix SUFFIX       Output filename suffix (default: _formant)
   --output-format OUTPUT_FORMAT
@@ -870,8 +868,7 @@ options:
   --silent              Suppress all console output
   --normalize {none,peak,rms}
                         Output normalization mode
-  --peak-dbfs PEAK_DBFS
-                     
+
 ... [truncated]
 ```
 
@@ -901,8 +898,8 @@ usage: pvxfreeze.py [-h] [-o OUTPUT_DIR] [--output OUTPUT] [--suffix SUFFIX]
                     [--dry-run]
                     [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
                     [--quiet] [--silent] [--normalize {none,peak,rms}]
-                    [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
-                    [--target-lufs TARGET_LUFS]
+                    [--peak-dbfs PEAK_DBFS] [--peak-scale PEAK_SCALE]
+                    [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
                     [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
                     [--compressor-ratio COMPRESSOR_RATIO]
                     [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
@@ -949,9 +946,9 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -o, --output-dir OUTPUT_DIR
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
                         Output directory
-  --output, --out OUTPUT
+  --output OUTPUT, --out OUTPUT
                         Explicit output file path (single-input mode only). Alias: --out
   --suffix SUFFIX       Output filename suffix (default: _freeze)
   --output-format OUTPUT_FORMAT
@@ -968,13 +965,11 @@ options:
                         Output normalization mode
   --peak-dbfs PEAK_DBFS
                         Target peak dBFS when --normalize peak
+  --peak-scale PEAK_SCALE
+                        Target linear peak amplitude (0.0-1.0) when --normalize peak (overrides --peak-dbfs)
   --rms-dbfs RMS_DBFS   Target RMS dBFS when --normalize rms
   --target-lufs TARGET_LUFS
-                        Integrated loudness target in LUFS
-  --compressor-threshold-db COMPRESSOR_THRESHOLD_DB
-                        Enable compressor above threshold dBFS
-  --compressor-ratio COMPRESSOR_RATIO
-                   
+                        Integrated loudness target i
 ... [truncated]
 ```
 
@@ -1004,8 +999,8 @@ usage: pvxharmonize.py [-h] [-o OUTPUT_DIR] [--output OUTPUT]
                        [--stdout] [--overwrite] [--dry-run]
                        [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
                        [--quiet] [--silent] [--normalize {none,peak,rms}]
-                       [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
-                       [--target-lufs TARGET_LUFS]
+                       [--peak-dbfs PEAK_DBFS] [--peak-scale PEAK_SCALE]
+                       [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
                        [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
                        [--compressor-ratio COMPRESSOR_RATIO]
                        [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
@@ -1055,9 +1050,9 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -o, --output-dir OUTPUT_DIR
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
                         Output directory
-  --output, --out OUTPUT
+  --output OUTPUT, --out OUTPUT
                         Explicit output file path (single-input mode only). Alias: --out
   --suffix SUFFIX       Output filename suffix (default: _harm)
   --output-format OUTPUT_FORMAT
@@ -1074,7 +1069,7 @@ options:
                         Output normalization mode
   --peak-dbfs PEAK_DBFS
                         Target peak dBFS when --normalize peak
-  --rms-dbfs RMS_DBFS   Target RMS dBFS when --no
+  --p
 ... [truncated]
 ```
 
@@ -1104,8 +1099,8 @@ usage: pvxlayer.py [-h] [-o OUTPUT_DIR] [--output OUTPUT] [--suffix SUFFIX]
                    [--dry-run]
                    [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
                    [--quiet] [--silent] [--normalize {none,peak,rms}]
-                   [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
-                   [--target-lufs TARGET_LUFS]
+                   [--peak-dbfs PEAK_DBFS] [--peak-scale PEAK_SCALE]
+                   [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
                    [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
                    [--compressor-ratio COMPRESSOR_RATIO]
                    [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
@@ -1162,9 +1157,9 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -o, --output-dir OUTPUT_DIR
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
                         Output directory
-  --output, --out OUTPUT
+  --output OUTPUT, --out OUTPUT
                         Explicit output file path (single-input mode only). Alias: --out
   --suffix SUFFIX       Output filename suffix (default: _layer)
   --output-format OUTPUT_FORMAT
@@ -1174,8 +1169,7 @@ options:
   --dry-run             Resolve and print, but do not write files
   --verbosity {silent,quiet,normal,verbose,debug}
                         Console verbosity level
-  -v, --verbose         Increase verbosity (repeat for extra detail)
-  --quiet               Reduce output
+  -v, --verbose         Increase verbosity (repeat for extra d
 ... [truncated]
 ```
 
@@ -1208,7 +1202,8 @@ usage: pvxmorph.py [-h] [-o OUTPUT] [--stdout] [--output-format OUTPUT_FORMAT]
                    [--order ORDER] [--mask-exponent MASK_EXPONENT]
                    [--envelope-lifter ENVELOPE_LIFTER] [--normalize-energy]
                    [--normalize {none,peak,rms}] [--peak-dbfs PEAK_DBFS]
-                   [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
+                   [--peak-scale PEAK_SCALE] [--rms-dbfs RMS_DBFS]
+                   [--target-lufs TARGET_LUFS]
                    [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
                    [--compressor-ratio COMPRESSOR_RATIO]
                    [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
@@ -1257,7 +1252,8 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -o, --output OUTPUT   Output file path
+  -o OUTPUT, --output OUTPUT
+                        Output file path
   --stdout              Write processed audio to stdout stream (for piping); equivalent to -o -
   --output-format OUTPUT_FORMAT
                         Output extension/format; for --stdout defaults to wav
@@ -1265,8 +1261,7 @@ options:
   --blend-mode {linear,geometric,magnitude_b_phase_a,magnitude_a_phase_b,carrier_a_envelope_b,carrier_b_envelope_a,carrier_a_mask_b,carrier_b_mask_a,product,max_mag,min_mag}
                         Cross-synthesis blend style. linear/geometric are symmetric blends; carrier_* modes transfer envelope/mask from modulator to carrier.
   --phase-mix PHASE_MIX
-                        Phase blend in [0,1]. If omitted, mode-specific defaults apply (A-phase for *_phase_a/carrier_a_*, B-phase for *_phase_b/carrier_b_*, alpha for symmetric modes). Accepts scalar or control file (.csv/.json).
-  --interp {none,linear,nearest,cubic,poly
+                        Phase blend in [0,1]. If omitted, mode-specific defaults apply (A-phase for *_phase_a/carrier_a_*, B-phase for *_phase_b/carrier_b_*, alpha for symmetric modes). Accepts scala
 ... [truncated]
 ```
 
@@ -1296,8 +1291,8 @@ usage: pvxretune.py [-h] [-o OUTPUT_DIR] [--output OUTPUT] [--suffix SUFFIX]
                     [--dry-run]
                     [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
                     [--quiet] [--silent] [--normalize {none,peak,rms}]
-                    [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
-                    [--target-lufs TARGET_LUFS]
+                    [--peak-dbfs PEAK_DBFS] [--peak-scale PEAK_SCALE]
+                    [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
                     [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
                     [--compressor-ratio COMPRESSOR_RATIO]
                     [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
@@ -1348,9 +1343,9 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -o, --output-dir OUTPUT_DIR
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
                         Output directory
-  --output, --out OUTPUT
+  --output OUTPUT, --out OUTPUT
                         Explicit output file path (single-input mode only). Alias: --out
   --suffix SUFFIX       Output filename suffix (default: _retune)
   --output-format OUTPUT_FORMAT
@@ -1367,8 +1362,8 @@ options:
                         Output normalization mode
   --peak-dbfs PEAK_DBFS
                         Target peak dBFS when --normalize peak
-  --rms-dbfs RMS_DBFS   Target RMS dBFS when --normalize rms
-  --target-lufs TARGET_L
+  --peak-scale PEAK_SCALE
+
 ... [truncated]
 ```
 
@@ -1398,8 +1393,8 @@ usage: pvxtransient.py [-h] [-o OUTPUT_DIR] [--output OUTPUT]
                        [--stdout] [--overwrite] [--dry-run]
                        [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
                        [--quiet] [--silent] [--normalize {none,peak,rms}]
-                       [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
-                       [--target-lufs TARGET_LUFS]
+                       [--peak-dbfs PEAK_DBFS] [--peak-scale PEAK_SCALE]
+                       [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
                        [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
                        [--compressor-ratio COMPRESSOR_RATIO]
                        [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
@@ -1452,9 +1447,9 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -o, --output-dir OUTPUT_DIR
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
                         Output directory
-  --output, --out OUTPUT
+  --output OUTPUT, --out OUTPUT
                         Explicit output file path (single-input mode only). Alias: --out
   --suffix SUFFIX       Output filename suffix (default: _trans)
   --output-format OUTPUT_FORMAT
@@ -1466,8 +1461,7 @@ options:
                         Console verbosity level
   -v, --verbose         Increase verbosity (repeat for extra detail)
   --quiet               Reduce output and hide status bars
-  --silent              Suppress all console output
-  --normali
+  --silent
 ... [truncated]
 ```
 
@@ -1497,8 +1491,8 @@ usage: pvxunison.py [-h] [-o OUTPUT_DIR] [--output OUTPUT] [--suffix SUFFIX]
                     [--dry-run]
                     [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
                     [--quiet] [--silent] [--normalize {none,peak,rms}]
-                    [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
-                    [--target-lufs TARGET_LUFS]
+                    [--peak-dbfs PEAK_DBFS] [--peak-scale PEAK_SCALE]
+                    [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
                     [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
                     [--compressor-ratio COMPRESSOR_RATIO]
                     [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
@@ -1546,9 +1540,9 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -o, --output-dir OUTPUT_DIR
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
                         Output directory
-  --output, --out OUTPUT
+  --output OUTPUT, --out OUTPUT
                         Explicit output file path (single-input mode only). Alias: --out
   --suffix SUFFIX       Output filename suffix (default: _unison)
   --output-format OUTPUT_FORMAT
@@ -1565,12 +1559,11 @@ options:
                         Output normalization mode
   --peak-dbfs PEAK_DBFS
                         Target peak dBFS when --normalize peak
+  --peak-scale PEAK_SCALE
+                        Target linear peak amplitude (0.0-1.0) when --normalize peak (overrides --peak-dbfs)
   --rms-dbfs RMS_DBFS   Target RMS dBFS when --normalize rms
   --target-lufs TARGET_LUFS
-                        Integrated loudness target in LUFS
-  --compressor-threshold-db COMPRESSOR_THRESHOLD_DB
-                        Enable compressor above threshold dBFS
-  --comp
+
 ... [truncated]
 ```
 
@@ -1643,11 +1636,9 @@ usage: pvxvoc.py [-h] [-o OUTPUT_DIR] [--suffix SUFFIX]
                  [--stereo-mode {independent,mid_side_lock,ref_channel_lock}]
                  [--ref-channel REF_CHANNEL]
                  [--coherence-strength COHERENCE_STRENGTH]
-                 [--pitch-shift-semitones PITCH_SHIFT_SEMITONES |
-                 --pitch-shift-cents PITCH_SHIFT_CENTS |
-                 --pitch-shift-ratio PITCH_SHIFT_RATIO |
-                 --target-f0 TARGET_F0] [--analysis-channel {first,mix}]
-                 [--f0-min F0_MIN] [--f0-max F0_MAX]
+                 [--pitch-shift-semitones PITCH_SHIFT_SEMITONES | --pitch-shift-cents PITCH_SHIFT_CENTS | --pitch-shift-ratio PITCH_SHIFT_RATIO | --target-f0 TARGET_F0]
+                 [--analysis-channel {first,mix}] [--f0-min F0_MIN]
+                 [--f0-max F0_MAX]
                  [--pitch-mode {standard,formant-preserving}]
                  [--formant-lifter FORMANT_LIFTER]
                  [--formant-strength FORMANT_STRENGTH]
@@ -1661,10 +1652,11 @@ usage: pvxvoc.py [-h] [-o OUTPUT_DIR] [--suffix SUFFIX]
                  [--target-sample-rate TARGET_SAMPLE_RATE]
                  [--resample-mode {auto,fft,linear}]
                  [--normalize {none,peak,rms}] [--peak-dbfs PEAK_DBFS]
-                 [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
+                 [--peak-scale PEAK_SCALE] [--rms-dbfs RMS_DBFS]
+                 [--target-lufs TARGET_LUFS]
                  [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
                  [--compressor-ratio COMPRESSOR_RATIO]
-                 [--compressor-attack-ms COMPRES
+                 [--compressor-attack-m
 ... [truncated]
 ```
 
@@ -1694,8 +1686,8 @@ usage: pvxwarp.py [-h] [-o OUTPUT_DIR] [--output OUTPUT] [--suffix SUFFIX]
                   [--dry-run]
                   [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
                   [--quiet] [--silent] [--normalize {none,peak,rms}]
-                  [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
-                  [--target-lufs TARGET_LUFS]
+                  [--peak-dbfs PEAK_DBFS] [--peak-scale PEAK_SCALE]
+                  [--rms-dbfs RMS_DBFS] [--target-lufs TARGET_LUFS]
                   [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
                   [--compressor-ratio COMPRESSOR_RATIO]
                   [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
@@ -1743,9 +1735,9 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -o, --output-dir OUTPUT_DIR
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
                         Output directory
-  --output, --out OUTPUT
+  --output OUTPUT, --out OUTPUT
                         Explicit output file path (single-input mode only). Alias: --out
   --suffix SUFFIX       Output filename suffix (default: _warp)
   --output-format OUTPUT_FORMAT
@@ -1762,14 +1754,13 @@ options:
                         Output normalization mode
   --peak-dbfs PEAK_DBFS
                         Target peak dBFS when --normalize peak
+  --peak-scale PEAK_SCALE
+                        Target linear peak amplitude (0.0-1.0) when --normalize peak (overrides --peak-dbfs)
   --rms-dbfs RMS_DBFS   Target RMS dBFS when --normalize rms
   --target-lufs TARGET_LUFS
                         Integrated loudness target in LUFS
   --compressor-threshold-db COMPRESSOR_THRESHOLD_DB
-                        Enable compressor above threshold dBFS
-  --compressor-ratio COMPRESSOR_RATIO
-                        Compressor ratio (>=1)
-  --compressor-attack-ms COMPRESSOR_ATTACK_M
+
 ... [truncated]
 ```
 
