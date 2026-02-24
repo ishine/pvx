@@ -112,9 +112,9 @@ def _simple_literal(node: ast.AST) -> Any:
 
 def _tool_name_for_path(path: Path) -> str:
     if path.name == "voc.py":
-        return "pvxvoc.py"
+        return "pvxvoc"
     if path.parent.name == "cli":
-        return f"{path.stem}.py"
+        return path.stem
     return path.name
 
 

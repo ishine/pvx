@@ -1799,8 +1799,8 @@ pvx --help</code></pre>
 source ~/.zshrc
 pvx --help</code></pre>
   <p>
-    No-PATH fallback:
-    <code>python3 pvx.py voc input.wav --stretch 1.2 --output output.wav</code>
+    No-PATH fallback (source checkout):
+    <code>PYTHONPATH=src python3 -m pvx.cli.pvx voc input.wav --stretch 1.2 --output output.wav</code>
   </p>
 </div>
 """
