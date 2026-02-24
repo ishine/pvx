@@ -2,7 +2,7 @@
 
 # pvx Architecture
 
-_Generated from commit `ef577fc` (commit date: 2026-02-23T14:24:44-05:00)._
+_Generated from commit `HEAD` (commit date: DATE_PLACEHOLDER)._
 
 System architecture for runtime processing, algorithm dispatch, and documentation pipelines.
 
