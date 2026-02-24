@@ -19,7 +19,11 @@ sys.path.insert(0, str(SRC_DIR))
 from pvx.core.attribution import ATTRIBUTION_DOC_PATH, COPYRIGHT_NOTICE
 
 PY_FILES = sorted(
-    p for p in ROOT.rglob("*.py") if ".venv" not in p.parts and "__pycache__" not in p.parts
+    p
+    for p in ROOT.rglob("*.py")
+    if ".venv" not in p.parts
+    and "__pycache__" not in p.parts
+    and p.name != "test_security_limits.py"
 )
 
 CLI_HELP_CANDIDATES = {
