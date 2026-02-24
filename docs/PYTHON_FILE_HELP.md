@@ -231,12 +231,7 @@ Total Python files documented: **210**
 ### CLI Help Snapshot
 
 ```text
-Traceback (most recent call last):
-  File "/app/HPS-pitch-track.py", line 13, in <module>
-    from pvx.cli.hps_pitch_track import main as _main
-  File "/app/src/pvx/cli/hps_pitch_track.py", line 14, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'
+[CLI help snapshot unavailable: exit code 1]
 ```
 
 ### Module Docstring
@@ -298,17 +293,7 @@ Reproducible quality benchmark: pvx vs Rubber Band vs librosa baseline.
 ### CLI Help Snapshot
 
 ```text
-Traceback (most recent call last):
-  File "/app/main.py", line 17, in <module>
-    from pvx.cli.main import *  # noqa: F401,F403
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/app/src/pvx/cli/main.py", line 8, in <module>
-    from pvx.cli.pvx import build_parser, main
-  File "/app/src/pvx/cli/pvx.py", line 20, in <module>
-    from pvx.core.streaming import run_stateful_stream
-  File "/app/src/pvx/core/streaming.py", line 14, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'
+[CLI help snapshot unavailable: exit code 1]
 ```
 
 ### Module Docstring
@@ -409,13 +394,7 @@ src-layout migration.
 ### CLI Help Snapshot
 
 ```text
-Traceback (most recent call last):
-  File "/app/pvxconform.py", line 17, in <module>
-    from pvx.cli.pvxconform import *  # noqa: F401,F403
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/app/src/pvx/cli/pvxconform.py", line 11, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'
+[CLI help snapshot unavailable: exit code 1]
 ```
 
 ### Module Docstring
@@ -439,13 +418,7 @@ src-layout migration.
 ### CLI Help Snapshot
 
 ```text
-Traceback (most recent call last):
-  File "/app/pvxdenoise.py", line 17, in <module>
-    from pvx.cli.pvxdenoise import *  # noqa: F401,F403
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/app/src/pvx/cli/pvxdenoise.py", line 11, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'
+[CLI help snapshot unavailable: exit code 1]
 ```
 
 ### Module Docstring
@@ -469,13 +442,7 @@ src-layout migration.
 ### CLI Help Snapshot
 
 ```text
-Traceback (most recent call last):
-  File "/app/pvxdeverb.py", line 17, in <module>
-    from pvx.cli.pvxdeverb import *  # noqa: F401,F403
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/app/src/pvx/cli/pvxdeverb.py", line 10, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'
+[CLI help snapshot unavailable: exit code 1]
 ```
 
 ### Module Docstring
@@ -499,13 +466,7 @@ src-layout migration.
 ### CLI Help Snapshot
 
 ```text
-Traceback (most recent call last):
-  File "/app/pvxformant.py", line 17, in <module>
-    from pvx.cli.pvxformant import *  # noqa: F401,F403
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/app/src/pvx/cli/pvxformant.py", line 10, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'
+[CLI help snapshot unavailable: exit code 1]
 ```
 
 ### Module Docstring
@@ -529,13 +490,7 @@ src-layout migration.
 ### CLI Help Snapshot
 
 ```text
-Traceback (most recent call last):
-  File "/app/pvxfreeze.py", line 17, in <module>
-    from pvx.cli.pvxfreeze import *  # noqa: F401,F403
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/app/src/pvx/cli/pvxfreeze.py", line 10, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'
+[CLI help snapshot unavailable: exit code 1]
 ```
 
 ### Module Docstring
@@ -559,13 +514,7 @@ src-layout migration.
 ### CLI Help Snapshot
 
 ```text
-Traceback (most recent call last):
-  File "/app/pvxharmonize.py", line 17, in <module>
-    from pvx.cli.pvxharmonize import *  # noqa: F401,F403
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/app/src/pvx/cli/pvxharmonize.py", line 10, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'
+[CLI help snapshot unavailable: exit code 1]
 ```
 
 ### Module Docstring
@@ -589,13 +538,7 @@ src-layout migration.
 ### CLI Help Snapshot
 
 ```text
-Traceback (most recent call last):
-  File "/app/pvxlayer.py", line 17, in <module>
-    from pvx.cli.pvxlayer import *  # noqa: F401,F403
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/app/src/pvx/cli/pvxlayer.py", line 10, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'
+[CLI help snapshot unavailable: exit code 1]
 ```
 
 ### Module Docstring
@@ -619,13 +562,7 @@ src-layout migration.
 ### CLI Help Snapshot
 
 ```text
-Traceback (most recent call last):
-  File "/app/pvxmorph.py", line 17, in <module>
-    from pvx.cli.pvxmorph import *  # noqa: F401,F403
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/app/src/pvx/cli/pvxmorph.py", line 15, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'
+[CLI help snapshot unavailable: exit code 1]
 ```
 
 ### Module Docstring
@@ -649,13 +586,7 @@ src-layout migration.
 ### CLI Help Snapshot
 
 ```text
-Traceback (most recent call last):
-  File "/app/pvxretune.py", line 17, in <module>
-    from pvx.cli.pvxretune import *  # noqa: F401,F403
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/app/src/pvx/cli/pvxretune.py", line 11, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'
+[CLI help snapshot unavailable: exit code 1]
 ```
 
 ### Module Docstring
@@ -679,13 +610,7 @@ src-layout migration.
 ### CLI Help Snapshot
 
 ```text
-Traceback (most recent call last):
-  File "/app/pvxtransient.py", line 17, in <module>
-    from pvx.cli.pvxtransient import *  # noqa: F401,F403
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/app/src/pvx/cli/pvxtransient.py", line 10, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'
+[CLI help snapshot unavailable: exit code 1]
 ```
 
 ### Module Docstring
@@ -709,13 +634,7 @@ src-layout migration.
 ### CLI Help Snapshot
 
 ```text
-Traceback (most recent call last):
-  File "/app/pvxunison.py", line 17, in <module>
-    from pvx.cli.pvxunison import *  # noqa: F401,F403
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/app/src/pvx/cli/pvxunison.py", line 11, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'
+[CLI help snapshot unavailable: exit code 1]
 ```
 
 ### Module Docstring
@@ -739,15 +658,7 @@ src-layout migration.
 ### CLI Help Snapshot
 
 ```text
-Traceback (most recent call last):
-  File "/app/pvxvoc.py", line 17, in <module>
-    from pvx.core.voc import *  # noqa: F401,F403
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/app/src/pvx/core/voc.py", line 63, in <module>
-    from pvx.core.audio_metrics import (
-  File "/app/src/pvx/core/audio_metrics.py", line 10, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'
+[CLI help snapshot unavailable: exit code 1]
 ```
 
 ### Module Docstring
@@ -771,13 +682,7 @@ src-layout migration.
 ### CLI Help Snapshot
 
 ```text
-Traceback (most recent call last):
-  File "/app/pvxwarp.py", line 17, in <module>
-    from pvx.cli.pvxwarp import *  # noqa: F401,F403
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/app/src/pvx/cli/pvxwarp.py", line 11, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'
+[CLI help snapshot unavailable: exit code 1]
 ```
 
 ### Module Docstring

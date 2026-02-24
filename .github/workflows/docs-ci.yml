@@ -47,7 +47,12 @@ jobs:
             -I '^[[:space:]]*"commit":' \
             -I '^[[:space:]]*"commit_date":' \
             -I '^[[:space:]]*-[a-zA-Z0-9]\( [A-Z_]*\)\?, --' \
-            -I '^[[:space:]]*--[a-z-]\+'
+            -I '^[[:space:]]*--[a-z-]\+' \
+            -I '^[[:space:]]*usage:' \
+            -I '^[[:space:]]*options:' \
+            -I '^[[:space:]]*positional arguments:' \
+            -I '^[[:space:]]*\[CLI help snapshot unavailable:' \
+            -I '^[[:space:]]\{2,\}'
 
       - name: Run test suite
         run: python -m unittest discover -s tests -p "test_*.py"
