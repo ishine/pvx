@@ -304,7 +304,7 @@ def _prepare_dataset(
 
 
 def _case_key(input_path: Path, task: TaskSpec) -> str:
-    return f"{input_path.name}::{task.name}"
+    return f"{input_path.stem}:{task.name}"
 
 
 def _diagnose_metrics(metrics: dict[str, float]) -> list[str]:
