@@ -1004,9 +1004,14 @@ def generate_window_assets_and_metrics(entries: list[dict[str, str]]) -> dict[st
             y_label="magnitude (dB)",
         )
 
-        metrics_by_name[name] = {
-            k: (round(v, 10) if isinstance(v, float) else v) for k, v in metrics.items()
-        }
+        metrics_by_name[name] = {}
+        for k, v in metrics.items():
+            try:
+                # Ensure numpy scalars are converted to standard float before rounding
+                val = float(v)
+                metrics_by_name[name][k] = round(val, 10)
+            except (ValueError, TypeError):
+                metrics_by_name[name][k] = v
         metrics_by_name[name].update(
             {
                 "time_plot": f"assets/windows/{name}_time.svg",
