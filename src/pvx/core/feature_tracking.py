@@ -8,6 +8,7 @@ from __future__ import annotations
 import math
 
 import numpy as np
+import scipy.linalg
 
 EPS = 1e-12
 
@@ -108,10 +109,7 @@ def _estimate_formants_lpc(frame: np.ndarray, sr: int, count: int = 3) -> tuple[
         return float("nan"), float("nan"), float("nan")
 
     r = np.asarray(corr[: order + 1], dtype=np.float64)
-    toeplitz = np.empty((order, order), dtype=np.float64)
-    for i in range(order):
-        for j in range(order):
-            toeplitz[i, j] = r[abs(i - j)]
+    toeplitz = scipy.linalg.toeplitz(r[:order])
     try:
         a = np.linalg.solve(toeplitz + (1e-9 * np.eye(order)), r[1 : order + 1])
     except np.linalg.LinAlgError:
