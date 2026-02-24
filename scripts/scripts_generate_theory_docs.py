@@ -43,13 +43,16 @@ def git_commit_meta() -> tuple[str, str]:
         if commit_proc.returncode == 0 and commit_proc.stdout.strip():
             commit = commit_proc.stdout.strip()
         date_proc = subprocess.run(
-            ["git", "-C", str(ROOT), "show", "-s", "--format=%cI", "HEAD"],
+            ["git", "-C", str(ROOT), "show", "-s", "--format=%ct", "HEAD"],
             capture_output=True,
             text=True,
             check=False,
         )
         if date_proc.returncode == 0 and date_proc.stdout.strip():
-            commit_date = date_proc.stdout.strip()
+            # Use manual UTC formatting to ensure stability across local/CI environments
+            from datetime import datetime, timezone
+            ts = int(date_proc.stdout.strip())
+            commit_date = datetime.fromtimestamp(ts, tz=timezone.utc).isoformat().replace("+00:00", "Z")
     except Exception:
         pass
     return commit, commit_date
@@ -954,7 +957,7 @@ def generate_interpolation_assets() -> dict[str, object]:
         "commit": COMMIT_HASH,
         "commit_date": COMMIT_DATE,
         "control_points": [
-            {"time_sec": float(tx), "value": float(vx)}
+            {"time_sec": round(float(tx), 6), "value": round(float(vx), 6)}
             for tx, vx in zip(x_control, y_control)
         ],
         "plots": plot_entries,
