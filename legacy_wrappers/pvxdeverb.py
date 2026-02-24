@@ -12,7 +12,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from pvx.cli.pvxdeverb import *  # noqa: F401,F403
 from pvx.cli.pvxdeverb import main as _main
