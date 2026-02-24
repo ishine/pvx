@@ -1944,7 +1944,7 @@ Analysis, QA, and Automation algorithm scaffolds.
 **Algorithm ID:** `analysis_qa_and_automation.auto_parameter_tuning_bayesian_optimization`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -1974,7 +1974,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `analysis_qa_and_automation.batch_preset_recommendation_based_on_source_features`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2004,7 +2004,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `analysis_qa_and_automation.clip_hum_buzz_artifact_detection`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2034,7 +2034,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `analysis_qa_and_automation.key_chord_detection`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2064,7 +2064,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `analysis_qa_and_automation.onset_beat_downbeat_tracking`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2094,7 +2094,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `analysis_qa_and_automation.pesq_stoi_visqol_quality_metrics`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2124,7 +2124,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `analysis_qa_and_automation.silence_speech_music_classifiers`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2154,7 +2154,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `analysis_qa_and_automation.structure_segmentation_verse_chorus_sections`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2210,7 +2210,7 @@ Creative Spectral Effects algorithm scaffolds.
 **Algorithm ID:** `creative_spectral_effects.cross_synthesis_vocoder`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2240,7 +2240,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `creative_spectral_effects.formant_painting_warping`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2270,7 +2270,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `creative_spectral_effects.phase_randomization_textures`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2300,7 +2300,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `creative_spectral_effects.resonator_filterbank_morphing`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2330,7 +2330,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `creative_spectral_effects.spectral_blur_smear`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2360,7 +2360,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `creative_spectral_effects.spectral_contrast_exaggeration`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2390,7 +2390,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `creative_spectral_effects.spectral_convolution_effects`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2420,7 +2420,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `creative_spectral_effects.spectral_freeze_banks`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2463,7 +2463,7 @@ Denoise and Restoration algorithm scaffolds.
 **Algorithm ID:** `denoise_and_restoration.declick_decrackle_median_wavelet_interpolation`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2493,7 +2493,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `denoise_and_restoration.declip_via_sparse_reconstruction`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2523,7 +2523,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `denoise_and_restoration.diffusion_based_speech_audio_denoise`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2553,7 +2553,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `denoise_and_restoration.log_mmse`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2583,7 +2583,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `denoise_and_restoration.minimum_statistics_noise_tracking`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2613,7 +2613,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `denoise_and_restoration.mmse_stsa`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2643,7 +2643,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `denoise_and_restoration.rnnoise_style_denoiser`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2673,7 +2673,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `denoise_and_restoration.wiener_denoising`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2716,7 +2716,7 @@ Dereverb and Room Correction algorithm scaffolds.
 **Algorithm ID:** `dereverb_and_room_correction.blind_deconvolution_dereverb`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2746,7 +2746,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dereverb_and_room_correction.drr_guided_dereverb`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2776,7 +2776,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dereverb_and_room_correction.late_reverb_suppression_via_coherence`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2806,7 +2806,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dereverb_and_room_correction.multi_band_adaptive_deverb`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2836,7 +2836,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dereverb_and_room_correction.neural_dereverb_module`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2866,7 +2866,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dereverb_and_room_correction.room_impulse_inverse_filtering`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2896,7 +2896,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dereverb_and_room_correction.spectral_decay_subtraction`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2926,7 +2926,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dereverb_and_room_correction.wpe_dereverberation`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2969,7 +2969,7 @@ Dynamics and Loudness algorithm scaffolds.
 **Algorithm ID:** `dynamics_and_loudness.ebu_r128_normalization`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2999,7 +2999,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dynamics_and_loudness.itu_bs_1770_loudness_measurement_gating`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3029,7 +3029,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dynamics_and_loudness.lufs_target_mastering_chain`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3059,7 +3059,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dynamics_and_loudness.multi_band_compression`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3089,7 +3089,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dynamics_and_loudness.spectral_dynamics_bin_wise_compressor_expander`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3119,7 +3119,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dynamics_and_loudness.transient_shaping`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3149,7 +3149,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dynamics_and_loudness.true_peak_limiting`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3179,7 +3179,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dynamics_and_loudness.upward_compression`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3222,7 +3222,7 @@ Granular and Modulation algorithm scaffolds.
 **Algorithm ID:** `granular_and_modulation.am_fm_ring_modulation_blocks`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3252,7 +3252,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `granular_and_modulation.envelope_followed_modulation_routing`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3282,7 +3282,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `granular_and_modulation.formant_lfo_modulation`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3312,7 +3312,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `granular_and_modulation.freeze_grain_morphing`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3342,7 +3342,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `granular_and_modulation.grain_cloud_pitch_textures`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3372,7 +3372,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `granular_and_modulation.granular_time_stretch_engine`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3402,7 +3402,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `granular_and_modulation.rhythmic_gate_stutter_quantizer`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3432,7 +3432,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `granular_and_modulation.spectral_tremolo`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3475,7 +3475,7 @@ Pitch Detection and Tracking algorithm scaffolds.
 **Algorithm ID:** `pitch_detection_and_tracking.crepe_style_neural_f0`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3505,7 +3505,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `pitch_detection_and_tracking.harmonic_product_spectrum_hps`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3535,7 +3535,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `pitch_detection_and_tracking.pyin`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3565,7 +3565,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `pitch_detection_and_tracking.rapt`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3595,7 +3595,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `pitch_detection_and_tracking.subharmonic_summation`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3625,7 +3625,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `pitch_detection_and_tracking.swipe`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3655,7 +3655,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `pitch_detection_and_tracking.viterbi_smoothed_pitch_contour_tracking`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3685,7 +3685,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `pitch_detection_and_tracking.yin`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3741,7 +3741,7 @@ Retune and Intonation algorithm scaffolds.
 **Algorithm ID:** `retune_and_intonation.adaptive_intonation_context_sensitive_intervals`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3771,7 +3771,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `retune_and_intonation.chord_aware_retuning`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3801,7 +3801,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `retune_and_intonation.just_intonation_mapping_per_key_center`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3831,7 +3831,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `retune_and_intonation.key_aware_retuning_with_confidence_weighting`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3861,7 +3861,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `retune_and_intonation.portamento_aware_retune_curves`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3891,7 +3891,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `retune_and_intonation.scala_mts_scale_import_and_quantization`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3921,7 +3921,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `retune_and_intonation.time_varying_cents_maps`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3951,7 +3951,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `retune_and_intonation.vibrato_preserving_correction`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3994,7 +3994,7 @@ Separation and Decomposition algorithm scaffolds.
 **Algorithm ID:** `separation_and_decomposition.demucs_style_stem_separation_backend`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4024,7 +4024,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `separation_and_decomposition.ica_bss_for_multichannel_stems`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4054,7 +4054,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `separation_and_decomposition.nmf_decomposition`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4084,7 +4084,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `separation_and_decomposition.probabilistic_latent_component_separation`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4114,7 +4114,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `separation_and_decomposition.rpca_hpss`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4144,7 +4144,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `separation_and_decomposition.sinusoidal_residual_transient_decomposition`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4174,7 +4174,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `separation_and_decomposition.tensor_decomposition_cp_tucker`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4204,7 +4204,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `separation_and_decomposition.u_net_vocal_accompaniment_split`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4260,7 +4260,7 @@ Spatial and multichannel: creative spatial fx.
 **Algorithm ID:** `spatial_and_multichannel.binaural_motion_trajectory_designer`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4290,7 +4290,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.decorrelated_reverb_upmix`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4320,7 +4320,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.rotating_speaker_doppler_field`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4350,7 +4350,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.spatial_freeze_resynthesis`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4380,7 +4380,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.spectral_spatial_granulator`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4410,7 +4410,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.stochastic_spatial_diffusion_cloud`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4453,7 +4453,7 @@ Spatial and multichannel: imaging and panning.
 **Algorithm ID:** `spatial_and_multichannel.binaural_itd_ild_synthesis`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4483,7 +4483,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.dbap_distance_based_amplitude_panning`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4513,7 +4513,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.phase_aligned_mid_side_field_rotation`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4543,7 +4543,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.stereo_width_frequency_dependent_control`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4573,7 +4573,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.transaural_crosstalk_cancellation`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4603,7 +4603,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.vbap_adaptive_panning`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4646,7 +4646,7 @@ Spatial and multichannel: multichannel restoration.
 **Algorithm ID:** `spatial_and_multichannel.coherence_based_dereverb_multichannel`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4676,7 +4676,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.cross_channel_click_pop_repair`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4706,7 +4706,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.microphone_array_calibration_tones`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4736,7 +4736,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.multichannel_noise_psd_tracking`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4766,7 +4766,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.multichannel_wiener_postfilter`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4796,7 +4796,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.phase_consistent_multichannel_denoise`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4839,7 +4839,7 @@ Spatial and multichannel: phase vocoder spatial.
 **Algorithm ID:** `spatial_and_multichannel.pvx_directional_spectral_warp`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4869,7 +4869,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.pvx_interaural_coherence_shaping`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4899,7 +4899,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.pvx_interchannel_phase_locking`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4929,7 +4929,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.pvx_multichannel_time_alignment`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4959,7 +4959,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.pvx_spatial_freeze_and_trajectory`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4989,7 +4989,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.pvx_spatial_transient_preservation`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5032,7 +5032,7 @@ Spectral and Time-Frequency Transforms algorithm scaffolds.
 **Algorithm ID:** `spectral_time_frequency_transforms.chirplet_transform_analysis`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5062,7 +5062,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spectral_time_frequency_transforms.constant_q_transform_cqt_processing`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5092,7 +5092,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spectral_time_frequency_transforms.multi_window_stft_fusion`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5122,7 +5122,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spectral_time_frequency_transforms.nsgt_based_processing`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5152,7 +5152,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spectral_time_frequency_transforms.reassigned_spectrogram_methods`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5182,7 +5182,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spectral_time_frequency_transforms.synchrosqueezed_stft`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5212,7 +5212,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spectral_time_frequency_transforms.variable_q_transform_vqt`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5242,7 +5242,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spectral_time_frequency_transforms.wavelet_packet_processing`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5285,7 +5285,7 @@ Time-Scale and Pitch Core algorithm scaffolds.
 **Algorithm ID:** `time_scale_and_pitch_core.beat_synchronous_time_warping`
 **Theme:** `Time-Scale and Pitch Core`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5315,7 +5315,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `time_scale_and_pitch_core.harmonic_percussive_split_tsm`
 **Theme:** `Time-Scale and Pitch Core`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5345,7 +5345,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `time_scale_and_pitch_core.lp_psola`
 **Theme:** `Time-Scale and Pitch Core`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5375,7 +5375,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `time_scale_and_pitch_core.multi_resolution_phase_vocoder`
 **Theme:** `Time-Scale and Pitch Core`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5405,7 +5405,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `time_scale_and_pitch_core.nonlinear_time_maps`
 **Theme:** `Time-Scale and Pitch Core`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5435,7 +5435,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `time_scale_and_pitch_core.td_psola`
 **Theme:** `Time-Scale and Pitch Core`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5465,7 +5465,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `time_scale_and_pitch_core.wsola_waveform_similarity_overlap_add`
 **Theme:** `Time-Scale and Pitch Core`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [`docs/pvx_ALGORITHM_PARAMS.md`](../docs/pvx_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
