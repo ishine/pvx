@@ -1005,10 +1005,14 @@ def generate_window_assets_and_metrics(entries: list[dict[str, str]]) -> dict[st
         )
 
         metrics_by_name[name] = {
-            **metrics,
-            "time_plot": f"assets/windows/{name}_time.svg",
-            "freq_plot": f"assets/windows/{name}_freq.svg",
+            k: (round(v, 10) if isinstance(v, float) else v) for k, v in metrics.items()
         }
+        metrics_by_name[name].update(
+            {
+                "time_plot": f"assets/windows/{name}_time.svg",
+                "freq_plot": f"assets/windows/{name}_freq.svg",
+            }
+        )
 
     metrics_payload = {
         "commit": COMMIT_HASH,
