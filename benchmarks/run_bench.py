@@ -304,7 +304,7 @@ def _prepare_dataset(
 
 
 def _case_key(input_path: Path, task: TaskSpec) -> str:
-    return f"{input_path.stem}:{task.name}"
+    return f"{input_path.name}::{task.name}"
 
 
 def _diagnose_metrics(metrics: dict[str, float]) -> list[str]:
@@ -1021,7 +1021,10 @@ def _check_gate(
         for row in rows:
             if not isinstance(row, dict):
                 continue
-            key = f"{row.get('input', 'unknown')}::{row.get('task', 'unknown')}"
+            input_val = str(row.get('input', 'unknown'))
+            # Normalize input to just the filename to allow cross-environment baseline matching
+            input_name = Path(input_val).name
+            key = f"{input_name}::{row.get('task', 'unknown')}"
             out[key] = row
         return out
 
