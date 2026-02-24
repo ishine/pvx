@@ -8,7 +8,6 @@ from __future__ import annotations
 import math
 
 import numpy as np
-import scipy.linalg
 
 EPS = 1e-12
 
@@ -109,7 +108,11 @@ def _estimate_formants_lpc(frame: np.ndarray, sr: int, count: int = 3) -> tuple[
         return float("nan"), float("nan"), float("nan")
 
     r = np.asarray(corr[: order + 1], dtype=np.float64)
-    toeplitz = scipy.linalg.toeplitz(r[:order])
+    # Optimized symmetric Toeplitz construction using vectorized indexing
+    # Equivalent to toeplitz[i, j] = r[abs(i-j)]
+    # This avoids Python loops and is faster for small matrices like LPC orders (8-20).
+    idx = np.abs(np.arange(order)[:, None] - np.arange(order))
+    toeplitz = r[idx]
     try:
         a = np.linalg.solve(toeplitz + (1e-9 * np.eye(order)), r[1 : order + 1])
     except np.linalg.LinAlgError:
