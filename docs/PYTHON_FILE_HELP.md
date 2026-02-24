@@ -871,7 +871,7 @@ options:
   --normalize {none,peak,rms}
                         Output normalization mode
   --peak-dbfs PEAK_DBFS
-                     
+
 ... [truncated]
 ```
 
@@ -974,7 +974,7 @@ options:
   --compressor-threshold-db COMPRESSOR_THRESHOLD_DB
                         Enable compressor above threshold dBFS
   --compressor-ratio COMPRESSOR_RATIO
-                   
+
 ... [truncated]
 ```
 

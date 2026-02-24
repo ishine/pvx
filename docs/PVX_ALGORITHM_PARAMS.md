@@ -4,7 +4,7 @@
 
 This file lists per-algorithm parameter keys consumed by `pvx.algorithms.base.run_algorithm()` dispatch.
 Legacy import alias `pvxalgorithms.base.run_algorithm()` is still available for compatibility.
-Use these keys as `**params` when calling module `process(audio, sample_rate, **params)`. 
+Use these keys as `**params` when calling module `process(audio, sample_rate, **params)`.
 
 ## `adaptive_intonation_context_sensitive_intervals`
 - No algorithm-specific keys (uses generic/default path).
