@@ -46,10 +46,11 @@ jobs:
             -I 'commit date:' \
             -I '"commit":' \
             -I '"commit_date":' \
-            -I '"peak_sidelobe_db":' \
-            -I '"scalloping_loss_db":' \
-            -I '"coherent_gain":' \
-            -I '"enbw_bins":'
+            -I 'peak_sidelobe_db' \
+            -I 'scalloping_loss_db' \
+            -I 'coherent_gain' \
+            -I 'enbw_bins' \
+            -- . ':!docs/PYTHON_FILE_HELP.md'
 
       - name: Run test suite
         run: python -m unittest discover -s tests -p "test_*.py"
