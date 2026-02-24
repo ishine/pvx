@@ -6199,4 +6199,4 @@ Tests for hybrid transient processing and stereo coherence modes.
 
 ## Attribution
 
-Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
+Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).

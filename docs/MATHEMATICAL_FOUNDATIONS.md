@@ -215,4 +215,4 @@ The plots below visualize core transfer functions and parameter curves used acro
 
 ## Attribution
 
-Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
+Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).

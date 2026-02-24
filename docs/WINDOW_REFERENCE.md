@@ -237,4 +237,4 @@ Each supported pvx window maps to one of the formula families above with the per
 
 ## Attribution
 
-Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).
+Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
