@@ -726,8 +726,6 @@ def generate_function_assets() -> dict[str, object]:
     )
 
     payload: dict[str, object] = {
-        "commit": COMMIT_HASH,
-        "commit_date": COMMIT_DATE,
         "plots": entries,
     }
     (DOCS_DIR / "function_gallery.json").write_text(
@@ -951,8 +949,6 @@ def generate_interpolation_assets() -> dict[str, object]:
         )
 
     payload: dict[str, object] = {
-        "commit": COMMIT_HASH,
-        "commit_date": COMMIT_DATE,
         "control_points": [
             {"time_sec": float(tx), "value": float(vx)}
             for tx, vx in zip(x_control, y_control)
@@ -1011,8 +1007,6 @@ def generate_window_assets_and_metrics(entries: list[dict[str, str]]) -> dict[st
         }
 
     metrics_payload = {
-        "commit": COMMIT_HASH,
-        "commit_date": COMMIT_DATE,
         "windows": metrics_by_name,
     }
     (DOCS_DIR / "window_metrics.json").write_text(
