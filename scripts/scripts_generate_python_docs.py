@@ -113,6 +113,9 @@ def parse_module(path: Path) -> dict:
 
 
 def cli_help(path: Path) -> str | None:
+    # Set COLUMNS to a fixed value to encourage consistent argparse help formatting.
+    env = dict(subprocess.os.environ)
+    env["COLUMNS"] = "100"
     try:
         proc = subprocess.run(
             ["python3", str(path), "--help"],
@@ -121,6 +124,7 @@ def cli_help(path: Path) -> str | None:
             capture_output=True,
             timeout=25,
             check=False,
+            env=env,
         )
     except Exception as exc:  # pragma: no cover
         return f"[help unavailable: {exc}]"
