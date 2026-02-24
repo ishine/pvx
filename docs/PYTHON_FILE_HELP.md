@@ -8,29 +8,29 @@ Total Python files documented: **210**
 
 ## Contents
 
-- [`HPS-pitch-track.py`](#HPS-pitch-trackpy)
 - [`benchmarks/__init__.py`](#benchmarksinitpy)
 - [`benchmarks/metrics.py`](#benchmarksmetricspy)
 - [`benchmarks/run_bench.py`](#benchmarksrunbenchpy)
+- [`legacy_wrappers/HPS-pitch-track.py`](#legacywrappersHPS-pitch-trackpy)
+- [`legacy_wrappers/pvxcommon.py`](#legacywrapperspvxcommonpy)
+- [`legacy_wrappers/pvxconform.py`](#legacywrapperspvxconformpy)
+- [`legacy_wrappers/pvxdenoise.py`](#legacywrapperspvxdenoisepy)
+- [`legacy_wrappers/pvxdeverb.py`](#legacywrapperspvxdeverbpy)
+- [`legacy_wrappers/pvxformant.py`](#legacywrapperspvxformantpy)
+- [`legacy_wrappers/pvxfreeze.py`](#legacywrapperspvxfreezepy)
+- [`legacy_wrappers/pvxharmonize.py`](#legacywrapperspvxharmonizepy)
+- [`legacy_wrappers/pvxlayer.py`](#legacywrapperspvxlayerpy)
+- [`legacy_wrappers/pvxmorph.py`](#legacywrapperspvxmorphpy)
+- [`legacy_wrappers/pvxretune.py`](#legacywrapperspvxretunepy)
+- [`legacy_wrappers/pvxtransient.py`](#legacywrapperspvxtransientpy)
+- [`legacy_wrappers/pvxunison.py`](#legacywrapperspvxunisonpy)
+- [`legacy_wrappers/pvxvoc.py`](#legacywrapperspvxvocpy)
+- [`legacy_wrappers/pvxwarp.py`](#legacywrapperspvxwarppy)
 - [`main.py`](#mainpy)
 - [`pvx.py`](#pvxpy)
 - [`pvxalgorithms/__init__.py`](#pvxalgorithmsinitpy)
 - [`pvxalgorithms/base.py`](#pvxalgorithmsbasepy)
 - [`pvxalgorithms/registry.py`](#pvxalgorithmsregistrypy)
-- [`pvxcommon.py`](#pvxcommonpy)
-- [`pvxconform.py`](#pvxconformpy)
-- [`pvxdenoise.py`](#pvxdenoisepy)
-- [`pvxdeverb.py`](#pvxdeverbpy)
-- [`pvxformant.py`](#pvxformantpy)
-- [`pvxfreeze.py`](#pvxfreezepy)
-- [`pvxharmonize.py`](#pvxharmonizepy)
-- [`pvxlayer.py`](#pvxlayerpy)
-- [`pvxmorph.py`](#pvxmorphpy)
-- [`pvxretune.py`](#pvxretunepy)
-- [`pvxtransient.py`](#pvxtransientpy)
-- [`pvxunison.py`](#pvxunisonpy)
-- [`pvxvoc.py`](#pvxvocpy)
-- [`pvxwarp.py`](#pvxwarppy)
 - [`scripts/scripts_ab_compare.py`](#scriptsscriptsabcomparepy)
 - [`scripts/scripts_apply_attribution.py`](#scriptsscriptsapplyattributionpy)
 - [`scripts/scripts_benchmark_matrix.py`](#scriptsscriptsbenchmarkmatrixpy)
@@ -219,14 +219,55 @@ Total Python files documented: **210**
 - [`tests/test_output_policy.py`](#teststestoutputpolicypy)
 - [`tests/test_transient_and_stereo.py`](#teststesttransientandstereopy)
 
-## `HPS-pitch-track.py`
+## `benchmarks/__init__.py`
+
+**Purpose:** Benchmark utilities for pvx quality regression.
+
+**Classes:** None
+**Functions:** None
+
+### Module Docstring
+
+```text
+Benchmark utilities for pvx quality regression.
+```
+
+## `benchmarks/metrics.py`
+
+**Purpose:** Objective metrics for pvx benchmark comparisons.
+
+**Classes:** `OptionalMetricValue`
+**Functions:** `_match_length`, `_principal_angle`, `_to_mono`, `_stft_complex`, `_stft_mag_db`, `_resample_signal`, `_onset_envelope`, `_detect_onsets`, `_match_events`, `_attack_time_ms`, `_f0_track_and_voicing`, `_hnr_track`, `_cross_correlation_lag_samples`, `_run_external_quality_tool`, `_proxy_quality_scalar`, `log_spectral_distance`, `modulation_spectrum_distance`, `transient_smear_score`, `signal_to_noise_ratio_db`, `si_sdr_db`, `spectral_convergence`, `envelope_correlation`, `rms_level_delta_db`, `crest_factor_delta_db`, `bandwidth_95_delta_hz`, `zero_crossing_rate_delta`, `dc_offset_delta`, `clipping_ratio_delta`, `integrated_lufs_delta_lu`, `short_term_lufs_delta_lu`, `loudness_range_delta_lu`, `true_peak_delta_dbtp`, `pesq_mos_lqo`, `stoi_score`, `visqol_mos_lqo`, `polqa_mos_lqo`, `peaq_odg`, `f0_rmse_cents`, `voicing_f1_score`, `harmonic_to_noise_ratio_drift_db`, `onset_precision_recall_f1`, `attack_time_error_ms`, `ild_drift_db`, `itd_drift_ms`, `interchannel_phase_deviation_by_band`, `phasiness_index`, `musical_noise_index`, `pre_echo_score`, `stereo_coherence_drift`
+
+### Module Docstring
+
+```text
+Objective metrics for pvx benchmark comparisons.
+```
+
+## `benchmarks/run_bench.py`
+
+**Purpose:** Reproducible quality benchmark: pvx vs Rubber Band vs librosa baseline.
+
+**Classes:** `TaskSpec`
+**Functions:** `_sha256_bytes`, `_sha256_file`, `_parse_version`, `_collect_environment_metadata`, `_corpus_manifest_entries`, `_load_manifest`, `_write_manifest`, `_manifest_index`, `_validate_corpus_against_manifest`, `_prepare_dataset`, `_case_key`, `_diagnose_metrics`, `_method_diagnostics`, `_pvx_bench_args`, `_read_audio`, `_write_audio`, `_match_channels`, `_to_mono`, `_align_pair`, `_generate_tiny_dataset`, `_run_pvx_cycle`, `_find_rubberband`, `_run_rubberband_cycle`, `_run_librosa_cycle`, `_compute_metrics`, `_aggregate`, `_render_markdown`, `_check_gate`, `main`
+
+**Help commands:** `python3 benchmarks/run_bench.py`, `python3 benchmarks/run_bench.py --help`
+
+### Module Docstring
+
+```text
+Reproducible quality benchmark: pvx vs Rubber Band vs librosa baseline.
+```
+
+## `legacy_wrappers/HPS-pitch-track.py`
 
 **Purpose:** Compatibility wrapper for the HPS pitch tracker CLI.
 
 **Classes:** None
 **Functions:** None
 
-**Help commands:** `python3 HPS-pitch-track.py --help`
+**Help commands:** `python3 legacy_wrappers/HPS-pitch-track.py --help`
 
 ### CLI Help Snapshot
 
@@ -314,160 +355,14 @@ Notes:
 Compatibility wrapper for the HPS pitch tracker CLI.
 ```
 
-## `benchmarks/__init__.py`
-
-**Purpose:** Benchmark utilities for pvx quality regression.
-
-**Classes:** None
-**Functions:** None
-
-### Module Docstring
-
-```text
-Benchmark utilities for pvx quality regression.
-```
-
-## `benchmarks/metrics.py`
-
-**Purpose:** Objective metrics for pvx benchmark comparisons.
-
-**Classes:** `OptionalMetricValue`
-**Functions:** `_match_length`, `_principal_angle`, `_to_mono`, `_stft_complex`, `_stft_mag_db`, `_resample_signal`, `_onset_envelope`, `_detect_onsets`, `_match_events`, `_attack_time_ms`, `_f0_track_and_voicing`, `_hnr_track`, `_cross_correlation_lag_samples`, `_run_external_quality_tool`, `_proxy_quality_scalar`, `log_spectral_distance`, `modulation_spectrum_distance`, `transient_smear_score`, `signal_to_noise_ratio_db`, `si_sdr_db`, `spectral_convergence`, `envelope_correlation`, `rms_level_delta_db`, `crest_factor_delta_db`, `bandwidth_95_delta_hz`, `zero_crossing_rate_delta`, `dc_offset_delta`, `clipping_ratio_delta`, `integrated_lufs_delta_lu`, `short_term_lufs_delta_lu`, `loudness_range_delta_lu`, `true_peak_delta_dbtp`, `pesq_mos_lqo`, `stoi_score`, `visqol_mos_lqo`, `polqa_mos_lqo`, `peaq_odg`, `f0_rmse_cents`, `voicing_f1_score`, `harmonic_to_noise_ratio_drift_db`, `onset_precision_recall_f1`, `attack_time_error_ms`, `ild_drift_db`, `itd_drift_ms`, `interchannel_phase_deviation_by_band`, `phasiness_index`, `musical_noise_index`, `pre_echo_score`, `stereo_coherence_drift`
-
-### Module Docstring
-
-```text
-Objective metrics for pvx benchmark comparisons.
-```
-
-## `benchmarks/run_bench.py`
-
-**Purpose:** Reproducible quality benchmark: pvx vs Rubber Band vs librosa baseline.
-
-**Classes:** `TaskSpec`
-**Functions:** `_sha256_bytes`, `_sha256_file`, `_parse_version`, `_collect_environment_metadata`, `_corpus_manifest_entries`, `_load_manifest`, `_write_manifest`, `_manifest_index`, `_validate_corpus_against_manifest`, `_prepare_dataset`, `_case_key`, `_diagnose_metrics`, `_method_diagnostics`, `_pvx_bench_args`, `_read_audio`, `_write_audio`, `_match_channels`, `_to_mono`, `_align_pair`, `_generate_tiny_dataset`, `_run_pvx_cycle`, `_find_rubberband`, `_run_rubberband_cycle`, `_run_librosa_cycle`, `_compute_metrics`, `_aggregate`, `_render_markdown`, `_check_gate`, `main`
-
-**Help commands:** `python3 benchmarks/run_bench.py`, `python3 benchmarks/run_bench.py --help`
-
-### Module Docstring
-
-```text
-Reproducible quality benchmark: pvx vs Rubber Band vs librosa baseline.
-```
-
-## `main.py`
+## `legacy_wrappers/pvxcommon.py`
 
 **Purpose:** Compatibility wrapper.
 
 **Classes:** None
 **Functions:** None
 
-**Help commands:** `python3 main.py --help`
-
-### CLI Help Snapshot
-
-```text
-usage: pvx [-h] [command] ...
-
-Unified CLI for pvx (audio quality first, speed second).
-Use subcommands to access all existing pvx tools from one entrypoint.
-
-positional arguments:
-  command     Subcommand name, helper command, or input path (defaults to `voc` when an input path is provided)
-  args        Arguments forwarded directly to the selected subcommand
-
-options:
-  -h, --help  show this help message and exit
-
-Quick start:
-  pvx voc input.wav --stretch 1.2 --output output.wav
-  pvx input.wav --stretch 1.2 --output output.wav   # defaults to `voc`
-  pvx follow guide.wav target.wav --output followed.wav --emit pitch_to_stretch
-  pvx chain input.wav --pipeline "voc --stretch 1.2 | formant --mode preserve" --output out.wav
-  pvx stream input.wav --output out.wav --chunk-seconds 0.2 --time-stretch 2.0
-  pvx list
-  pvx examples basic
-  pvx help voc
-
-Available tool commands: voc, freeze, harmonize, conform, morph, warp, formant, transient, unison, denoise, deverb, retune, layer, pitch-track
-```
-
-### Module Docstring
-
-```text
-Compatibility wrapper.
-
-This root module forwards imports/execution to `pvx.cli.main` after the
-src-layout migration.
-```
-
-## `pvx.py`
-
-**Purpose:** Compatibility wrapper.
-
-**Classes:** None
-**Functions:** None
-
-**Help commands:** `python3 pvx.py`
-
-### Module Docstring
-
-```text
-Compatibility wrapper.
-
-This root module forwards imports/execution to `pvx.cli.pvx` after the
-src-layout migration.
-```
-
-## `pvxalgorithms/__init__.py`
-
-**Purpose:** Compatibility shim for `pvxalgorithms` namespace.
-
-**Classes:** None
-**Functions:** None
-
-### Module Docstring
-
-```text
-Compatibility shim for `pvxalgorithms` namespace.
-
-Use `pvx.algorithms` as the canonical import path.
-```
-
-## `pvxalgorithms/base.py`
-
-**Purpose:** Compatibility shim for `pvxalgorithms.base`.
-
-**Classes:** None
-**Functions:** None
-
-### Module Docstring
-
-```text
-Compatibility shim for `pvxalgorithms.base`.
-```
-
-## `pvxalgorithms/registry.py`
-
-**Purpose:** Compatibility shim for `pvxalgorithms.registry`.
-
-**Classes:** None
-**Functions:** None
-
-### Module Docstring
-
-```text
-Compatibility shim for `pvxalgorithms.registry`.
-```
-
-## `pvxcommon.py`
-
-**Purpose:** Compatibility wrapper.
-
-**Classes:** None
-**Functions:** None
-
-**Help commands:** `python3 pvxcommon.py`
+**Help commands:** `python3 legacy_wrappers/pvxcommon.py`
 
 ### Module Docstring
 
@@ -478,14 +373,14 @@ This root module forwards imports/execution to `pvx.core.common` after the
 src-layout migration.
 ```
 
-## `pvxconform.py`
+## `legacy_wrappers/pvxconform.py`
 
 **Purpose:** Compatibility wrapper.
 
 **Classes:** None
 **Functions:** None
 
-**Help commands:** `python3 pvxconform.py --help`
+**Help commands:** `python3 legacy_wrappers/pvxconform.py --help`
 
 ### CLI Help Snapshot
 
@@ -577,14 +472,14 @@ This root module forwards imports/execution to `pvx.cli.pvxconform` after the
 src-layout migration.
 ```
 
-## `pvxdenoise.py`
+## `legacy_wrappers/pvxdenoise.py`
 
 **Purpose:** Compatibility wrapper.
 
 **Classes:** None
 **Functions:** None
 
-**Help commands:** `python3 pvxdenoise.py --help`
+**Help commands:** `python3 legacy_wrappers/pvxdenoise.py --help`
 
 ### CLI Help Snapshot
 
@@ -678,14 +573,14 @@ This root module forwards imports/execution to `pvx.cli.pvxdenoise` after the
 src-layout migration.
 ```
 
-## `pvxdeverb.py`
+## `legacy_wrappers/pvxdeverb.py`
 
 **Purpose:** Compatibility wrapper.
 
 **Classes:** None
 **Functions:** None
 
-**Help commands:** `python3 pvxdeverb.py --help`
+**Help commands:** `python3 legacy_wrappers/pvxdeverb.py --help`
 
 ### CLI Help Snapshot
 
@@ -780,14 +675,14 @@ This root module forwards imports/execution to `pvx.cli.pvxdeverb` after the
 src-layout migration.
 ```
 
-## `pvxformant.py`
+## `legacy_wrappers/pvxformant.py`
 
 **Purpose:** Compatibility wrapper.
 
 **Classes:** None
 **Functions:** None
 
-**Help commands:** `python3 pvxformant.py --help`
+**Help commands:** `python3 legacy_wrappers/pvxformant.py --help`
 
 ### CLI Help Snapshot
 
@@ -881,14 +776,14 @@ This root module forwards imports/execution to `pvx.cli.pvxformant` after the
 src-layout migration.
 ```
 
-## `pvxfreeze.py`
+## `legacy_wrappers/pvxfreeze.py`
 
 **Purpose:** Compatibility wrapper.
 
 **Classes:** None
 **Functions:** None
 
-**Help commands:** `python3 pvxfreeze.py --help`
+**Help commands:** `python3 legacy_wrappers/pvxfreeze.py --help`
 
 ### CLI Help Snapshot
 
@@ -982,14 +877,14 @@ This root module forwards imports/execution to `pvx.cli.pvxfreeze` after the
 src-layout migration.
 ```
 
-## `pvxharmonize.py`
+## `legacy_wrappers/pvxharmonize.py`
 
 **Purpose:** Compatibility wrapper.
 
 **Classes:** None
 **Functions:** None
 
-**Help commands:** `python3 pvxharmonize.py --help`
+**Help commands:** `python3 legacy_wrappers/pvxharmonize.py --help`
 
 ### CLI Help Snapshot
 
@@ -1082,14 +977,14 @@ This root module forwards imports/execution to `pvx.cli.pvxharmonize` after the
 src-layout migration.
 ```
 
-## `pvxlayer.py`
+## `legacy_wrappers/pvxlayer.py`
 
 **Purpose:** Compatibility wrapper.
 
 **Classes:** None
 **Functions:** None
 
-**Help commands:** `python3 pvxlayer.py --help`
+**Help commands:** `python3 legacy_wrappers/pvxlayer.py --help`
 
 ### CLI Help Snapshot
 
@@ -1182,14 +1077,14 @@ This root module forwards imports/execution to `pvx.cli.pvxlayer` after the
 src-layout migration.
 ```
 
-## `pvxmorph.py`
+## `legacy_wrappers/pvxmorph.py`
 
 **Purpose:** Compatibility wrapper.
 
 **Classes:** None
 **Functions:** None
 
-**Help commands:** `python3 pvxmorph.py --help`
+**Help commands:** `python3 legacy_wrappers/pvxmorph.py --help`
 
 ### CLI Help Snapshot
 
@@ -1274,14 +1169,14 @@ This root module forwards imports/execution to `pvx.cli.pvxmorph` after the
 src-layout migration.
 ```
 
-## `pvxretune.py`
+## `legacy_wrappers/pvxretune.py`
 
 **Purpose:** Compatibility wrapper.
 
 **Classes:** None
 **Functions:** None
 
-**Help commands:** `python3 pvxretune.py --help`
+**Help commands:** `python3 legacy_wrappers/pvxretune.py --help`
 
 ### CLI Help Snapshot
 
@@ -1376,14 +1271,14 @@ This root module forwards imports/execution to `pvx.cli.pvxretune` after the
 src-layout migration.
 ```
 
-## `pvxtransient.py`
+## `legacy_wrappers/pvxtransient.py`
 
 **Purpose:** Compatibility wrapper.
 
 **Classes:** None
 **Functions:** None
 
-**Help commands:** `python3 pvxtransient.py --help`
+**Help commands:** `python3 legacy_wrappers/pvxtransient.py --help`
 
 ### CLI Help Snapshot
 
@@ -1474,14 +1369,14 @@ This root module forwards imports/execution to `pvx.cli.pvxtransient` after the
 src-layout migration.
 ```
 
-## `pvxunison.py`
+## `legacy_wrappers/pvxunison.py`
 
 **Purpose:** Compatibility wrapper.
 
 **Classes:** None
 **Functions:** None
 
-**Help commands:** `python3 pvxunison.py --help`
+**Help commands:** `python3 legacy_wrappers/pvxunison.py --help`
 
 ### CLI Help Snapshot
 
@@ -1576,14 +1471,14 @@ This root module forwards imports/execution to `pvx.cli.pvxunison` after the
 src-layout migration.
 ```
 
-## `pvxvoc.py`
+## `legacy_wrappers/pvxvoc.py`
 
 **Purpose:** Compatibility wrapper.
 
 **Classes:** None
 **Functions:** None
 
-**Help commands:** `python3 pvxvoc.py --help`
+**Help commands:** `python3 legacy_wrappers/pvxvoc.py --help`
 
 ### CLI Help Snapshot
 
@@ -1669,14 +1564,14 @@ This root module forwards imports/execution to `pvx.core.voc` after the
 src-layout migration.
 ```
 
-## `pvxwarp.py`
+## `legacy_wrappers/pvxwarp.py`
 
 **Purpose:** Compatibility wrapper.
 
 **Classes:** None
 **Functions:** None
 
-**Help commands:** `python3 pvxwarp.py --help`
+**Help commands:** `python3 legacy_wrappers/pvxwarp.py --help`
 
 ### CLI Help Snapshot
 
@@ -1771,6 +1666,83 @@ Compatibility wrapper.
 
 This root module forwards imports/execution to `pvx.cli.pvxwarp` after the
 src-layout migration.
+```
+
+## `main.py`
+
+**Purpose:** Compatibility wrapper.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 main.py`
+
+### Module Docstring
+
+```text
+Compatibility wrapper.
+
+This root module forwards imports/execution to `pvx.cli.main` after the
+src-layout migration.
+```
+
+## `pvx.py`
+
+**Purpose:** Compatibility wrapper.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvx.py`
+
+### Module Docstring
+
+```text
+Compatibility wrapper.
+
+This root module forwards imports/execution to `pvx.cli.pvx` after the
+src-layout migration.
+```
+
+## `pvxalgorithms/__init__.py`
+
+**Purpose:** Compatibility shim for `pvxalgorithms` namespace.
+
+**Classes:** None
+**Functions:** None
+
+### Module Docstring
+
+```text
+Compatibility shim for `pvxalgorithms` namespace.
+
+Use `pvx.algorithms` as the canonical import path.
+```
+
+## `pvxalgorithms/base.py`
+
+**Purpose:** Compatibility shim for `pvxalgorithms.base`.
+
+**Classes:** None
+**Functions:** None
+
+### Module Docstring
+
+```text
+Compatibility shim for `pvxalgorithms.base`.
+```
+
+## `pvxalgorithms/registry.py`
+
+**Purpose:** Compatibility shim for `pvxalgorithms.registry`.
+
+**Classes:** None
+**Functions:** None
+
+### Module Docstring
+
+```text
+Compatibility shim for `pvxalgorithms.registry`.
 ```
 
 ## `scripts/scripts_ab_compare.py`
