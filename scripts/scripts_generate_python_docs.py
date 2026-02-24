@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import ast
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -118,13 +119,16 @@ def parse_module(path: Path) -> dict:
 
 def cli_help(path: Path) -> str | None:
     try:
+        env = os.environ.copy()
+        env["PYTHONPATH"] = str(SRC_DIR)
         proc = subprocess.run(
-            ["python3", str(path), "--help"],
+            [sys.executable, str(path), "--help"],
             cwd=ROOT,
             text=True,
             capture_output=True,
             timeout=25,
             check=False,
+            env=env,
         )
     except Exception as exc:  # pragma: no cover
         return f"[help unavailable: {exc}]"
