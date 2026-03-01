@@ -200,6 +200,7 @@ pvx denoise noisy.wav --reduction-db 8 --stdout | pvx deverb - --strength 0.3 --
 ```
 
 More runnable recipes (72): [docs/EXAMPLES.md](docs/EXAMPLES.md)
+
 Wild experimentation pack (100 ideas): [docs/CRAZY_100.md](docs/CRAZY_100.md)
 
 If you run these and everything sounds exactly the same, either the command failed quietly or your source was already suspiciously perfect.
