@@ -48,6 +48,7 @@ def _resize_curve(values: np.ndarray, target_bins: int) -> np.ndarray:
         return src.copy()
     if src.size == 0:
         return np.ones(target_bins, dtype=np.float64)
+    # Normalize to [0,1] so the mapping is shape-preserving regardless of FFT size.
     x_old = np.linspace(0.0, 1.0, num=src.size, endpoint=True)
     x_new = np.linspace(0.0, 1.0, num=target_bins, endpoint=True)
     return np.interp(x_new, x_old, src)
@@ -61,6 +62,7 @@ def _shift_response_curve(curve: np.ndarray, *, shift_bins: int, transpose_semit
     ratio = float(2.0 ** (float(transpose_semitones) / 12.0))
     if ratio <= 0.0:
         ratio = 1.0
+    # Bin shift and pitch transpose are applied in one interpolation step.
     indices = (np.arange(n, dtype=np.float64) - float(shift_bins)) / ratio
     x_old = np.arange(n, dtype=np.float64)
     out = np.interp(indices, x_old, src, left=src[0], right=src[-1])
@@ -192,6 +194,7 @@ def evaluate_scalar_control(
     if interp == "linear":
         return np.interp(times, t, v, left=float(v[0]), right=float(v[-1]))
     if interp == "cubic":
+        # Global cubic fit keeps runtime tiny and deterministic for short control maps.
         deg = min(3, v.size - 1)
         coef = np.polyfit(t, v, deg=deg)
         out = np.polyval(coef, times)
@@ -284,6 +287,7 @@ def process_response_operator(
         response_curve = np.maximum(response_curve, 1e-9)
 
         frame_times = _frame_times(n_frames, config.hop_size, sample_rate)
+        # mix_vec is per-frame modulation depth; tvfilter consumes map dynamics here.
         mix_vec = evaluate_scalar_control(
             frame_times,
             np.asarray(tv_points_t if tv_points_t is not None else [], dtype=np.float64),
@@ -295,6 +299,7 @@ def process_response_operator(
         mix_vec = np.clip(mix_vec, 0.0, 4.0)
 
         if operator in {"filter", "tvfilter"}:
+            # Response curve is interpreted as multiplicative magnitude shaping.
             gain = 1.0 + (response_curve[:, None] - 1.0) * mix_vec[None, :]
             out_mag = mag * np.maximum(gain, 1e-9)
         elif operator == "noisefilter":
@@ -304,6 +309,7 @@ def process_response_operator(
             den = mag * atten
             out_mag = (1.0 - mix_vec[None, :]) * mag + mix_vec[None, :] * den
         elif operator == "bandamp":
+            # bandamp builds broad Gaussian-like boosts around dominant response peaks.
             band_shape = _compute_band_shape(
                 response_curve,
                 peak_count=int(peak_count),
@@ -314,6 +320,7 @@ def process_response_operator(
             gain = 1.0 + (gain_curve[:, None] - 1.0) * mix_vec[None, :]
             out_mag = mag * np.maximum(gain, 1e-9)
         elif operator == "spec-compander":
+            # spec-compander works in "relative-to-response" space, then maps back to absolute.
             ref = np.maximum(response_curve[:, None], 1e-9)
             rel = mag / ref
             threshold = max(1e-6, db_to_amp(float(comp_threshold_db)))

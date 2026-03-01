@@ -189,6 +189,7 @@ Implemented after this Phase 0 note:
 - Unified CLI helper commands added:
   - `pvx chain` for managed serial multi-stage chains
   - `pvx stream` for chunked wrapper over `pvx voc`
+  - `pvx stretch-budget` for preflight max-stretch estimation from file metadata + disk budget assumptions
 
 ## Attribution
 

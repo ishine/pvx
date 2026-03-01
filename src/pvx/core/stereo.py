@@ -22,6 +22,7 @@ def lr_to_ms(audio: np.ndarray) -> np.ndarray:
     arr = np.asarray(audio, dtype=np.float64)
     if arr.ndim != 2 or arr.shape[1] != 2:
         raise ValueError("mid/side conversion requires exactly 2 channels")
+    # sqrt(1/2) keeps LR <-> MS transform orthonormal (no loudness jump on encode/decode).
     scale = 1.0 / math.sqrt(2.0)
     mid = (arr[:, 0] + arr[:, 1]) * scale
     side = (arr[:, 0] - arr[:, 1]) * scale
@@ -32,6 +33,7 @@ def ms_to_lr(audio_ms: np.ndarray) -> np.ndarray:
     arr = np.asarray(audio_ms, dtype=np.float64)
     if arr.ndim != 2 or arr.shape[1] != 2:
         raise ValueError("M/S decoding requires exactly 2 channels")
+    # Same orthonormal scaling as encoder, so round-trips stay numerically stable.
     scale = 1.0 / math.sqrt(2.0)
     left = (arr[:, 0] + arr[:, 1]) * scale
     right = (arr[:, 0] - arr[:, 1]) * scale

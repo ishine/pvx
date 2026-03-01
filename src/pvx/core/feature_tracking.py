@@ -37,6 +37,7 @@ def _mel_filterbank(sr: int, n_fft: int, n_mels: int, fmin: float, fmax: float) 
         left = hz_points[i]
         center = hz_points[i + 1]
         right = hz_points[i + 2]
+        # Triangular Mel bands approximate perceptual spacing with cheap linear ramps.
         left_slope = _safe_div((hz_bins - left), (center - left))
         right_slope = _safe_div((right - hz_bins), (right - center))
         tri = np.maximum(0.0, np.minimum(left_slope, right_slope))
@@ -53,6 +54,7 @@ def _dct_type2(x: np.ndarray, n_coeffs: int) -> np.ndarray:
     k = np.arange(n_coeffs, dtype=np.float64)[:, None]
     i = np.arange(n, dtype=np.float64)[None, :]
     basis = np.cos(np.pi * (i + 0.5) * k / float(n))
+    # Orthonormal scaling keeps MFCC magnitudes consistent across frame sizes.
     scale = np.sqrt(2.0 / float(n))
     out = scale * (basis @ x)
     if n_coeffs > 0:
@@ -89,6 +91,7 @@ def _acf_peak_ratio(frame: np.ndarray, sr: int, fmin: float, fmax: float) -> tup
         return 0.0, 0.0
     window = corr[min_lag : max_lag + 1]
     lag = int(np.argmax(window)) + min_lag
+    # Peak-vs-zero-lag ratio acts as a voicing confidence estimate.
     peak = float(corr[lag])
     conf = float(np.clip(peak / max(corr[0], EPS), 0.0, 1.0))
     hz = float(sr / lag) if lag > 0 else 0.0
@@ -100,6 +103,7 @@ def _estimate_formants_lpc(frame: np.ndarray, sr: int, count: int = 3) -> tuple[
     if work.size < 32:
         return float("nan"), float("nan"), float("nan")
     pre = np.copy(work)
+    # Light pre-emphasis improves LPC sensitivity to vocal-tract resonances.
     pre[1:] = pre[1:] - 0.97 * pre[:-1]
     pre *= np.hamming(pre.size)
     order = int(min(20, max(8, sr // 1000 + 2)))
@@ -124,6 +128,7 @@ def _estimate_formants_lpc(frame: np.ndarray, sr: int, count: int = 3) -> tuple[
     ang = np.angle(roots)
     freqs = ang * (float(sr) / (2.0 * np.pi))
     bw = -0.5 * (float(sr) / np.pi) * np.log(np.maximum(np.abs(roots), EPS))
+    # Keep speech-like poles only; wide-band poles are usually unstable/noisy.
     valid = (freqs > 90.0) & (freqs < 5000.0) & (bw < 700.0)
     formants = np.sort(freqs[valid])
     if formants.size == 0:
@@ -143,6 +148,7 @@ def _estimate_tempo_bpm(onset_env: np.ndarray, hop_size: int, sr: int) -> float:
     lag_max = min(ac.size - 1, int((60.0 / 40.0) * float(sr) / float(hop_size)))
     if lag_max <= lag_min:
         return 120.0
+    # Tempo is taken from the dominant autocorrelation lag in a musical BPM range.
     lag = int(np.argmax(ac[lag_min : lag_max + 1])) + lag_min
     bpm = 60.0 * float(sr) / (float(lag) * float(hop_size))
     return float(np.clip(bpm, 40.0, 240.0))
@@ -186,6 +192,7 @@ def _estimate_inharmonicity(
     w = np.asarray(weights, dtype=np.float64)
     if float(np.sum(w)) <= EPS:
         return float(np.mean(deviations))
+    # Magnitude-weighted deviation emphasizes strong partials over incidental peaks.
     return float(np.sum(np.asarray(deviations, dtype=np.float64) * w) / np.sum(w))
 
 
@@ -282,6 +289,7 @@ def extract_feature_tracks(
         onset_strength[idx] = flux[idx]
         prev_mag = mag
 
+        # 95% cumulative-energy rolloff is less jittery than "max bin" type measures.
         csum = np.cumsum(pwr)
         threshold = 0.95 * csum[-1] if csum.size else 0.0
         ridx = int(np.searchsorted(csum, threshold)) if csum.size else 0
@@ -304,6 +312,7 @@ def extract_feature_tracks(
         mid = fr_l.size - 1
         lo = max(0, mid - itd_max_lag)
         hi = min(corr.size, mid + itd_max_lag + 1)
+        # Constrained lag search keeps ITD estimates realistic and robust.
         lag = int(np.argmax(corr[lo:hi])) + lo - mid
         itd_ms[idx] = 1000.0 * float(lag) / float(sr)
 
@@ -361,6 +370,7 @@ def extract_feature_tracks(
     diff = np.diff(np.asarray(f0_hz, dtype=np.float64), prepend=float(f0_hz[0]))
     cents_jump = 1200.0 * np.log2(np.maximum(np.asarray(f0_hz, dtype=np.float64), EPS) / np.maximum(np.asarray(f0_hz, dtype=np.float64) - diff, EPS))
     cents_jump = np.nan_to_num(cents_jump, nan=0.0, posinf=0.0, neginf=0.0)
+    # Convert pitch jump into a smooth "stable vs unstable" control signal.
     pitch_stability = np.exp(-np.abs(cents_jump) / 50.0)
     note_boundary = ((np.abs(cents_jump) >= 80.0) | (onset_norm > 0.6)).astype(np.float64)
     transient_mask = (onset_norm > 0.55).astype(np.float64)
@@ -373,6 +383,7 @@ def extract_feature_tracks(
     noise_score = np.clip((0.5 * flatness + 0.5 * hiss_ratio) * (1.0 - silence_prob), 0.0, 1.0)
     score_stack = np.stack([silence_prob, speech_score, music_score, noise_score], axis=1)
     score_sum = np.sum(score_stack, axis=1, keepdims=True)
+    # Normalize lightweight classifier scores into probabilities per frame.
     probs = np.asarray(_safe_div(score_stack, score_sum + EPS), dtype=np.float64)
     silence_prob = probs[:, 0]
     speech_prob = probs[:, 1]

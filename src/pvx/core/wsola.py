@@ -11,6 +11,7 @@ import numpy as np
 
 def _safe_window(length: int) -> np.ndarray:
     n = max(2, int(length))
+    # Hann keeps overlap-add energy smooth without introducing phase discontinuities.
     return np.hanning(n).astype(np.float64)
 
 
@@ -56,6 +57,7 @@ def wsola_time_stretch(
 
     window = _safe_window(frame_len)
     target_len = max(1, int(round(x.size * ratio)))
+    # Keep a little extra tail room so late overlap writes never reallocate.
     max_out = target_len + frame_len + 2 * max(analysis_hop, synthesis_hop)
     y = np.zeros(max_out, dtype=np.float64)
     weight = np.zeros(max_out, dtype=np.float64)
@@ -82,6 +84,7 @@ def wsola_time_stretch(
 
         out_overlap = y[out_pos : out_pos + overlap]
         out_w = weight[out_pos : out_pos + overlap]
+        # Normalize the already-synthesized overlap region before similarity scoring.
         out_norm = out_overlap.copy()
         nz = out_w > 1e-9
         out_norm[nz] = out_overlap[nz] / out_w[nz]
@@ -94,6 +97,7 @@ def wsola_time_stretch(
                 seg = x[cand : cand + overlap]
                 if seg.size != overlap:
                     continue
+                # Correlation in normalized space yields deterministic "best overlap" alignment.
                 denom = (np.linalg.norm(seg) + 1e-12) * ref_norm
                 score = float(np.dot(seg, out_norm) / denom)
                 if score > best_score:

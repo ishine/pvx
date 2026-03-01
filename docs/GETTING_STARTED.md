@@ -397,14 +397,35 @@ pvx follow guide.wav target.wav --output target_follow.wav --emit pitch_to_stret
 pvx chain sample.wav --pipeline "voc --stretch 1.2 | formant --mode preserve" --output sample_chain.wav
 pvx stream sample.wav --output sample_stream.wav --chunk-seconds 0.2 --time-stretch 2.0
 pvx stream sample.wav --mode wrapper --output sample_stream_wrapper.wav --chunk-seconds 0.2 --time-stretch 2.0
+pvx stretch-budget sample.wav --disk-budget 20GB --bit-depth 16 --requested-stretch 1000000
 ```
 
 - `pvx follow` replaces long sidechain pipes for pitch/control-map-driven workflows.
 - `pvx chain` runs serial stages with managed intermediate files.
 - `pvx stream` defaults to a stateful chunk processor for smoother long-form continuity.
 - `pvx stream --mode wrapper` keeps legacy segmented-wrapper behavior.
+- `pvx stretch-budget` estimates maximum practical stretch before you commit to a long render.
 
-## 10.1 Feature Tracking for Sidechain Control
+## 10.1 Estimate Stretch Budget Before Extreme Jobs
+
+Use this helper before very large ratios (`100x`, `1000x`, `1000000x`) so disk limits are explicit.
+
+```bash
+pvx stretch-budget input.wav --disk-budget 20GB --bit-depth 16
+pvx stretch-budget input.wav --disk-budget 20GB --requested-stretch 1000000 --fail-if-exceeds --json
+```
+
+What it uses:
+- input shape (frames/channels/sample rate)
+- output storage assumption (`--output-format`, `--bit-depth` / `--subtype`)
+- budget (`--disk-budget` or free space at `--budget-path`)
+- headroom (`--safety-margin`, default `0.90`)
+
+Recommendation:
+- for production, prefer `--target-duration` over arbitrary huge ratios.
+- if you run extreme jobs, combine `--stretch-mode multistage` with `--auto-segment-seconds`, `--checkpoint-dir`, and `--resume`.
+
+## 10.2 Feature Tracking for Sidechain Control
 
 `pvx pitch-track` now emits feature vectors (not just pitch map fields), including:
 - pitch/voicing (`f0_hz`, `pitch_ratio`, `confidence`, `voicing_prob`, `pitch_stability`)

@@ -595,9 +595,11 @@ def time_pitch_shift_channel(
     if pitch_ratio <= 0.0:
         raise ValueError("pitch_ratio must be > 0")
 
+    # Internal stretch combines user time-stretch and the compensation required for pitch resampling.
     internal_stretch = stretch * pitch_ratio
     shifted = phase_vocoder_time_stretch(signal, internal_stretch, config)
     if abs(pitch_ratio - 1.0) > 1e-10:
+        # Resample after the stretch pass so timing lands at exactly `stretch * original_len`.
         target_samples = max(1, int(round(shifted.size / pitch_ratio)))
         shifted = resample_1d(shifted, target_samples, resample_mode)
 
@@ -616,6 +618,7 @@ def time_pitch_shift_audio(
     channels: list[np.ndarray] = []
     for idx in range(audio.shape[1]):
         channels.append(time_pitch_shift_channel(audio[:, idx], stretch, pitch_ratio, config, resample_mode=resample_mode))
+    # Per-channel processing can differ by a sample after rounding; pad to the longest.
     out_len = max(ch.size for ch in channels)
     out = np.zeros((out_len, len(channels)), dtype=np.float64)
     for ch, values in enumerate(channels):
@@ -686,6 +689,7 @@ def concat_with_crossfade(chunks: list[np.ndarray], sr: int, crossfade_ms: float
         if fade <= 0 or out.shape[0] < fade or nxt.shape[0] < fade:
             out = np.vstack([out, nxt])
             continue
+        # Linear crossfade is cheap and prevents hard discontinuities at segment boundaries.
         w = np.linspace(0.0, 1.0, num=fade, endpoint=True)[:, None]
         tail = out[-fade:, :] * (1.0 - w) + nxt[:fade, :] * w
         out = np.vstack([out[:-fade, :], tail, nxt[fade:, :]])

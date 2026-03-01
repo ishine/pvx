@@ -35,6 +35,7 @@ def _normalize_robust(values: np.ndarray) -> np.ndarray:
     if values.size == 0:
         return values.astype(np.float64)
     x = np.asarray(values, dtype=np.float64)
+    # Percentile normalization dampens the effect of isolated transient outliers.
     lo = float(np.percentile(x, 10.0))
     hi = float(np.percentile(x, 90.0))
     if not np.isfinite(lo) or not np.isfinite(hi) or hi <= lo + 1e-12:
@@ -50,6 +51,7 @@ def _frame_signal(signal: np.ndarray, n_fft: int, hop_size: int, *, center: bool
         return np.zeros((n_fft, 0), dtype=np.float64)
 
     if center:
+        # Mirror the STFT-style centered framing convention used by the main vocoder.
         pad = n_fft // 2
         x = np.pad(x, (pad, pad), mode="constant")
     if x.size < n_fft:
@@ -140,6 +142,7 @@ def pick_onset_frames(
     if score.size <= 2:
         return np.array([int(np.argmax(score))], dtype=np.int64) if score.size else np.zeros(0, dtype=np.int64)
 
+    # Sensitivity shifts quantile threshold: higher sensitivity -> more candidate onsets.
     s = float(np.clip(sensitivity, 0.0, 1.0))
     threshold = float(np.quantile(score, 0.92 - 0.50 * s))
     threshold = float(np.clip(threshold, 0.08, 0.95))
@@ -207,6 +210,7 @@ def build_transient_mask(
     pre = max(1, int(round(0.35 * protect)))
     post = max(1, int(round(0.65 * protect)))
     for onset in np.asarray(onset_samples, dtype=np.int64):
+        # Slightly longer post-onset protection better preserves attack + immediate decay.
         center = int(np.clip(onset, 0, n - 1))
         start = max(0, center - pre)
         end = min(n, center + post)
@@ -232,6 +236,7 @@ def map_mask_to_output(mask_in: np.ndarray, stretch: float, output_samples: int)
     if src.size == 0:
         return np.zeros(out_len, dtype=bool)
     ratio = max(1e-9, float(stretch))
+    # Nearest-source mapping keeps mask edges aligned with integer sample indices.
     idx = np.rint(np.arange(out_len, dtype=np.float64) / ratio).astype(np.int64)
     idx = np.clip(idx, 0, src.size - 1)
     return src[idx]

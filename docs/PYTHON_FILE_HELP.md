@@ -4,7 +4,7 @@
 
 Comprehensive reference for every Python file in this repository.
 
-Total Python files documented: **243**
+Total Python files documented: **251**
 
 ## Contents
 
@@ -12,6 +12,7 @@ Total Python files documented: **243**
 - [`benchmarks/__init__.py`](#benchmarksinitpy)
 - [`benchmarks/metrics.py`](#benchmarksmetricspy)
 - [`benchmarks/run_bench.py`](#benchmarksrunbenchpy)
+- [`benchmarks/run_pvc_parity.py`](#benchmarksrunpvcparitypy)
 - [`main.py`](#mainpy)
 - [`pvx.py`](#pvxpy)
 - [`pvxalgorithms/__init__.py`](#pvxalgorithmsinitpy)
@@ -24,6 +25,7 @@ Total Python files documented: **243**
 - [`pvxconform.py`](#pvxconformpy)
 - [`pvxdenoise.py`](#pvxdenoisepy)
 - [`pvxdeverb.py`](#pvxdeverbpy)
+- [`pvxenvelope.py`](#pvxenvelopepy)
 - [`pvxfilter.py`](#pvxfilterpy)
 - [`pvxformant.py`](#pvxformantpy)
 - [`pvxfreeze.py`](#pvxfreezepy)
@@ -33,6 +35,7 @@ Total Python files documented: **243**
 - [`pvxlayer.py`](#pvxlayerpy)
 - [`pvxmorph.py`](#pvxmorphpy)
 - [`pvxnoisefilter.py`](#pvxnoisefilterpy)
+- [`pvxreshape.py`](#pvxreshapepy)
 - [`pvxresponse.py`](#pvxresponsepy)
 - [`pvxretune.py`](#pvxretunepy)
 - [`pvxring.py`](#pvxringpy)
@@ -195,6 +198,7 @@ Total Python files documented: **243**
 - [`src/pvx/cli/pvxconform.py`](#srcpvxclipvxconformpy)
 - [`src/pvx/cli/pvxdenoise.py`](#srcpvxclipvxdenoisepy)
 - [`src/pvx/cli/pvxdeverb.py`](#srcpvxclipvxdeverbpy)
+- [`src/pvx/cli/pvxenvelope.py`](#srcpvxclipvxenvelopepy)
 - [`src/pvx/cli/pvxfilter.py`](#srcpvxclipvxfilterpy)
 - [`src/pvx/cli/pvxformant.py`](#srcpvxclipvxformantpy)
 - [`src/pvx/cli/pvxfreeze.py`](#srcpvxclipvxfreezepy)
@@ -204,6 +208,7 @@ Total Python files documented: **243**
 - [`src/pvx/cli/pvxlayer.py`](#srcpvxclipvxlayerpy)
 - [`src/pvx/cli/pvxmorph.py`](#srcpvxclipvxmorphpy)
 - [`src/pvx/cli/pvxnoisefilter.py`](#srcpvxclipvxnoisefilterpy)
+- [`src/pvx/cli/pvxreshape.py`](#srcpvxclipvxreshapepy)
 - [`src/pvx/cli/pvxresponse.py`](#srcpvxclipvxresponsepy)
 - [`src/pvx/cli/pvxretune.py`](#srcpvxclipvxretunepy)
 - [`src/pvx/cli/pvxring.py`](#srcpvxclipvxringpy)
@@ -223,6 +228,7 @@ Total Python files documented: **243**
 - [`src/pvx/core/feature_tracking.py`](#srcpvxcorefeaturetrackingpy)
 - [`src/pvx/core/output_policy.py`](#srcpvxcoreoutputpolicypy)
 - [`src/pvx/core/presets.py`](#srcpvxcorepresetspy)
+- [`src/pvx/core/pvc_functions.py`](#srcpvxcorepvcfunctionspy)
 - [`src/pvx/core/pvc_harmony.py`](#srcpvxcorepvcharmonypy)
 - [`src/pvx/core/pvc_ops.py`](#srcpvxcorepvcopspy)
 - [`src/pvx/core/pvc_resonators.py`](#srcpvxcorepvcresonatorspy)
@@ -249,7 +255,9 @@ Total Python files documented: **243**
 - [`tests/test_dsp.py`](#teststestdsppy)
 - [`tests/test_microtonal.py`](#teststestmicrotonalpy)
 - [`tests/test_output_policy.py`](#teststestoutputpolicypy)
+- [`tests/test_pvc_parity_benchmark.py`](#teststestpvcparitybenchmarkpy)
 - [`tests/test_pvc_phase3_5.py`](#teststestpvcphase35py)
+- [`tests/test_pvc_phase6.py`](#teststestpvcphase6py)
 - [`tests/test_transient_and_stereo.py`](#teststesttransientandstereopy)
 
 ## `HPS-pitch-track.py`
@@ -388,6 +396,21 @@ Objective metrics for pvx benchmark comparisons.
 Reproducible quality benchmark: pvx vs Rubber Band vs librosa baseline.
 ```
 
+## `benchmarks/run_pvc_parity.py`
+
+**Purpose:** PVC-style parity benchmark suite for phase 3-7 operators.
+
+**Classes:** `CaseSpec`
+**Functions:** `_to_mono`, `_match_length`, `_flat_response`, `_tilted_response`, `_generate_input`, `_case_specs`, `_run_tvfilter_envelope`, `_run_ringtv_controlled`, `_run_analysis_response_function_chain`, `_compute_case_metrics`, `_aggregate`, `_render_markdown`, `_gate_failures`, `main`
+
+**Help commands:** `python3 benchmarks/run_pvc_parity.py`, `python3 benchmarks/run_pvc_parity.py --help`
+
+### Module Docstring
+
+```text
+PVC-style parity benchmark suite for phase 3-7 operators.
+```
+
 ## `main.py`
 
 **Purpose:** Compatibility wrapper.
@@ -418,11 +441,12 @@ Quick start:
   pvx follow guide.wav target.wav --output followed.wav --emit pitch_to_stretch
   pvx chain input.wav --pipeline "voc --stretch 1.2 | formant --mode preserve" --output out.wav
   pvx stream input.wav --output out.wav --chunk-seconds 0.2 --time-stretch 2.0
+  pvx stretch-budget input.wav --disk-budget 20GB --bit-depth 16 --requested-stretch 1000000
   pvx list
   pvx examples basic
   pvx help voc
 
-Available tool commands: voc, freeze, harmonize, conform, morph, warp, formant, transient, unison, denoise, deverb, retune, layer, pitch-track, analysis, response, filter, tvfilter, noisefilter, bandamp, spec-compander, ring, ringfilter, ringtvfilter, chordmapper, inharmonator
+Available tool commands: voc, freeze, harmonize, conform, morph, warp, formant, transient, unison, denoise, deverb, retune, layer, pitch-track, analysis, response, envelope, reshape, filter, tvfilter, noisefilter, bandamp, spec-compander, ring, ringfilter, ringtvfilter, chordmapper, inharmonator
 ```
 
 ### Module Docstring
@@ -1049,6 +1073,83 @@ Compatibility wrapper.
 
 This root module forwards imports/execution to `pvx.cli.pvxdeverb` after the
 src-layout migration.
+```
+
+## `pvxenvelope.py`
+
+**Purpose:** Compatibility wrapper for `pvx.cli.pvxenvelope`.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvxenvelope.py --help`
+
+### CLI Help Snapshot
+
+```text
+usage: pvx envelope [-h] [--mode {adsr,ramp,exp,sine}] --duration DURATION
+                    [--rate RATE] [--start START] [--peak PEAK]
+                    [--sustain SUSTAIN] [--end END] [--attack-sec ATTACK_SEC]
+                    [--decay-sec DECAY_SEC] [--release-sec RELEASE_SEC]
+                    [--exp-curve EXP_CURVE] [--sine-cycles SINE_CYCLES]
+                    [--sine-phase-rad SINE_PHASE_RAD] [--min MIN_VALUE]
+                    [--max MAX_VALUE] [--key KEY] [--format {csv,json,auto}]
+                    [--output OUTPUT] [--stdout]
+                    [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
+                    [--quiet] [--silent]
+
+Generate deterministic control-rate envelope maps for pvx CSV/JSON workflows.
+
+options:
+  -h, --help            show this help message and exit
+  --mode {adsr,ramp,exp,sine}
+                        Envelope mode
+  --duration DURATION   Envelope duration in seconds
+  --rate RATE           Control points per second (default: 20)
+  --start START         Start value (mode-dependent)
+  --peak PEAK           Peak or depth value (mode-dependent)
+  --sustain SUSTAIN     Sustain value for ADSR mode
+  --end END             End value for ADSR/ramp/exp modes
+  --attack-sec ATTACK_SEC
+                        ADSR attack in seconds
+  --decay-sec DECAY_SEC
+                        ADSR decay in seconds
+  --release-sec RELEASE_SEC
+                        ADSR release in seconds
+  --exp-curve EXP_CURVE
+                        Exponential curve steepness for exp mode
+  --sine-cycles SINE_CYCLES
+                        Number of cycles for sine mode
+  --sine-phase-rad SINE_PHASE_RAD
+                        Initial sine phase in radians
+  --min MIN_VALUE       Optional value clamp minimum
+  --max MAX_VALUE       Optional value clamp maximum
+  --key KEY             Output control column/key name (default: value)
+  --format {csv,json,auto}
+                        Output format (default: auto from extension or csv for stdout)
+  --output, --out OUTPUT
+                        Output path. Default: stdout.
+  --stdout              Write map to stdout
+  --verbosity {silent,quiet,normal,verbose,debug}
+                        Console verbosity level
+  -v, --verbose         Increase verbosity (repeat for extra detail)
+  --quiet               Reduce output and hide status bars
+  --silent              Suppress all console output
+
+Examples:
+  pvx envelope --mode adsr --duration 8 --rate 20 --attack-sec 0.2 --decay-sec 0.6 --sustain 1.1 --release-sec 1.0 --key stretch --output stretch_env.csv
+  pvx envelope --mode ramp --duration 6 --rate 10 --start 1.0 --end 0.5 --key pitch_ratio --stdout | pvx voc input.wav --stretch 1.0 --pitch-map-stdin --route pitch_ratio=pitch_ratio --output out.wav
+  pvx envelope --mode sine --duration 12 --rate 30 --start 1.0 --peak 0.25 --sine-cycles 6 --min 0.75 --max 1.25 --key stretch --output stretch_lfo.json
+
+Notes:
+  - Generated maps are control-rate signals (not sample-rate audio).
+  - Use --key to emit directly as stretch or pitch_ratio for pvx voc map workflows.
+```
+
+### Module Docstring
+
+```text
+Compatibility wrapper for `pvx.cli.pvxenvelope`.
 ```
 
 ## `pvxfilter.py`
@@ -1930,6 +2031,87 @@ options:
 
 ```text
 Compatibility wrapper for `pvx.cli.pvxnoisefilter`.
+```
+
+## `pvxreshape.py`
+
+**Purpose:** Compatibility wrapper for `pvx.cli.pvxreshape`.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvxreshape.py --help`
+
+### CLI Help Snapshot
+
+```text
+usage: pvx reshape [-h] [--key KEY] [--output-key OUTPUT_KEY]
+                   --operation {scale,offset,clip,pow,normalize,invert,smooth,time-scale,time-shift,resample}
+                   [--factor FACTOR] [--offset OFFSET] [--min MIN_VALUE]
+                   [--max MAX_VALUE] [--exponent EXPONENT] [--window WINDOW]
+                   [--target-min TARGET_MIN] [--target-max TARGET_MAX]
+                   [--rate RATE]
+                   [--interp {none,stairstep,nearest,linear,cubic,polynomial}]
+                   [--order ORDER] [--input-format {auto,csv,json}]
+                   [--format {auto,csv,json}] [--output OUTPUT] [--stdout]
+                   [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
+                   [--quiet] [--silent]
+                   input
+
+Transform control-rate CSV/JSON maps for pvx routing and modulation workflows.
+
+positional arguments:
+  input                 Input control map path or '-' for stdin
+
+options:
+  -h, --help            show this help message and exit
+  --key KEY             Control column/key to read (default: value)
+  --output-key OUTPUT_KEY
+                        Output control key. Default: same as --key
+  --operation {scale,offset,clip,pow,normalize,invert,smooth,time-scale,time-shift,resample}
+                        Reshape operation
+  --factor FACTOR       Scale factor for scale/time-scale ops
+  --offset OFFSET       Offset for offset/time-shift ops
+  --min MIN_VALUE       Minimum clamp value
+  --max MAX_VALUE       Maximum clamp value
+  --exponent EXPONENT   Exponent for pow operation
+  --window WINDOW       Window size for smooth operation
+  --target-min TARGET_MIN
+                        Target minimum for normalize operation
+  --target-max TARGET_MAX
+                        Target maximum for normalize operation
+  --rate RATE           Resample control rate (Hz) for resample operation
+  --interp {none,stairstep,nearest,linear,cubic,polynomial}
+                        Interpolation mode
+  --order ORDER         Polynomial order for --interp polynomial
+  --input-format {auto,csv,json}
+                        Input format override (default: auto by suffix or csv for stdin)
+  --format {auto,csv,json}
+                        Output format (default: auto from --output suffix or csv for stdout)
+  --output, --out OUTPUT
+                        Output file path. Default: stdout.
+  --stdout              Write reshaped map to stdout
+  --verbosity {silent,quiet,normal,verbose,debug}
+                        Console verbosity level
+  -v, --verbose         Increase verbosity (repeat for extra detail)
+  --quiet               Reduce output and hide status bars
+  --silent              Suppress all console output
+
+Examples:
+  pvx reshape stretch_env.csv --key stretch --operation scale --factor 1.2 --output stretch_scaled.csv
+  pvx reshape map.csv --key pitch_ratio --operation clip --min 0.5 --max 2.0 --stdout | pvx voc input.wav --pitch-map-stdin --route pitch_ratio=pitch_ratio --output out.wav
+  pvx reshape alpha_curve.csv --operation resample --rate 50 --interp polynomial --order 5 --output alpha_curve_dense.csv
+  pvx reshape stretch_env.csv --operation smooth --window 9 --output stretch_smooth.csv
+
+Notes:
+  - Use --key to select which control column to reshape.
+  - For stdin input, pass '-' as INPUT and optionally set --input-format.
+```
+
+### Module Docstring
+
+```text
+Compatibility wrapper for `pvx.cli.pvxreshape`.
 ```
 
 ## `pvxresponse.py`
@@ -6751,7 +6933,7 @@ Compatibility entrypoint for the unified pvx CLI.
 **Purpose:** Unified top-level CLI for the pvx command suite.
 
 **Classes:** `ToolSpec`, `_BytesStdin`
-**Functions:** `_tool_index`, `_load_entrypoint`, `_looks_like_audio_input`, `_tool_names_csv`, `print_tools`, `print_examples`, `_prompt_text`, `_prompt_choice`, `_print_command_preview`, `print_follow_examples`, `_extract_follow_example_request`, `run_guided_mode`, `_split_pipeline_stages`, `_token_flag`, `_run_stage_command`, `_run_stage_capture_stdout`, `_patched_stdin_bytes`, `run_follow_mode`, `run_chain_mode`, `run_stream_mode`, `dispatch_tool`, `build_parser`, `main`
+**Functions:** `_tool_index`, `_load_entrypoint`, `_looks_like_audio_input`, `_tool_names_csv`, `print_tools`, `print_examples`, `_prompt_text`, `_prompt_choice`, `_print_command_preview`, `print_follow_examples`, `_extract_follow_example_request`, `run_guided_mode`, `_split_pipeline_stages`, `_token_flag`, `_run_stage_command`, `_run_stage_capture_stdout`, `_patched_stdin_bytes`, `run_follow_mode`, `run_chain_mode`, `run_stream_mode`, `_parse_size_bytes`, `_format_bytes_human`, `_infer_output_format`, `_bytes_per_sample_from_subtype`, `run_stretch_budget_mode`, `dispatch_tool`, `build_parser`, `main`
 
 **Help commands:** `python3 src/pvx/cli/pvx.py`, `python3 src/pvx/cli/pvx.py --help`
 
@@ -6849,6 +7031,21 @@ Phase-consistent spectral denoiser.
 
 ```text
 Spectral tail suppression for dereverberation-like cleanup.
+```
+
+## `src/pvx/cli/pvxenvelope.py`
+
+**Purpose:** PVC-style envelope function-stream generator.
+
+**Classes:** None
+**Functions:** `build_parser`, `_resolve_output_format`, `_render_payload`, `main`
+
+**Help commands:** `python3 src/pvx/cli/pvxenvelope.py`, `python3 src/pvx/cli/pvxenvelope.py --help`
+
+### Module Docstring
+
+```text
+PVC-style envelope function-stream generator.
 ```
 
 ## `src/pvx/cli/pvxfilter.py`
@@ -6984,6 +7181,21 @@ Spectral morphing between two input files.
 
 ```text
 Response-profile noise filter wrapper.
+```
+
+## `src/pvx/cli/pvxreshape.py`
+
+**Purpose:** PVC-style function-stream reshaper for control maps.
+
+**Classes:** None
+**Functions:** `build_parser`, `_resolve_output_format`, `_resolve_input_format`, `_render_payload`, `main`
+
+**Help commands:** `python3 src/pvx/cli/pvxreshape.py`, `python3 src/pvx/cli/pvxreshape.py --help`
+
+### Module Docstring
+
+```text
+PVC-style function-stream reshaper for control maps.
 ```
 
 ## `src/pvx/cli/pvxresponse.py`
@@ -7258,6 +7470,23 @@ Shared output policy helpers for bit depth, dither, true-peak, and metadata side
 
 ```text
 Preset definitions for pvx processing intent modes.
+```
+
+## `src/pvx/core/pvc_functions.py`
+
+**Purpose:** PVC-style function-stream utilities for control-rate map authoring.
+
+**Classes:** None
+**Functions:** `_sanitize_times_values`, `_auto_format_from_path`, `parse_control_points_payload`, `load_control_points`, `dump_control_points_csv`, `dump_control_points_json`, `generate_envelope_points`, `_moving_average`, `reshape_control_points`
+
+### Module Docstring
+
+```text
+PVC-style function-stream utilities for control-rate map authoring.
+
+Phase 6 coverage:
+- envelope: generate deterministic control trajectories
+- reshape: transform existing control trajectories
 ```
 
 ## `src/pvx/core/pvc_harmony.py`
@@ -7666,6 +7895,21 @@ microtonal pitch controls produce expected conversion outputs.
 Unit tests for shared output policy helpers.
 ```
 
+## `tests/test_pvc_parity_benchmark.py`
+
+**Purpose:** Tests for PVC parity benchmark runner and gate logic.
+
+**Classes:** `TestPVCParityBenchmark`
+**Functions:** None
+
+**Help commands:** `python3 tests/test_pvc_parity_benchmark.py`
+
+### Module Docstring
+
+```text
+Tests for PVC parity benchmark runner and gate logic.
+```
+
 ## `tests/test_pvc_phase3_5.py`
 
 **Purpose:** Unit tests for PVC-inspired Phase 3-5 core operators.
@@ -7679,6 +7923,21 @@ Unit tests for shared output policy helpers.
 
 ```text
 Unit tests for PVC-inspired Phase 3-5 core operators.
+```
+
+## `tests/test_pvc_phase6.py`
+
+**Purpose:** Unit tests for PVC-inspired Phase 6 function-stream utilities.
+
+**Classes:** `TestPVCPhase6Utilities`, `TestPVCPhase6Cli`
+**Functions:** None
+
+**Help commands:** `python3 tests/test_pvc_phase6.py`
+
+### Module Docstring
+
+```text
+Unit tests for PVC-inspired Phase 6 function-stream utilities.
 ```
 
 ## `tests/test_transient_and_stereo.py`

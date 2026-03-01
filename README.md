@@ -403,6 +403,7 @@ pvx guided
 pvx follow --example all
 pvx chain --example
 pvx stream --example
+pvx stretch-budget --help
 ```
 
 You can also use a convenience shortcut for the default vocoder path:
@@ -609,6 +610,7 @@ Short aliases:
 Additional helper workflows:
 - `pvx chain`: managed multi-stage chains without manually wiring per-stage `--stdout` / `-` plumbing
 - `pvx stream`: stateful chunk engine for long-form streaming workflows (`--mode stateful` default, `--mode wrapper` compatibility fallback)
+- `pvx stretch-budget`: estimate max safe stretch from an input file and disk budget before launching extreme renders
 
 `pvx voc` includes beginner UX features:
 
@@ -767,6 +769,16 @@ See [docs/DIAGRAMS.md](docs/DIAGRAMS.md) for:
 - rerun with `--checkpoint-dir ... --resume`
 - consider `--auto-segment-seconds 0.25` to reduce recompute scope
 
+### I need a massive stretch ratio (for example 1,000,000x)
+- run a budget estimate first so you do not launch an impossible render:
+  - `pvx stretch-budget input.wav --disk-budget 20GB --bit-depth 16 --requested-stretch 1000000`
+- for script/CI gating, fail early if request exceeds budget:
+  - `pvx stretch-budget input.wav --disk-budget 20GB --requested-stretch 1000000 --fail-if-exceeds --json`
+- if you proceed, prefer:
+  - `--target-duration` over arbitrary giant ratios
+  - `--stretch-mode multistage`
+  - `--auto-segment-seconds` + `--checkpoint-dir` + `--resume`
+
 ## FAQ
 
 ### Can pvx time-stretch and time-compress?
@@ -825,6 +837,25 @@ Explicit route example (map `pitch_ratio` -> `stretch`, force `pitch_ratio` to u
 ```bash
 pvx pitch-track A.wav --output - \
   | pvx voc B.wav --control-stdin --route stretch=pitch_ratio --route pitch_ratio=const(1.0) --output B_time_follow.wav
+```
+
+### How large can stretch get before it becomes impractical?
+Use:
+
+```bash
+pvx stretch-budget input.wav --disk-budget 20GB --bit-depth 16 --json
+```
+
+This estimates the maximum safe stretch from:
+- input frames/channels/sample rate
+- assumed output format + subtype/bit depth
+- available budget (`--disk-budget` or free space at `--budget-path`)
+- safety headroom (`--safety-margin`, default `0.90`)
+
+You can also ask whether a requested ratio fits:
+
+```bash
+pvx stretch-budget input.wav --disk-budget 20GB --requested-stretch 1000000 --fail-if-exceeds
 ```
 
 `pvx pitch-track` can now emit a broad feature vector for control-map routing, including:

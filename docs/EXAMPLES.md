@@ -78,6 +78,15 @@ Expected audible progression:
 - `step5`: more stable stereo image during stretch
 - if all five sound identical, something is broken and tea alone will not save it
 
+Preflight for extreme ratios:
+
+```bash
+pvx stretch-budget one_shot.wav --disk-budget 20GB --bit-depth 16 --requested-stretch 1000000
+pvx stretch-budget one_shot.wav --disk-budget 20GB --requested-stretch 1000000 --fail-if-exceeds --json
+```
+
+Use this before launching very large renders so budget limits are explicit.
+
 ## Use-Case Index (By Theme)
 
 | Theme | Start here | Typical tools |

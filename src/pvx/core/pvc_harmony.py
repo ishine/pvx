@@ -67,6 +67,7 @@ def chord_mapper_mask(
     cents_mod = np.mod(cents, 1200.0)
 
     for idx in np.flatnonzero(valid):
+        # Gaussian distance in cents gives a smooth, musically intuitive attraction field.
         d = np.abs(cents_mod[idx] - classes)
         d = np.minimum(d, 1200.0 - d)
         nearest = float(np.min(d))
@@ -82,7 +83,7 @@ def _inharmonic_inverse_map(freqs_hz: np.ndarray, *, f0_hz: float, inharmonicity
         return f_out.copy()
 
     a = b / (f0 * f0)
-    # Solve u + a*u^2 = f_out^2, where u = f_in^2.
+    # Solve u + a*u^2 = f_out^2, where u = f_in^2; this inverts stiff-string dispersion.
     rhs = np.square(f_out)
     disc = 1.0 + 4.0 * a * rhs
     u = np.maximum(0.0, (-1.0 + np.sqrt(disc)) / (2.0 * a))
@@ -100,6 +101,7 @@ def _interp_mag_phase_from_freq(
     pha_src = np.asarray(pha, dtype=np.float64).reshape(-1)
 
     mag_dst = np.interp(freqs_hz, src_f, mag_src, left=mag_src[0], right=mag_src[-1])
+    # Interpolate phase on the unit circle to avoid branch-wrap discontinuities.
     cos_src = np.cos(pha_src)
     sin_src = np.sin(pha_src)
     cos_dst = np.interp(freqs_hz, src_f, cos_src, left=cos_src[0], right=cos_src[-1])
@@ -164,6 +166,7 @@ def process_harmony_operator(
             )
             warped_mag = np.zeros_like(mag)
             warped_phase = np.zeros_like(pha)
+            # Warp each frame along the inharmonic frequency map, then blend by mix.
             for frame in range(n_frames):
                 m_frame, p_frame = _interp_mag_phase_from_freq(
                     mag[:, frame],

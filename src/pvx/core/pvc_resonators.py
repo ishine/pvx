@@ -63,6 +63,7 @@ def _ring_modulate(
     if freq.size != n or depth.size != n or mix.size != n:
         raise ValueError("Ring tracks must match signal length")
 
+    # Integrate instantaneous frequency into carrier phase for sample-accurate modulation.
     phase = np.cumsum(2.0 * np.pi * freq / float(sample_rate))
     carrier = np.sin(phase)
     mod = x * ((1.0 - depth) + depth * carrier)
@@ -71,6 +72,7 @@ def _ring_modulate(
     fb = float(np.clip(feedback, 0.0, 0.999))
     if fb > 0.0:
         out = y.copy()
+        # Single-pole feedback path gives controlled "ring memory" without instability.
         for idx in range(1, out.size):
             out[idx] += fb * out[idx - 1]
         y = out
@@ -102,12 +104,14 @@ def _resonant_peak_filter(
     if not (0.0 < w0 < 1.0):
         return x.copy()
 
+    # Peak IIR approximates a narrow resonator around center_hz.
     b, a = iirpeak(w0, Q=q_val)
     y = lfilter(b, a, x)
 
     alpha = float(np.clip(decay, 0.0, 0.999))
     if alpha > 0.0:
         mem = np.zeros_like(y)
+        # Exponential tail memory controls resonator ring-down time.
         for idx in range(1, y.size):
             mem[idx] = y[idx] + alpha * mem[idx - 1]
         y = (1.0 - alpha) * mem
@@ -174,6 +178,7 @@ def process_ring_operator(
     )
 
     if operator != "ringtvfilter":
+        # Non-tv variants intentionally ignore control tracks and stay static.
         freq_track = np.full_like(freq_track, float(frequency_hz))
         depth_track = np.full_like(depth_track, float(depth))
         mix_track = np.full_like(mix_track, float(mix))

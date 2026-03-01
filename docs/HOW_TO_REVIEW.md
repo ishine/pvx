@@ -18,13 +18,15 @@ pvx help follow
 pvx follow --example all
 pvx chain --help
 pvx stream --help
+pvx stretch-budget --help
 ```
 
 Check:
-- `follow`, `chain`, and `stream` helper commands appear in `pvx list`.
+- `follow`, `chain`, `stream`, and `stretch-budget` helper commands appear in `pvx list`.
 - `pvx help follow` points users to `pvx follow --help`.
 - `pvx follow --example all` prints built-in feature-follow recipes.
 - `pvx stream --help` shows `--mode {stateful,wrapper}`.
+- `pvx stretch-budget --help` documents budget/safety/requested-stretch flags.
 - `pvx voc` help includes output-policy flags:
   - `--bit-depth`
   - `--dither`
@@ -61,6 +63,20 @@ Check:
 - `pvx follow` writes output without requiring explicit shell pipes.
 - output files are written.
 
+## 3.1 Stretch Budget Estimator Workflow
+
+Run:
+
+```bash
+pvx stretch-budget test.wav --disk-budget 250MB --bit-depth 16
+pvx stretch-budget test.wav --disk-budget 250MB --requested-stretch 1000000 --fail-if-exceeds --json
+```
+
+Check:
+- first command prints a finite `max safe stretch`.
+- second command exits non-zero when request exceeds usable budget.
+- JSON output includes `max_safe_stretch`, `requested_stretch`, and `requested_fits_budget`.
+
 ## 4. Output Policy Behavior
 
 Run:
@@ -86,6 +102,7 @@ python3 -m unittest tests.test_control_bus tests.test_cli_regression
 Check:
 - control-route parsing and CSV mapping tests pass.
 - `pvx follow` regression tests pass (including invalid passthrough rejection).
+- `pvx stretch-budget` regression tests pass (JSON shape + fail-if-exceeds behavior).
 
 ## 6. Benchmark/Regression
 

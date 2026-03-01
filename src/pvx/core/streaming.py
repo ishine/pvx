@@ -178,6 +178,7 @@ def _chunk_core_extract(
 ) -> tuple[np.ndarray, int]:
     seg_start = max(0, chunk_start - context_samples)
     seg_end = min(full_audio.shape[0], chunk_end + context_samples)
+    # Pull surrounding context so STFT analysis near chunk edges stays stable.
     seg = np.asarray(full_audio[seg_start:seg_end], dtype=np.float64)
 
     block = voc_core.process_audio_block(
@@ -197,6 +198,7 @@ def _chunk_core_extract(
     out_start = max(0, min(out_start, seg_out.shape[0]))
     out_end = max(out_start, min(out_end, seg_out.shape[0]))
 
+    # Keep only the region that maps to the requested chunk (discard context halo).
     core = seg_out[out_start:out_end, :]
     target_len = max(1, int(round((chunk_end - chunk_start) * stretch)))
     core = voc_core.force_length_multi(core, target_len)
@@ -238,6 +240,7 @@ def run_stateful_stream(
     dynamic_refs: dict[str, voc_core.DynamicControlRef] = dict(getattr(args, "_dynamic_control_refs", {}) or {})
 
     config = _build_config(args)
+    # Chunk size controls scheduling granularity; context protects continuity at seams.
     chunk_samples = max(1, int(round(float(chunk_seconds) * sr)))
     computed_context = max(config.win_length * 2, config.hop_size * 8)
     if context_ms is None:
@@ -292,6 +295,7 @@ def run_stateful_stream(
         if dynamic_signals:
             mid_sec = 0.5 * ((start + end) / float(sr))
             sample_t = np.asarray([mid_sec], dtype=np.float64)
+            # Sample dynamic controls at chunk midpoint for deterministic per-chunk settings.
             overrides: dict[str, float] = {}
             for parameter, signal in dynamic_signals.items():
                 value = float(voc_core._sample_dynamic_signal(signal, sample_t)[0])

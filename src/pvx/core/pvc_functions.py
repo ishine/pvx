@@ -70,6 +70,7 @@ def _sanitize_times_values(times: np.ndarray, values: np.ndarray) -> tuple[np.nd
     out_t: list[float] = []
     out_v: list[float] = []
     for tt, vv in zip(t.tolist(), v.tolist()):
+        # Merge exact-time duplicates by keeping the latest value (authoring-tool friendly behavior).
         if out_t and abs(tt - out_t[-1]) <= 1e-12:
             out_v[-1] = vv
         else:
@@ -132,6 +133,7 @@ def parse_control_points_payload(
             points_t.append(t_val)
             points_v.append(v_val)
     else:
+        # JSON accepts either an object with points/control or a raw list of point rows.
         root = json.loads(text)
         rows: list[dict[str, Any]] = []
         if isinstance(root, dict):
@@ -241,6 +243,7 @@ def generate_envelope_points(
         r = max(0.0, float(release_sec))
         total_env = a + d + r
         if total_env > duration and total_env > 0.0:
+            # If ADSR times exceed clip duration, compress stages proportionally.
             scale = duration / total_env
             a *= scale
             d *= scale
@@ -359,6 +362,7 @@ def reshape_control_points(
             return out_t, out_v
         count = max(2, int(round((stop - start) * rate)) + 1)
         new_t = np.linspace(start, stop, num=count, endpoint=True, dtype=np.float64)
+        # Reuse shared interpolation logic so reshape semantics match runtime control evaluation.
         new_v = evaluate_scalar_control(
             new_t,
             out_t,
@@ -379,4 +383,3 @@ def reshape_control_points(
             out_v = np.clip(out_v, lo, hi)
 
     return _sanitize_times_values(out_t, out_v)
-

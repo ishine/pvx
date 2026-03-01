@@ -50,6 +50,7 @@ def _resample_1d_linear(signal: np.ndarray, src_sr: int, dst_sr: int) -> np.ndar
     x = np.asarray(signal, dtype=np.float64).reshape(-1)
     if x.size == 0 or src_sr <= 0 or dst_sr <= 0 or src_sr == dst_sr:
         return x
+    # Simple linear resampling is enough for metric alignment and keeps dependencies minimal.
     n_out = max(1, int(round(x.size * float(dst_sr) / float(src_sr))))
     x_old = np.linspace(0.0, 1.0, x.size, endpoint=False)
     x_new = np.linspace(0.0, 1.0, n_out, endpoint=False)
@@ -94,6 +95,7 @@ def _stft_complex(x: np.ndarray, n_fft: int, hop: int) -> np.ndarray:
     out = np.empty((n_fft // 2 + 1, frames), dtype=np.complex128)
     for idx in range(frames):
         start = idx * hop
+        # Fixed window/hop gives stable metric comparisons across files.
         out[:, idx] = np.fft.rfft(signal[start : start + n_fft] * win, n=n_fft)
     return out
 
@@ -110,6 +112,7 @@ def _onset_envelope(x: np.ndarray, *, n_fft: int = 1024, hop_size: int = 256) ->
     mag = np.power(10.0, spec_db / 20.0)
     if mag.shape[1] <= 1:
         return np.zeros(mag.shape[1], dtype=np.float64)
+    # Positive spectral flux is a lightweight onset proxy for smear/correlation metrics.
     delta = np.maximum(0.0, mag[:, 1:] - mag[:, :-1])
     flux = np.sqrt(np.sum(delta * delta, axis=0))
     flux = np.concatenate([np.zeros(1, dtype=np.float64), flux], axis=0)
@@ -127,6 +130,7 @@ def _spectral_centroid_and_bw95(signal: np.ndarray, sr: int) -> tuple[float, flo
     x = np.asarray(signal, dtype=np.float64).reshape(-1)
     if x.size == 0 or sr <= 0:
         return 0.0, 0.0
+    # Power-of-two FFT bounded to keep this helper quick even on long files.
     n_fft = int(2 ** np.ceil(np.log2(max(256, min(8192, x.size)))))
     if x.size < n_fft:
         x = np.pad(x, (0, n_fft - x.size), mode="constant")
@@ -302,6 +306,7 @@ def summarize_audio_comparison_metrics(
 ) -> dict[str, float]:
     ref_2d = _to_2d(reference_audio)
     cand_2d = _to_2d(candidate_audio)
+    # Normalize both inputs onto reference sample-rate before pairwise metrics.
     ref_2d = _resample_audio_linear(ref_2d, int(reference_sr), int(reference_sr))
     cand_2d = _resample_audio_linear(cand_2d, int(candidate_sr), int(reference_sr))
     ref_2d, cand_2d = _match_length(ref_2d, cand_2d)
@@ -371,6 +376,7 @@ def summarize_audio_comparison_metrics(
         diff = ref_db[:bins, :frames] - cand_db[:bins, :frames]
         lsd_output = float(np.sqrt(np.mean(diff * diff)))
 
+        # Modulation-spectrum distance compares temporal evolution per spectral bin.
         ref_mod = np.abs(np.fft.rfft(ref_db[:bins, :frames], axis=1))
         cand_mod = np.abs(np.fft.rfft(cand_db[:bins, :frames], axis=1))
         m_bins = min(ref_mod.shape[1], cand_mod.shape[1])
@@ -432,6 +438,7 @@ def summarize_audio_comparison_metrics(
         b2 = min(spec_ref_l.shape[0], spec_ref_r.shape[0], spec_cand_l.shape[0], spec_cand_r.shape[0])
         f2 = min(spec_ref_l.shape[1], spec_ref_r.shape[1], spec_cand_l.shape[1], spec_cand_r.shape[1])
         if b2 > 0 and f2 > 0:
+            # Inter-channel phase drift estimates stereo-image rotation over processing.
             ipd_ref = _principal_angle(np.angle(spec_ref_l[:b2, :f2]) - np.angle(spec_ref_r[:b2, :f2]))
             ipd_cand = _principal_angle(np.angle(spec_cand_l[:b2, :f2]) - np.angle(spec_cand_r[:b2, :f2]))
             stereo_phase_drift_output = float(np.mean(np.abs(_principal_angle(ipd_cand - ipd_ref))))
@@ -456,6 +463,7 @@ def summarize_audio_comparison_metrics(
             lo = max(0, center - max_lag)
             hi = min(cc.size, center + max_lag + 1)
             local = cc[lo:hi]
+            # Search only a short lag window; real stereo ITD is tiny in practice.
             return int(np.argmax(np.abs(local)) + lo - center)
 
         ref_lag = _lag(ref_lr[:, 0], ref_lr[:, 1])

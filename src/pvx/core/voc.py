@@ -1285,10 +1285,12 @@ def _sample_dynamic_signal(signal: DynamicControlSignal, query_sec: np.ndarray) 
         return y[chosen]
 
     if mode == "linear":
+        # Linear interpolation is the default because it is stable and cheap in long renders.
         return np.interp(query_sec, x, y)
 
     if mode == "cubic":
         if scipy_cubic_spline is not None and x.size >= 4:
+            # Natural spline keeps endpoints well-behaved for sparse automation curves.
             spline = scipy_cubic_spline(x, y, bc_type="natural", extrapolate=True)
             return np.asarray(spline(query_sec), dtype=np.float64)
         return np.interp(query_sec, x, y)
@@ -1517,6 +1519,7 @@ def transform_bin_count(n_fft: int, transform: TransformMode) -> int:
 def _analysis_angular_velocity(n_bins: int, n_fft: int, hop_size: int, transform: TransformMode, *, xp=np):
     idx = xp.arange(n_bins, dtype=xp.float64)
     if transform in {"dct", "dst", "hartley"}:
+        # Real-valued transforms are mirrored around Nyquist; fold indices to signed bins.
         pivot = n_fft // 2
         idx = xp.where(idx <= pivot, idx, idx - n_fft)
     return 2.0 * np.pi * hop_size * idx / float(n_fft)
@@ -1573,6 +1576,7 @@ def _onesided_to_full_spectrum(spectrum, n_fft: int, *, xp=np):
         else:
             mirror_src = spec[1:]
         if mirror_src.size:
+            # Rebuild negative frequencies via Hermitian symmetry for real output.
             full[bins:] = xp.conj(mirror_src[::-1])
     return full
 
@@ -2063,6 +2067,7 @@ def make_window(kind: WindowType, n_fft: int, win_length: int, *, kaiser_beta: f
         return base.astype(xp.float64, copy=False)
 
     window = xp.zeros(n_fft, dtype=xp.float64)
+    # Center short windows inside the FFT frame to preserve existing hop semantics.
     offset = (n_fft - win_length) // 2
     window[offset : offset + win_length] = base
     return window
@@ -2105,6 +2110,7 @@ def stft(signal: np.ndarray, config: VocoderConfig):
     for frame_idx in range(frame_count):
         start = frame_idx * config.hop_size
         frame = work_signal[start : start + config.n_fft]
+        # Windowing is applied per frame before transform to control leakage.
         spectrum[:, frame_idx] = _forward_transform(frame * window, config.n_fft, transform, xp=xp)
 
     if bridge_to_cuda:
@@ -2141,6 +2147,7 @@ def istft(
         weight[start : start + config.n_fft] += window * window
 
     nz = weight > 1e-12
+    # Weighted overlap-add normalization removes window-power bias.
     output[nz] /= weight[nz]
 
     if config.center:
@@ -2269,6 +2276,7 @@ def build_fourier_sync_plan(
             progress_callback(frame_idx + 1, frame_count)
 
     finite_f0 = f0_track[np.isfinite(f0_track)]
+    # Median fallback keeps plan deterministic if a subset of frames fail F0 estimation.
     fallback_f0 = float(np.median(finite_f0)) if finite_f0.size else (f0_min_hz + f0_max_hz) * 0.5
     f0_track = fill_nan_with_nearest(f0_track, fallback=fallback_f0)
     f0_track = smooth_series(f0_track, smooth_span)
@@ -2293,6 +2301,7 @@ def build_fourier_sync_plan(
     )
     frame_lengths = np.rint(smooth_series(frame_lengths.astype(np.float64), smooth_span)).astype(np.int64)
     frame_lengths = np.clip(frame_lengths, min_fft, max_fft)
+    # Regularization prevents frame-length flicker that would cause audible zippering.
     frame_lengths = regularize_frame_lengths(
         frame_lengths,
         max_step=max(2, int(round(config.n_fft * 0.015))),
@@ -2367,6 +2376,7 @@ def build_output_time_steps(
 
         if flags is not None and bool(flags[onset_idx]) and onset_idx != last_onset_idx:
             if onset_realign and frac > 1e-12:
+                # Realign to frame boundary on onset, then bank removed advance as time credit.
                 onset_credit += 1.0 - frac
                 read_pos = float(frame_idx)
             else:
@@ -2377,6 +2387,7 @@ def build_output_time_steps(
         steps[out_idx] = read_pos
         advance = base_advance
         if onset_credit > 0.0 and credit_pull > 0.0:
+            # Spend accumulated credit to locally slow read advance around transients.
             credit_get = min(onset_credit, credit_pull * advance)
             onset_credit -= credit_get
             advance = max(1e-9, advance - credit_get)
@@ -2425,6 +2436,7 @@ def apply_phase_engine(
         return phase
     if blend >= 1.0:
         return random_phase
+    # Blend on the unit circle (complex plane), then unwrap back to phase angle.
     return xp.angle((1.0 - blend) * xp.exp(1j * phase) + blend * xp.exp(1j * random_phase))
 
 
@@ -2526,6 +2538,7 @@ def phase_vocoder_time_stretch(
 
         mag = (1.0 - frac) * xp.abs(left) + frac * xp.abs(right)
 
+        # Canonical phase-vocoder update: predicted advance + wrapped residual correction.
         delta = right_phase - left_phase - omega
         delta = principal_angle(delta)
         synth_phase = phase + omega + delta
@@ -2546,6 +2559,7 @@ def phase_vocoder_time_stretch(
             analysis_phase = xp.angle(
                 (1.0 - frac) * xp.exp(1j * left_phase) + frac * xp.exp(1j * right_phase)
             )
+            # Identity locking ties nearby bins to local peaks to reduce vertical phase scatter.
             synth_phase = apply_identity_phase_locking(synth_phase, analysis_phase, mag)
 
         phase = synth_phase
@@ -2611,6 +2625,7 @@ def phase_vocoder_time_stretch_fourier_sync(
             xp=xp,
         )
         spectrum = _forward_transform(frame * window, n_fft_i, transform, xp=xp)
+        # Each analysis frame is resized into a common reference bin grid for interpolation.
         input_stft[:, frame_idx] = resize_spectrum_bins(spectrum, ref_bins)
         if progress_callback is not None and (frame_idx == frame_count - 1 or (frame_idx % 8) == 0):
             progress_callback(frame_idx + 1, total_steps)
@@ -2679,6 +2694,7 @@ def phase_vocoder_time_stretch_fourier_sync(
 
         n_left = int(frame_lengths[frame_idx])
         n_right = int(frame_lengths[right_idx])
+        # Output FFT size follows interpolated sync-plan lengths to keep harmonic bins aligned.
         output_lengths[out_idx] = max(16, int(round((1.0 - frac) * n_left + frac * n_right)))
         completed_steps += 1
         if progress_callback is not None and (out_idx == out_frames - 1 or (out_idx % 8) == 0):
@@ -2737,6 +2753,7 @@ def compute_multistage_stretches(stretch: float, max_stage_stretch: float) -> li
     else:
         stage_count = int(math.ceil(math.log(1.0 / stretch) / math.log(max_stage)))
     stage_count = max(2, stage_count)
+    # Equal-ratio stages keep each pass in a numerically safer operating range.
     stage = float(stretch ** (1.0 / stage_count))
     return [stage] * stage_count
 
@@ -2828,6 +2845,7 @@ def phase_vocoder_time_stretch_multistage(
                 progress_callback=stage_cb,
             )
 
+    # Final hard length pass removes cumulative rounding drift across stages.
     target_len = max(1, int(round(original_len * stretch)))
     return np.asarray(force_length(work, target_len), dtype=np.float64)
 
@@ -2983,6 +3001,7 @@ def phase_vocoder_time_stretch_multires_fusion(
             progress_callback=sub_cb,
         )
         stretched_i = np.asarray(force_length(stretched_i, target_len), dtype=np.float64)
+        # Weighted sum of aligned renders acts as a simple multi-resolution ensemble.
         fused += float(weight) * stretched_i
         max_stages = max(max_stages, int(stage_count_i))
 
@@ -3315,6 +3334,7 @@ def apply_mastering_chain(audio: np.ndarray, sample_rate: int, args: argparse.Na
         out = out[:, None]
     out = out.copy()
 
+    # Dynamics order is intentional: downward expander -> compressor -> compander.
     if args.expander_threshold_db is not None:
         out = _apply_expander(
             out,
@@ -3348,6 +3368,7 @@ def apply_mastering_chain(audio: np.ndarray, sample_rate: int, args: argparse.Na
             args.compander_makeup_db,
         )
 
+    # Normalize before optional LUFS trim so downstream limiter/clip stages have predictable input.
     out = normalize_audio(out, args.normalize, args.peak_dbfs, args.rms_dbfs)
 
     if args.target_lufs is not None:
@@ -3361,6 +3382,7 @@ def apply_mastering_chain(audio: np.ndarray, sample_rate: int, args: argparse.Na
     if args.soft_clip_level is not None:
         out = _apply_soft_clip(out, args.soft_clip_level, args.soft_clip_type, args.soft_clip_drive)
 
+    # Hard clip is intentionally last and only used as a final guard rail.
     hard_clip_level = args.hard_clip_level
     if hard_clip_level is None and bool(getattr(args, "clip", False)):
         hard_clip_level = 1.0
@@ -3378,6 +3400,7 @@ def cepstral_envelope(magnitude, lifter: int):
     cep = xp.fft.irfft(log_mag, n=n_fft)
 
     if lifter > 0 and lifter < n_fft // 2:
+        # Liftering keeps low-quefrency envelope structure while suppressing fine harmonic detail.
         lifted = xp.zeros_like(cep)
         lifted[: lifter + 1] = cep[: lifter + 1]
         lifted[-lifter:] = cep[-lifter:]
@@ -3849,6 +3872,7 @@ def process_audio_block(
     pitch_ratio: float,
     progress_callback_factory: Callable[[float, float, str], ProgressCallback | None] | None = None,
 ) -> AudioBlockResult:
+    # Internal stretch combines explicit time stretch with pitch-resample compensation.
     internal_stretch = float(stretch * pitch_ratio)
     if internal_stretch <= 0.0:
         raise ValueError("Computed internal stretch must be > 0")
@@ -3867,6 +3891,7 @@ def process_audio_block(
     stereo_mode = str(getattr(args, "stereo_mode", "independent")).strip().lower()
 
     ms_active = stereo_mode == "mid_side_lock" and audio.shape[1] == 2
+    # Mid/side mode keeps stereo image operations in M/S space for better coherence control.
     working_audio = lr_to_ms(audio) if ms_active else audio
 
     stretch_mode = str(getattr(args, "stretch_mode", "auto")).strip().lower()
@@ -3955,6 +3980,7 @@ def process_audio_block(
             )
             return np.asarray(stretched_i, dtype=np.float64), 1
 
+        # Standard branch picks single-pass or multistage strategy based on resolved flags.
         stretched_i, stage_count_i = stretch_channel_with_strategy(
             signal=source_ch,
             stretch=internal_stretch,
@@ -4010,6 +4036,7 @@ def process_audio_block(
                 stretched = stretched_wsola
                 stage_count_i = 1
             else:
+                # Hybrid mode: PV for steady-state + WSOLA for transient regions.
                 steady_cfg = replace(config, transient_preserve=False)
                 stretched_pv, stage_count_i = _run_core_stretch(source_ch, steady_cfg, callback)
                 stretched_pv = np.asarray(force_length(stretched_pv, target_len), dtype=np.float64)
@@ -4024,6 +4051,7 @@ def process_audio_block(
         stage_count = max(stage_count, int(stage_count_i))
 
         if abs(pitch_ratio - 1.0) > 1e-10:
+            # Pitch shift is done by time-domain resampling after internal time stretch.
             pitch_len = max(1, int(round(stretched.size / pitch_ratio)))
             shifted = resample_1d(stretched, pitch_len, args.resample_mode)
         else:
@@ -4047,6 +4075,7 @@ def process_audio_block(
 
     if ms_active:
         if coherence_strength > 1e-9:
+            # Optional phase alignment on side channel reduces L/R wander after heavy processing.
             out_audio[:, 1] = _lock_channel_phase_to_reference(
                 out_audio[:, 0],
                 out_audio[:, 1],
