@@ -76,6 +76,59 @@ class TestCLIRegression(unittest.TestCase):
         self.assertIn("freeze", proc.stdout)
         self.assertIn("pitch-track", proc.stdout)
         self.assertIn("follow", proc.stdout)
+        self.assertIn("stretch-budget", proc.stdout)
+
+    def test_unified_cli_stretch_budget_json_reports_max(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            in_path = tmp_path / "budget_in.wav"
+            write_mono_tone(in_path, duration=0.4, freq_hz=220.0)
+
+            cmd = [
+                sys.executable,
+                str(UNIFIED_CLI),
+                "stretch-budget",
+                str(in_path),
+                "--disk-budget",
+                "40MB",
+                "--bit-depth",
+                "16",
+                "--json",
+            ]
+            proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+            payload = json.loads(proc.stdout)
+            self.assertIn("max_safe_stretch", payload)
+            self.assertGreater(float(payload["max_safe_stretch"]), 1000.0)
+            self.assertEqual(payload["output_format_assumed"], "wav")
+            self.assertIsNone(payload["requested_fits_budget"])
+
+    def test_unified_cli_stretch_budget_requested_fail_exit(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            in_path = tmp_path / "budget_req.wav"
+            write_mono_tone(in_path, duration=0.25, freq_hz=250.0)
+
+            cmd = [
+                sys.executable,
+                str(UNIFIED_CLI),
+                "stretch-budget",
+                str(in_path),
+                "--disk-budget",
+                "1MB",
+                "--bit-depth",
+                "16",
+                "--requested-stretch",
+                "1000000",
+                "--fail-if-exceeds",
+                "--json",
+            ]
+            proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertNotEqual(proc.returncode, 0)
+            payload = json.loads(proc.stdout)
+            self.assertEqual(float(payload["requested_stretch"]), 1_000_000.0)
+            self.assertFalse(bool(payload["requested_fits_budget"]))
+            self.assertIn("exceeds usable budget", proc.stderr)
 
     def test_unified_cli_dispatches_voc(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -285,6 +338,12 @@ class TestCLIRegression(unittest.TestCase):
         proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, msg=proc.stderr)
         self.assertIn("pvx follow --help", proc.stdout)
+
+    def test_unified_cli_help_stretch_budget_target(self) -> None:
+        cmd = [sys.executable, str(UNIFIED_CLI), "help", "stretch-budget"]
+        proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+        self.assertIn("pvx stretch-budget --help", proc.stdout)
 
     def test_unified_cli_follow_example_basic(self) -> None:
         cmd = [sys.executable, str(UNIFIED_CLI), "follow", "--example"]

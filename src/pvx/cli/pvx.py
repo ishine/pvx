@@ -10,12 +10,17 @@ import contextlib
 import difflib
 import importlib
 import io
+import json
+import re
 import shlex
+import shutil
 import sys
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
+
+import soundfile as sf
 
 from pvx.core.streaming import run_stateful_stream
 
@@ -303,6 +308,10 @@ EXAMPLE_COMMANDS: dict[str, tuple[str, str]] = {
         "Chunked stream wrapper over pvx voc",
         "pvx stream input.wav --output output_stream.wav --chunk-seconds 0.2 --time-stretch 2.0 --preset extreme_ambient",
     ),
+    "stretch-budget": (
+        "Estimate max safe stretch from a file and disk budget",
+        "pvx stretch-budget input.wav --disk-budget 20GB --bit-depth 16 --requested-stretch 1000000",
+    ),
 }
 
 
@@ -429,6 +438,7 @@ def print_tools() -> None:
     print("  follow       Track one file and control another in one command")
     print("  chain        Run a managed multi-stage one-line tool chain")
     print("  stream       Chunked stream wrapper around `pvx voc`")
+    print("  stretch-budget  Estimate max safe stretch from file size/budget assumptions")
     print("  help <tool>  Show subcommand help")
     print("")
     print("Backward compatibility: existing wrappers remain supported (pvxvoc.py, pvxfreeze.py, ...).")
@@ -1057,6 +1067,304 @@ def run_stream_mode(forwarded_args: list[str]) -> int:
     return _run_stage_command("voc", voc_args)
 
 
+_SIZE_UNITS_BYTES: dict[str, float] = {
+    "b": 1.0,
+    "kb": 1_000.0,
+    "mb": 1_000_000.0,
+    "gb": 1_000_000_000.0,
+    "tb": 1_000_000_000_000.0,
+    "kib": 1024.0,
+    "mib": 1024.0 * 1024.0,
+    "gib": 1024.0 * 1024.0 * 1024.0,
+    "tib": 1024.0 * 1024.0 * 1024.0 * 1024.0,
+}
+
+_SUBTYPE_BYTES_PER_SAMPLE: dict[str, int] = {
+    "PCM_S8": 1,
+    "PCM_U8": 1,
+    "PCM_16": 2,
+    "PCM_24": 3,
+    "PCM_32": 4,
+    "FLOAT": 4,
+    "DOUBLE": 8,
+}
+
+
+def _parse_size_bytes(text: str) -> float:
+    raw = str(text).strip().lower()
+    match = re.fullmatch(r"([0-9]+(?:\.[0-9]+)?)\s*([a-z]*)", raw)
+    if match is None:
+        raise ValueError(
+            f"Invalid size '{text}'. Use forms like 500MB, 20GB, 2.5TB, or 10GiB."
+        )
+    value = float(match.group(1))
+    unit = str(match.group(2) or "b")
+    if unit not in _SIZE_UNITS_BYTES:
+        choices = ", ".join(sorted(_SIZE_UNITS_BYTES))
+        raise ValueError(f"Unsupported size unit '{unit}'. Supported units: {choices}")
+    out = value * _SIZE_UNITS_BYTES[unit]
+    if out <= 0.0:
+        raise ValueError("Size must be > 0")
+    return out
+
+
+def _format_bytes_human(value: float) -> str:
+    units = ("B", "KB", "MB", "GB", "TB", "PB")
+    x = float(value)
+    idx = 0
+    while idx < len(units) - 1 and abs(x) >= 1000.0:
+        x /= 1000.0
+        idx += 1
+    return f"{x:.3f} {units[idx]}"
+
+
+def _infer_output_format(input_path: Path, requested: str) -> str:
+    token = str(requested).strip().lower()
+    if token == "auto":
+        token = input_path.suffix.lower().lstrip(".")
+    token = token.lstrip(".")
+    if token == "aif":
+        token = "aiff"
+    if token == "oga":
+        token = "ogg"
+    allowed = {"wav", "flac", "aiff", "ogg", "caf"}
+    if token not in allowed:
+        raise ValueError(
+            f"Unsupported output format '{requested}'. Choose one of: {', '.join(sorted(allowed))}, auto"
+        )
+    return token
+
+
+def _bytes_per_sample_from_subtype(subtype: str) -> int | None:
+    key = str(subtype).strip().upper()
+    if not key:
+        return None
+    return _SUBTYPE_BYTES_PER_SAMPLE.get(key)
+
+
+def run_stretch_budget_mode(forwarded_args: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        prog="pvx stretch-budget",
+        description=(
+            "Estimate maximum safe time-stretch for an input file under a disk budget.\n"
+            "This is a storage-budget estimate, not a quality guarantee."
+        ),
+    )
+    parser.add_argument("input", help="Input audio file path")
+    parser.add_argument(
+        "--disk-budget",
+        type=str,
+        default=None,
+        help="Total budget size (e.g., 500MB, 20GB, 2TiB). If omitted, use free space at --budget-path.",
+    )
+    parser.add_argument(
+        "--budget-path",
+        type=Path,
+        default=Path("."),
+        help="Path used to query free space when --disk-budget is omitted (default: current directory).",
+    )
+    parser.add_argument(
+        "--safety-margin",
+        type=float,
+        default=0.90,
+        help="Usable fraction of budget in (0,1]; default: 0.90 (10%% headroom).",
+    )
+    parser.add_argument(
+        "--output-format",
+        type=str,
+        default="auto",
+        help="Output format assumption: auto, wav, flac, aiff, ogg, caf (default: auto from input extension).",
+    )
+    parser.add_argument(
+        "--bit-depth",
+        choices=["inherit", "16", "24", "32f"],
+        default="inherit",
+        help="Bit-depth assumption when --subtype is not set (default: inherit from input subtype).",
+    )
+    parser.add_argument(
+        "--subtype",
+        type=str,
+        default=None,
+        help="Explicit libsndfile subtype assumption (e.g., PCM_16, PCM_24, FLOAT).",
+    )
+    parser.add_argument(
+        "--requested-stretch",
+        type=float,
+        default=None,
+        help="Optional stretch ratio to evaluate against the computed budget.",
+    )
+    parser.add_argument(
+        "--fail-if-exceeds",
+        action="store_true",
+        help="Return non-zero when --requested-stretch does not fit the usable budget.",
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit machine-readable JSON summary.",
+    )
+    args = parser.parse_args(forwarded_args)
+
+    input_path = Path(args.input).expanduser().resolve()
+    if not input_path.exists():
+        parser.error(f"Input not found: {input_path}")
+    if args.safety_margin <= 0.0 or args.safety_margin > 1.0:
+        parser.error("--safety-margin must be in (0, 1]")
+    if args.requested_stretch is not None and float(args.requested_stretch) <= 0.0:
+        parser.error("--requested-stretch must be > 0")
+
+    if args.disk_budget is not None:
+        try:
+            budget_bytes = _parse_size_bytes(str(args.disk_budget))
+        except ValueError as exc:
+            parser.error(str(exc))
+        budget_source = f"explicit:{str(args.disk_budget).strip()}"
+    else:
+        budget_root = Path(args.budget_path).expanduser().resolve()
+        try:
+            budget_bytes = float(shutil.disk_usage(str(budget_root)).free)
+        except Exception as exc:
+            parser.error(f"Failed to query free disk at {budget_root}: {exc}")
+        budget_source = f"free-space:{budget_root}"
+
+    if budget_bytes <= 0.0:
+        parser.error("Resolved budget must be > 0 bytes")
+
+    try:
+        info = sf.info(str(input_path))
+    except Exception as exc:
+        parser.error(f"Failed to read input metadata: {exc}")
+    frames = int(getattr(info, "frames", 0) or 0)
+    channels = int(getattr(info, "channels", 0) or 0)
+    sample_rate = int(getattr(info, "samplerate", 0) or 0)
+    if frames <= 0:
+        parser.error("Input has no audio frames")
+    if channels <= 0:
+        parser.error("Input has invalid channel count")
+    if sample_rate <= 0:
+        parser.error("Input has invalid sample rate")
+
+    try:
+        output_format = _infer_output_format(input_path, str(args.output_format))
+    except ValueError as exc:
+        parser.error(str(exc))
+
+    bytes_per_sample: int | None = None
+    bytes_source = ""
+    subtype_assumed = ""
+    if args.subtype is not None:
+        bytes_per_sample = _bytes_per_sample_from_subtype(str(args.subtype))
+        if bytes_per_sample is None:
+            supported = ", ".join(sorted(_SUBTYPE_BYTES_PER_SAMPLE))
+            parser.error(f"Unsupported --subtype '{args.subtype}' for estimator. Supported: {supported}")
+        subtype_assumed = str(args.subtype).strip().upper()
+        bytes_source = "explicit --subtype"
+    elif str(args.bit_depth) != "inherit":
+        if str(args.bit_depth) == "16":
+            bytes_per_sample = 2
+            subtype_assumed = "PCM_16"
+        elif str(args.bit_depth) == "24":
+            bytes_per_sample = 3
+            subtype_assumed = "PCM_24"
+        else:
+            bytes_per_sample = 4
+            subtype_assumed = "FLOAT"
+        bytes_source = "explicit --bit-depth"
+    else:
+        inferred_subtype = str(getattr(info, "subtype", "") or "")
+        inferred_bps = _bytes_per_sample_from_subtype(inferred_subtype)
+        if inferred_bps is None:
+            bytes_per_sample = 4
+            subtype_assumed = "FLOAT"
+            bytes_source = f"fallback from input subtype '{inferred_subtype or 'unknown'}'"
+        else:
+            bytes_per_sample = inferred_bps
+            subtype_assumed = inferred_subtype.strip().upper()
+            bytes_source = "inherited input subtype"
+
+    base_bytes = float(frames) * float(channels) * float(bytes_per_sample)
+    usable_budget_bytes = float(budget_bytes) * float(args.safety_margin)
+    max_safe_stretch = usable_budget_bytes / max(base_bytes, 1.0)
+    input_duration_sec = float(frames) / float(sample_rate)
+    max_duration_sec = input_duration_sec * max_safe_stretch
+    max_frames = max(1, int(round(float(frames) * max_safe_stretch)))
+    conservative_for_compressed = output_format in {"flac", "ogg"}
+
+    requested_bytes: float | None = None
+    requested_ok: bool | None = None
+    requested_duration_sec: float | None = None
+    if args.requested_stretch is not None:
+        requested = float(args.requested_stretch)
+        requested_bytes = base_bytes * requested
+        requested_ok = bool(requested_bytes <= usable_budget_bytes)
+        requested_duration_sec = input_duration_sec * requested
+
+    payload = {
+        "input_path": str(input_path),
+        "input_frames": int(frames),
+        "input_channels": int(channels),
+        "input_sample_rate": int(sample_rate),
+        "input_duration_sec": float(input_duration_sec),
+        "input_subtype": str(getattr(info, "subtype", "") or ""),
+        "output_format_assumed": str(output_format),
+        "subtype_assumed": str(subtype_assumed),
+        "bytes_per_sample_assumed": int(bytes_per_sample),
+        "bytes_assumption_source": str(bytes_source),
+        "estimate_mode": "conservative_pcm_equivalent" if conservative_for_compressed else "pcm_equivalent",
+        "budget_source": str(budget_source),
+        "budget_bytes": float(budget_bytes),
+        "safety_margin": float(args.safety_margin),
+        "usable_budget_bytes": float(usable_budget_bytes),
+        "estimated_bytes_at_1x": float(base_bytes),
+        "max_safe_stretch": float(max_safe_stretch),
+        "max_safe_duration_sec": float(max_duration_sec),
+        "max_safe_output_frames": int(max_frames),
+        "requested_stretch": None if args.requested_stretch is None else float(args.requested_stretch),
+        "requested_estimated_bytes": None if requested_bytes is None else float(requested_bytes),
+        "requested_duration_sec": None if requested_duration_sec is None else float(requested_duration_sec),
+        "requested_fits_budget": requested_ok,
+    }
+
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print("pvx stretch budget estimate")
+        print(f"- input: {payload['input_path']}")
+        print(
+            f"- input shape: {payload['input_channels']} ch, {payload['input_sample_rate']} Hz, "
+            f"{payload['input_frames']} frames ({payload['input_duration_sec']:.3f} s)"
+        )
+        print(
+            f"- output assumption: format={payload['output_format_assumed']}, "
+            f"subtype={payload['subtype_assumed']}, bytes/sample={payload['bytes_per_sample_assumed']} "
+            f"({payload['bytes_assumption_source']})"
+        )
+        print(
+            f"- budget: {_format_bytes_human(payload['budget_bytes'])} "
+            f"(usable {_format_bytes_human(payload['usable_budget_bytes'])} at safety-margin={payload['safety_margin']:.3f})"
+        )
+        print(f"- estimated size at 1.0x: {_format_bytes_human(payload['estimated_bytes_at_1x'])}")
+        print(f"- max safe stretch: {payload['max_safe_stretch']:.6f}x")
+        print(
+            f"- max safe output: {_format_bytes_human(payload['usable_budget_bytes'])}, "
+            f"{payload['max_safe_output_frames']} frames, {payload['max_safe_duration_sec']:.3f} s"
+        )
+        if conservative_for_compressed:
+            print("- note: compressed format selected; estimate is conservative PCM-equivalent.")
+        if args.requested_stretch is not None:
+            fits_text = "yes" if bool(payload["requested_fits_budget"]) else "no"
+            print(
+                f"- requested stretch: {payload['requested_stretch']:.6f}x "
+                f"(est. {_format_bytes_human(float(payload['requested_estimated_bytes'] or 0.0))}, "
+                f"duration {float(payload['requested_duration_sec'] or 0.0):.3f} s) -> fits budget: {fits_text}"
+            )
+
+    if bool(args.fail_if_exceeds) and args.requested_stretch is not None and not bool(requested_ok):
+        print("[stretch-budget] requested stretch exceeds usable budget", file=sys.stderr)
+        return 1
+    return 0
+
+
 def dispatch_tool(command: str, forwarded_args: list[str]) -> int:
     spec = TOOL_INDEX.get(command)
     if spec is None:
@@ -1080,6 +1388,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  pvx follow guide.wav target.wav --output followed.wav --emit pitch_to_stretch\n"
             "  pvx chain input.wav --pipeline \"voc --stretch 1.2 | formant --mode preserve\" --output out.wav\n"
             "  pvx stream input.wav --output out.wav --chunk-seconds 0.2 --time-stretch 2.0\n"
+            "  pvx stretch-budget input.wav --disk-budget 20GB --bit-depth 16 --requested-stretch 1000000\n"
             "  pvx list\n"
             "  pvx examples basic\n"
             "  pvx help voc\n"
@@ -1114,7 +1423,22 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     command = str(command_raw).strip().lower()
-    helper_commands = {"list", "ls", "tools", "examples", "example", "guided", "guide", "follow", "chain", "stream", "help"}
+    helper_commands = {
+        "list",
+        "ls",
+        "tools",
+        "examples",
+        "example",
+        "guided",
+        "guide",
+        "follow",
+        "chain",
+        "stream",
+        "stretch-budget",
+        "stretchbudget",
+        "budget",
+        "help",
+    }
 
     if command in {"list", "ls", "tools"}:
         print_tools()
@@ -1146,6 +1470,11 @@ def main(argv: list[str] | None = None) -> int:
             return run_stream_mode(forwarded)
         except ValueError as exc:
             parser.error(str(exc))
+    if command in {"stretch-budget", "stretchbudget", "budget"}:
+        try:
+            return run_stretch_budget_mode(forwarded)
+        except ValueError as exc:
+            parser.error(str(exc))
     if command == "help":
         if not forwarded:
             parser.print_help()
@@ -1169,6 +1498,9 @@ def main(argv: list[str] | None = None) -> int:
                 return 0
             if target == "stream":
                 print("Run `pvx stream --help` for chunked streaming wrapper options.")
+                return 0
+            if target in {"stretch-budget", "stretchbudget", "budget"}:
+                print("Run `pvx stretch-budget --help` for file-based stretch-budget estimates.")
                 return 0
             parser.print_help()
             return 0
