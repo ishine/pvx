@@ -81,11 +81,12 @@ Primary references:
    - benchmark runner: `/Users/cleider/dev/pvx/benchmarks/run_pvc_parity.py`
    - baseline: `/Users/cleider/dev/pvx/benchmarks/baseline_pvc_parity.json`
    - CI workflow: `/Users/cleider/dev/pvx/.github/workflows/pvc-parity-regression.yml`
+   - expanded pipeline scenario: `analysis_response_function_chain` (analysis-derived response + function-stream modulation)
 
 ## Immediate Next Steps
 
 1. Add explicit PVC-style resynthesis family toggles and thresholds where they improve auditability without fragmenting the core `pvx voc` interface.
-2. Expand parity scenarios to include cross-tool pipelines that combine `analysis` + `response` + function-stream modulation in one benchmark case.
+2. Add additional parity scenarios that stress the same pipeline family with persisted artifact round-trips (`pvx analysis create` + `pvx response create`) and stricter drift gates.
 
 ## Attribution
 

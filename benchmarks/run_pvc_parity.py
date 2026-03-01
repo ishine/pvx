@@ -33,11 +33,12 @@ from benchmarks.metrics import (
     modulation_spectrum_distance,
     signal_to_noise_ratio_db,
 )
+from pvx.core.analysis_store import analyze_audio
 from pvx.core.pvc_functions import generate_envelope_points, reshape_control_points
 from pvx.core.pvc_harmony import process_harmony_operator
 from pvx.core.pvc_ops import process_response_operator
 from pvx.core.pvc_resonators import process_ring_operator
-from pvx.core.response_store import ResponseArtifact
+from pvx.core.response_store import ResponseArtifact, response_from_analysis
 from pvx.core.voc import VocoderConfig, configure_runtime
 
 
@@ -194,6 +195,12 @@ def _case_specs() -> list[CaseSpec]:
             expected_identity=False,
             run=lambda audio, sr, cfg, resp: _run_ringtv_controlled(audio, sr),
         ),
+        CaseSpec(
+            name="analysis_response_function_chain",
+            description="Pipeline chain that derives response from analysis and applies function-stream modulation.",
+            expected_identity=False,
+            run=lambda audio, sr, cfg, resp: _run_analysis_response_function_chain(audio, sr, cfg),
+        ),
     ]
 
 
@@ -284,6 +291,67 @@ def _run_ringtv_controlled(audio: np.ndarray, sr: int) -> np.ndarray:
     shaped = samples * ((1.0 - depth_track) + depth_track * carrier)
     shaped = (1.0 - mix_track) * samples + mix_track * shaped
     return 0.6 * out + 0.4 * shaped
+
+
+def _run_analysis_response_function_chain(
+    audio: np.ndarray,
+    sr: int,
+    cfg: VocoderConfig,
+) -> np.ndarray:
+    mono = np.asarray(audio, dtype=np.float64).reshape(-1)
+    analysis = analyze_audio(mono, sr, cfg, source_path="synthetic:pvc_parity_input")
+    derived_response = response_from_analysis(
+        analysis,
+        method="rms",
+        phase_mode="zero",
+        normalize="peak",
+        smoothing_bins=7,
+    )
+    total_sec = float(mono.size / max(1, sr))
+    t, v = generate_envelope_points(
+        duration_sec=total_sec,
+        rate_hz=30.0,
+        mode="exp",
+        start=0.12,
+        end=0.95,
+        exp_curve=3.0,
+        min_value=0.0,
+        max_value=1.0,
+    )
+    t_sm, mix = reshape_control_points(
+        t,
+        v,
+        operation="smooth",
+        window=7,
+        min_value=0.20,
+        max_value=1.0,
+    )
+    filtered = process_response_operator(
+        mono,
+        sr,
+        cfg,
+        derived_response,
+        operator="tvfilter",
+        response_mix=0.65,
+        dry_mix=0.0,
+        response_gain_db=4.0,
+        tv_points_t=t_sm,
+        tv_points_v=mix,
+        tv_interp="cubic",
+        tv_order=3,
+    )[:, 0]
+    harmonized = process_harmony_operator(
+        filtered,
+        sr,
+        cfg,
+        operator="chordmapper",
+        root_hz=220.0,
+        chord="sus4",
+        strength=0.28,
+        attenuation=0.45,
+        boost_db=4.0,
+    )[:, 0]
+    return harmonized
 
 
 def _compute_case_metrics(reference: np.ndarray, candidate: np.ndarray) -> dict[str, float]:

@@ -2,6 +2,7 @@ uv.lock
 __pycache__/
 *.pyc
 benchmarks/out/
+benchmarks/out_pvc_parity/
 examples/*.wav
 examples/*.aiff
 test_pv.wav

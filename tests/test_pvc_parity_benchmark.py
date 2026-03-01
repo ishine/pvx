@@ -92,6 +92,16 @@ class TestPVCParityBenchmark(unittest.TestCase):
             self.assertIn("aggregate", payload)
             self.assertTrue(payload["rows"])
 
+    def test_full_run_includes_analysis_response_function_case(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="pvx-pvc-bench-full-") as tmp:
+            out_dir = Path(tmp) / "out"
+            code = run_pvc_parity_main(["--out-dir", str(out_dir)])
+            self.assertEqual(code, 0)
+            payload = json.loads((out_dir / "pvc_parity_report.json").read_text(encoding="utf-8"))
+            rows = payload.get("rows", [])
+            case_names = {str(row.get("name", "")) for row in rows if isinstance(row, dict)}
+            self.assertIn("analysis_response_function_chain", case_names)
+
 
 if __name__ == "__main__":
     unittest.main()
