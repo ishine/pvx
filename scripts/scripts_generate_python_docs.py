@@ -37,6 +37,21 @@ CLI_HELP_CANDIDATES = {
     ROOT / "pvxdeverb.py",
     ROOT / "pvxretune.py",
     ROOT / "pvxlayer.py",
+    ROOT / "pvxanalysis.py",
+    ROOT / "pvxresponse.py",
+    ROOT / "pvxenvelope.py",
+    ROOT / "pvxreshape.py",
+    ROOT / "pvxfilter.py",
+    ROOT / "pvxtvfilter.py",
+    ROOT / "pvxnoisefilter.py",
+    ROOT / "pvxbandamp.py",
+    ROOT / "pvxspeccompander.py",
+    ROOT / "pvxring.py",
+    ROOT / "pvxringfilter.py",
+    ROOT / "pvxringtvfilter.py",
+    ROOT / "pvxharmmap.py",
+    ROOT / "pvxchordmapper.py",
+    ROOT / "pvxinharmonator.py",
     ROOT / "HPS-pitch-track.py",
 }
 
@@ -226,7 +241,7 @@ def generate_python_help_doc() -> None:
             lines.append(f"**Algorithm ID:** `{info['algorithm_id']}`")
             lines.append(f"**Theme:** `{info['theme']}`")
             lines.append("**Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`")
-            lines.append("**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.")
+            lines.append("**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).")
             lines.append("")
 
         lines.append(f"**Classes:** {', '.join('`'+c+'`' for c in info['classes']) if info['classes'] else 'None'}")

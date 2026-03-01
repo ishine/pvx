@@ -1,0 +1,42 @@
+name: pvc-parity-regression
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: |
+            requirements.txt
+            pyproject.toml
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install -e .
+      - name: Run PVC parity benchmark gate
+        run: |
+          python benchmarks/run_pvc_parity.py \
+            --quick \
+            --out-dir benchmarks/out_pvc_parity \
+            --baseline benchmarks/baseline_pvc_parity.json \
+            --gate \
+            --gate-tolerance 0.20
+      - name: Upload PVC parity report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pvc-parity-report
+          path: benchmarks/out_pvc_parity/

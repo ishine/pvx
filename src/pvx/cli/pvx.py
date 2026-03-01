@@ -113,6 +113,90 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
         summary="Track f0 and emit control-map CSV",
         aliases=("hps-pitch-track", "hps", "track"),
     ),
+    ToolSpec(
+        name="analysis",
+        entrypoint="pvx.cli.pvxanalysis:main",
+        summary="Create/inspect reusable PVXAN analysis artifacts",
+        aliases=("pvxanalysis",),
+    ),
+    ToolSpec(
+        name="response",
+        entrypoint="pvx.cli.pvxresponse:main",
+        summary="Create/inspect reusable PVXRF response artifacts",
+        aliases=("pvxresponse",),
+    ),
+    ToolSpec(
+        name="envelope",
+        entrypoint="pvx.cli.pvxenvelope:main",
+        summary="Generate control-rate envelope maps (CSV/JSON)",
+        aliases=("pvxenvelope",),
+    ),
+    ToolSpec(
+        name="reshape",
+        entrypoint="pvx.cli.pvxreshape:main",
+        summary="Reshape control-rate maps for pvx routing",
+        aliases=("pvxreshape",),
+    ),
+    ToolSpec(
+        name="filter",
+        entrypoint="pvx.cli.pvxfilter:main",
+        summary="Response-driven spectral filtering (PVC-inspired)",
+        aliases=("pvxfilter",),
+    ),
+    ToolSpec(
+        name="tvfilter",
+        entrypoint="pvx.cli.pvxtvfilter:main",
+        summary="Time-varying response filter with control maps",
+        aliases=("pvxtvfilter",),
+    ),
+    ToolSpec(
+        name="noisefilter",
+        entrypoint="pvx.cli.pvxnoisefilter:main",
+        summary="Response-referenced noise filtering",
+        aliases=("pvxnoisefilter",),
+    ),
+    ToolSpec(
+        name="bandamp",
+        entrypoint="pvx.cli.pvxbandamp:main",
+        summary="Response-peak band amplification",
+        aliases=("pvxbandamp",),
+    ),
+    ToolSpec(
+        name="spec-compander",
+        entrypoint="pvx.cli.pvxspeccompander:main",
+        summary="Response-referenced spectral compander",
+        aliases=("pvxspeccompander", "speccompander"),
+    ),
+    ToolSpec(
+        name="ring",
+        entrypoint="pvx.cli.pvxring:main",
+        summary="Ring modulation operator",
+        aliases=("pvxring",),
+    ),
+    ToolSpec(
+        name="ringfilter",
+        entrypoint="pvx.cli.pvxringfilter:main",
+        summary="Ring modulation plus resonator filtering",
+        aliases=("pvxringfilter",),
+    ),
+    ToolSpec(
+        name="ringtvfilter",
+        entrypoint="pvx.cli.pvxringtvfilter:main",
+        summary="Time-varying ring modulation plus resonator filtering",
+        aliases=("pvxringtvfilter",),
+    ),
+    ToolSpec(
+        name="chordmapper",
+        entrypoint="pvx.cli.pvxchordmapper:main",
+        summary="Chord-aware spectral mapping",
+        aliases=("pvxchordmapper",),
+    ),
+    ToolSpec(
+        name="inharmonator",
+        entrypoint="pvx.cli.pvxinharmonator:main",
+        summary="Inharmonic spectral warping",
+        aliases=("pvxinharmonator",),
+    ),
 )
 
 
@@ -174,6 +258,42 @@ EXAMPLE_COMMANDS: dict[str, tuple[str, str]] = {
     "follow-noise-aware": (
         "Feature-driven follow (noise-aware hiss/hum control)",
         "pvx follow guide.wav target.wav --feature-set all --emit pitch_map --stretch 1.0 --route stretch=affine(hiss_ratio,-0.6,1.2) --route stretch=clip(stretch,0.8,1.2) --route pitch_ratio=affine(hum_60_ratio,-0.4,1.15) --route pitch_ratio=clip(pitch_ratio,0.9,1.2) --output followed_noise_aware.wav",
+    ),
+    "analysis": (
+        "Create reusable analysis artifact",
+        "pvx analysis create input.wav --output input.pvxan.npz --n-fft 4096 --hop-size 256",
+    ),
+    "response": (
+        "Derive reusable response artifact",
+        "pvx response create input.pvxan.npz --output input.pvxrf.npz --method median --normalize peak",
+    ),
+    "envelope": (
+        "Generate a stretch envelope control map",
+        "pvx envelope --mode adsr --duration 8 --rate 20 --attack-sec 0.2 --decay-sec 0.6 --sustain 1.1 --release-sec 1.0 --key stretch --output stretch_env.csv",
+    ),
+    "reshape": (
+        "Reshape and resample a control map",
+        "pvx reshape stretch_env.csv --key stretch --operation resample --rate 50 --interp polynomial --order 5 --output stretch_env_dense.csv",
+    ),
+    "filter": (
+        "Response-driven static filter",
+        "pvx filter input.wav --response input.pvxrf.npz --response-mix 1.0 --output filtered.wav",
+    ),
+    "tvfilter": (
+        "Time-varying response filter",
+        "pvx tvfilter input.wav --response input.pvxrf.npz --tv-map mix_map.csv --tv-interp linear --output tvfiltered.wav",
+    ),
+    "ringfilter": (
+        "Ring + resonator filter",
+        "pvx ringfilter input.wav --frequency-hz 55 --resonance-hz 1200 --resonance-q 9 --output ringfilter.wav",
+    ),
+    "chordmapper": (
+        "Chord-aware harmonic mapping",
+        "pvx chordmapper input.wav --root-hz 220 --chord minor --strength 0.75 --output chordmapped.wav",
+    ),
+    "inharmonator": (
+        "Inharmonic spectral warping",
+        "pvx inharmonator input.wav --inharmonic-f0-hz 220 --inharmonicity 0.0002 --inharmonic-mix 1.0 --output inharm.wav",
     ),
     "chain": (
         "Managed multi-stage chain",
@@ -238,6 +358,16 @@ _CHAIN_TOOL_ALLOWLIST: set[str] = {
     "deverb",
     "retune",
     "layer",
+    "filter",
+    "tvfilter",
+    "noisefilter",
+    "bandamp",
+    "spec-compander",
+    "ring",
+    "ringfilter",
+    "ringtvfilter",
+    "chordmapper",
+    "inharmonator",
 }
 _CHAIN_STAGE_FORBIDDEN_FLAGS: set[str] = {
     "-o",

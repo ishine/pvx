@@ -114,7 +114,7 @@ Design priority:
 `pvx` audio I/O is provided by `soundfile/libsndfile`, so exact format support depends on your runtime build.
 
 - Quick summary: `wav`, `flac`, `aiff`, `ogg`, `caf` are supported for stream output and are safe defaults.
-- Full current format table: `FILE_TYPES.md`
+- Full current format table: [FILE_TYPES.md](FILE_TYPES.md)
 
 ## 3. Stretch vs Pitch Shift
 
@@ -427,7 +427,7 @@ pvx pitch-track guide.wav --feature-set all --mfcc-count 13 --output - \
 ```
 
 For a larger gallery (single-feature, multi-feature, MFCC/MPEG-7 vector, and multi-guide workflows), see:
-- `docs/FEATURE_SIDECHAIN_EXAMPLES.md`
+- [docs/FEATURE_SIDECHAIN_EXAMPLES.md](FEATURE_SIDECHAIN_EXAMPLES.md)
 
 You can also print built-in command snippets directly from the command-line interface (CLI):
 
@@ -449,10 +449,10 @@ All audio-output tools now share deterministic output policy flags:
 
 ## 12. Next Steps
 
-- Run practical recipes and advanced use cases (72+): `docs/EXAMPLES.md`
-- Learn architecture and DSP diagrams (26+): `docs/DIAGRAMS.md`
-- Study equation-level behavior (31 sections): `docs/MATHEMATICAL_FOUNDATIONS.md`
-- Use Python API directly: `docs/API_OVERVIEW.md`
+- Run practical recipes and advanced use cases (72+): [docs/EXAMPLES.md](EXAMPLES.md)
+- Learn architecture and DSP diagrams (26+): [docs/DIAGRAMS.md](DIAGRAMS.md)
+- Study equation-level behavior (31 sections): [docs/MATHEMATICAL_FOUNDATIONS.md](MATHEMATICAL_FOUNDATIONS.md)
+- Use Python API directly: [docs/API_OVERVIEW.md](API_OVERVIEW.md)
 - Use benchmark runner: `benchmarks/run_bench.py`
 
 ## 13. Extra Beginner Recipes (Quick Wins)

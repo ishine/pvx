@@ -98,7 +98,7 @@ python3 benchmarks/run_bench.py --quick --out-dir benchmarks/out_stage4_validati
 Check:
 - report files generated:
   - `benchmarks/out_stage4_validation/report.json`
-  - `benchmarks/out_stage4_validation/report.md`
+  - [benchmarks/out_stage4_validation/report.md](../benchmarks/out_stage4_validation/report.md)
 
 ## 7. Full Test Suite
 

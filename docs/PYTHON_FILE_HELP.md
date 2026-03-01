@@ -4,7 +4,7 @@
 
 Comprehensive reference for every Python file in this repository.
 
-Total Python files documented: **210**
+Total Python files documented: **243**
 
 ## Contents
 
@@ -17,17 +17,30 @@ Total Python files documented: **210**
 - [`pvxalgorithms/__init__.py`](#pvxalgorithmsinitpy)
 - [`pvxalgorithms/base.py`](#pvxalgorithmsbasepy)
 - [`pvxalgorithms/registry.py`](#pvxalgorithmsregistrypy)
+- [`pvxanalysis.py`](#pvxanalysispy)
+- [`pvxbandamp.py`](#pvxbandamppy)
+- [`pvxchordmapper.py`](#pvxchordmapperpy)
 - [`pvxcommon.py`](#pvxcommonpy)
 - [`pvxconform.py`](#pvxconformpy)
 - [`pvxdenoise.py`](#pvxdenoisepy)
 - [`pvxdeverb.py`](#pvxdeverbpy)
+- [`pvxfilter.py`](#pvxfilterpy)
 - [`pvxformant.py`](#pvxformantpy)
 - [`pvxfreeze.py`](#pvxfreezepy)
+- [`pvxharmmap.py`](#pvxharmmappy)
 - [`pvxharmonize.py`](#pvxharmonizepy)
+- [`pvxinharmonator.py`](#pvxinharmonatorpy)
 - [`pvxlayer.py`](#pvxlayerpy)
 - [`pvxmorph.py`](#pvxmorphpy)
+- [`pvxnoisefilter.py`](#pvxnoisefilterpy)
+- [`pvxresponse.py`](#pvxresponsepy)
 - [`pvxretune.py`](#pvxretunepy)
+- [`pvxring.py`](#pvxringpy)
+- [`pvxringfilter.py`](#pvxringfilterpy)
+- [`pvxringtvfilter.py`](#pvxringtvfilterpy)
+- [`pvxspeccompander.py`](#pvxspeccompanderpy)
 - [`pvxtransient.py`](#pvxtransientpy)
+- [`pvxtvfilter.py`](#pvxtvfilterpy)
 - [`pvxunison.py`](#pvxunisonpy)
 - [`pvxvoc.py`](#pvxvocpy)
 - [`pvxwarp.py`](#pvxwarppy)
@@ -176,19 +189,33 @@ Total Python files documented: **210**
 - [`src/pvx/cli/hps_pitch_track.py`](#srcpvxclihpspitchtrackpy)
 - [`src/pvx/cli/main.py`](#srcpvxclimainpy)
 - [`src/pvx/cli/pvx.py`](#srcpvxclipvxpy)
+- [`src/pvx/cli/pvxanalysis.py`](#srcpvxclipvxanalysispy)
+- [`src/pvx/cli/pvxbandamp.py`](#srcpvxclipvxbandamppy)
+- [`src/pvx/cli/pvxchordmapper.py`](#srcpvxclipvxchordmapperpy)
 - [`src/pvx/cli/pvxconform.py`](#srcpvxclipvxconformpy)
 - [`src/pvx/cli/pvxdenoise.py`](#srcpvxclipvxdenoisepy)
 - [`src/pvx/cli/pvxdeverb.py`](#srcpvxclipvxdeverbpy)
+- [`src/pvx/cli/pvxfilter.py`](#srcpvxclipvxfilterpy)
 - [`src/pvx/cli/pvxformant.py`](#srcpvxclipvxformantpy)
 - [`src/pvx/cli/pvxfreeze.py`](#srcpvxclipvxfreezepy)
+- [`src/pvx/cli/pvxharmmap.py`](#srcpvxclipvxharmmappy)
 - [`src/pvx/cli/pvxharmonize.py`](#srcpvxclipvxharmonizepy)
+- [`src/pvx/cli/pvxinharmonator.py`](#srcpvxclipvxinharmonatorpy)
 - [`src/pvx/cli/pvxlayer.py`](#srcpvxclipvxlayerpy)
 - [`src/pvx/cli/pvxmorph.py`](#srcpvxclipvxmorphpy)
+- [`src/pvx/cli/pvxnoisefilter.py`](#srcpvxclipvxnoisefilterpy)
+- [`src/pvx/cli/pvxresponse.py`](#srcpvxclipvxresponsepy)
 - [`src/pvx/cli/pvxretune.py`](#srcpvxclipvxretunepy)
+- [`src/pvx/cli/pvxring.py`](#srcpvxclipvxringpy)
+- [`src/pvx/cli/pvxringfilter.py`](#srcpvxclipvxringfilterpy)
+- [`src/pvx/cli/pvxringtvfilter.py`](#srcpvxclipvxringtvfilterpy)
+- [`src/pvx/cli/pvxspeccompander.py`](#srcpvxclipvxspeccompanderpy)
 - [`src/pvx/cli/pvxtransient.py`](#srcpvxclipvxtransientpy)
+- [`src/pvx/cli/pvxtvfilter.py`](#srcpvxclipvxtvfilterpy)
 - [`src/pvx/cli/pvxunison.py`](#srcpvxclipvxunisonpy)
 - [`src/pvx/cli/pvxwarp.py`](#srcpvxclipvxwarppy)
 - [`src/pvx/core/__init__.py`](#srcpvxcoreinitpy)
+- [`src/pvx/core/analysis_store.py`](#srcpvxcoreanalysisstorepy)
 - [`src/pvx/core/attribution.py`](#srcpvxcoreattributionpy)
 - [`src/pvx/core/audio_metrics.py`](#srcpvxcoreaudiometricspy)
 - [`src/pvx/core/common.py`](#srcpvxcorecommonpy)
@@ -196,6 +223,10 @@ Total Python files documented: **210**
 - [`src/pvx/core/feature_tracking.py`](#srcpvxcorefeaturetrackingpy)
 - [`src/pvx/core/output_policy.py`](#srcpvxcoreoutputpolicypy)
 - [`src/pvx/core/presets.py`](#srcpvxcorepresetspy)
+- [`src/pvx/core/pvc_harmony.py`](#srcpvxcorepvcharmonypy)
+- [`src/pvx/core/pvc_ops.py`](#srcpvxcorepvcopspy)
+- [`src/pvx/core/pvc_resonators.py`](#srcpvxcorepvcresonatorspy)
+- [`src/pvx/core/response_store.py`](#srcpvxcoreresponsestorepy)
 - [`src/pvx/core/stereo.py`](#srcpvxcorestereopy)
 - [`src/pvx/core/streaming.py`](#srcpvxcorestreamingpy)
 - [`src/pvx/core/transients.py`](#srcpvxcoretransientspy)
@@ -207,6 +238,7 @@ Total Python files documented: **210**
 - [`src/pvxalgorithms/base.py`](#srcpvxalgorithmsbasepy)
 - [`src/pvxalgorithms/registry.py`](#srcpvxalgorithmsregistrypy)
 - [`tests/test_algorithms_generated.py`](#teststestalgorithmsgeneratedpy)
+- [`tests/test_analysis_response_store.py`](#teststestanalysisresponsestorepy)
 - [`tests/test_audio_metrics.py`](#teststestaudiometricspy)
 - [`tests/test_benchmark_metrics.py`](#teststestbenchmarkmetricspy)
 - [`tests/test_benchmark_runner.py`](#teststestbenchmarkrunnerpy)
@@ -217,6 +249,7 @@ Total Python files documented: **210**
 - [`tests/test_dsp.py`](#teststestdsppy)
 - [`tests/test_microtonal.py`](#teststestmicrotonalpy)
 - [`tests/test_output_policy.py`](#teststestoutputpolicypy)
+- [`tests/test_pvc_phase3_5.py`](#teststestpvcphase35py)
 - [`tests/test_transient_and_stereo.py`](#teststesttransientandstereopy)
 
 ## `HPS-pitch-track.py`
@@ -389,7 +422,7 @@ Quick start:
   pvx examples basic
   pvx help voc
 
-Available tool commands: voc, freeze, harmonize, conform, morph, warp, formant, transient, unison, denoise, deverb, retune, layer, pitch-track
+Available tool commands: voc, freeze, harmonize, conform, morph, warp, formant, transient, unison, denoise, deverb, retune, layer, pitch-track, analysis, response, filter, tvfilter, noisefilter, bandamp, spec-compander, ring, ringfilter, ringtvfilter, chordmapper, inharmonator
 ```
 
 ### Module Docstring
@@ -458,6 +491,242 @@ Compatibility shim for `pvxalgorithms.base`.
 
 ```text
 Compatibility shim for `pvxalgorithms.registry`.
+```
+
+## `pvxanalysis.py`
+
+**Purpose:** Compatibility wrapper.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvxanalysis.py --help`
+
+### CLI Help Snapshot
+
+```text
+usage: pvx analysis [-h] {create,inspect} ...
+
+Create and inspect PVXAN analysis artifacts for reusable phase-vocoder workflows.
+
+positional arguments:
+  {create,inspect}
+    create          Analyze audio and save PVXAN artifact
+    inspect         Inspect existing PVXAN artifact
+
+options:
+  -h, --help        show this help message and exit
+
+Examples:
+  pvx analysis create input.wav --output input.pvxan.npz --n-fft 4096 --hop-size 256
+  pvx analysis inspect input.pvxan.npz
+  pvxanalysis.py input.wav --output input.pvxan.npz
+
+Notes:
+  - When command is omitted, create mode is assumed for convenience.
+  - PVXAN stores complex STFT payloads (channels x frames x bins) in compressed NPZ format.
+```
+
+### Module Docstring
+
+```text
+Compatibility wrapper.
+
+This root module forwards imports/execution to `pvx.cli.pvxanalysis` after the
+src-layout migration.
+```
+
+## `pvxbandamp.py`
+
+**Purpose:** Compatibility wrapper for `pvx.cli.pvxbandamp`.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvxbandamp.py --help`
+
+### CLI Help Snapshot
+
+```text
+usage: pvx bandamp [-h] [-o OUTPUT_DIR] [--output OUTPUT] [--suffix SUFFIX]
+                   [--output-format OUTPUT_FORMAT] [--stdout] [--overwrite]
+                   [--dry-run]
+                   [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
+                   [--quiet] [--silent] [--normalize {none,peak,rms}]
+                   [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
+                   [--target-lufs TARGET_LUFS]
+                   [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
+                   [--compressor-ratio COMPRESSOR_RATIO]
+                   [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
+                   [--compressor-release-ms COMPRESSOR_RELEASE_MS]
+                   [--compressor-makeup-db COMPRESSOR_MAKEUP_DB]
+                   [--expander-threshold-db EXPANDER_THRESHOLD_DB]
+                   [--expander-ratio EXPANDER_RATIO]
+                   [--expander-attack-ms EXPANDER_ATTACK_MS]
+                   [--expander-release-ms EXPANDER_RELEASE_MS]
+                   [--compander-threshold-db COMPANDER_THRESHOLD_DB]
+                   [--compander-compress-ratio COMPANDER_COMPRESS_RATIO]
+                   [--compander-expand-ratio COMPANDER_EXPAND_RATIO]
+                   [--compander-attack-ms COMPANDER_ATTACK_MS]
+                   [--compander-release-ms COMPANDER_RELEASE_MS]
+                   [--compander-makeup-db COMPANDER_MAKEUP_DB]
+                   [--limiter-threshold LIMITER_THRESHOLD]
+                   [--soft-clip-level SOFT_CLIP_LEVEL]
+                   [--soft-clip-type {tanh,arctan,cubic}]
+                   [--soft-clip-drive SOFT_CLIP_DRIVE]
+                   [--hard-clip-level HARD_CLIP_LEVEL] [--clip]
+                   [--subtype SUBTYPE] [--bit-depth {inherit,16,24,32f}]
+                   [--dither {none,tpdf}] [--dither-seed DITHER_SEED]
+                   [--true-peak-max-dbtp TRUE_PEAK_MAX_DBTP]
+                   [--metadata-policy {none,sidecar,copy}] [--n-fft N_FFT]
+                   [--win-length WIN_LENGTH] [--hop-size HOP_SIZE]
+                   [--window {hann,hamming,blackman,blackmanharris,nuttall,flattop,blackman_nuttall,exact_blackman,sine,bartlett,boxcar,triangular,bartlett_hann,tukey,tukey_0p1,tukey_0p25,tukey_0p75,tukey_0p9,parzen,lanczos,welch,gaussian_0p25,gaussian_0p35,gaussian_0p45,gaussian_0p55,gaussian_0p65,general_gaussian_1p5_0p35,general_gaussian_2p0_0p35,general_gaussian_3p0_0p35,general_gaussian_4p0_0p35,exponential_0p25,exponential_0p5,exponential_1p0,cauchy_0p5,cauchy_1p0,cauchy_2p0,cosine_power_2,cosine_power_3,cosine_power_4,hann_poisson_0p5,hann_poisson_1p0,hann_poisson_2p0,general_hamming_0p50,general_hamming_0p60,general_hamming_0p70,general_hamming_0p80,bohman,cosine,kaiser,rect}]
+                   [--kaiser-beta KAISER_BETA]
+                   [--transform {fft,dft,czt,dct,dst,hartley}]
+                   [--phase-engine {propagate,hybrid,random}]
+                   [--ambient-phase-mix AMBIENT_PHASE_MIX]
+                   [--phase-random-seed PHASE_RANDOM_SEED]
+                   [--onset-time-credit]
+                   [--onset-credit-pull ONSET_CREDIT_PULL]
+                   [--onset-credit-max ONSET_CREDIT_MAX] [--no-onset-realign]
+                   [--no-center] [--device {auto,cpu,cuda}]
+                   [--cuda-device CUDA_DEVICE]
+                   [--operator {filter,tvfilter,noisefilter,bandamp,spec-compander}]
+                   --response RESPONSE [--response-mix RESPONSE_MIX]
+                   [--dry-mix DRY_MIX] [--response-gain-db RESPONSE_GAIN_DB]
+                   [--transpose-semitones TRANSPOSE_SEMITONES]
+                   [--shift-bins SHIFT_BINS] [--tv-map TV_MAP]
+                   [--tv-key TV_KEY]
+                   [--tv-interp {none,stairstep,nearest,linear,cubic,polynomial}]
+                   [--tv-order TV_ORDER] [--noise-floor NOISE_FLOOR]
+                   [--band-gain-db BAND_GAIN_DB]
+                   [--band-width-bins BAND_WIDTH_BINS]
+                   [--peak-count PEAK_COUNT]
+                   [--comp-threshold-db COMP_THRESHOLD_DB]
+                   [--comp-ratio COMP_RATIO] [--expand-ratio EXPAND_RATIO]
+                   inputs [inputs ...]
+
+Response-driven spectral processing using PVXRF artifacts.
+
+positional arguments:
+  inputs                Input files/globs or '-' for stdin
+
+options:
+  -h, --help            show this help message and exit
+  -o, --output-dir OUTPUT_DIR
+                        Output directory
+  --output, --out OUTPUT
+                        Explicit output file path (single-input mode only). Alias: --out
+  --suffix SUFFIX       Output filename suffix (default: _filter)
+  --output-format OUTPUT_FORMAT
+                        Output extension/format
+  --stdout              Write processed audio to stdout stream (for piping); requires exactly one input
+  --overwrite           Overwrite existing outputs
+  --dry-run             Resolve and print, but do not write files
+  --verbosity {silent,quiet,normal,verbose,debug}
+       
+... [truncated]
+```
+
+### Module Docstring
+
+```text
+Compatibility wrapper for `pvx.cli.pvxbandamp`.
+```
+
+## `pvxchordmapper.py`
+
+**Purpose:** Compatibility wrapper for `pvx.cli.pvxchordmapper`.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvxchordmapper.py --help`
+
+### CLI Help Snapshot
+
+```text
+usage: pvx chordmapper [-h] [-o OUTPUT_DIR] [--output OUTPUT]
+                       [--suffix SUFFIX] [--output-format OUTPUT_FORMAT]
+                       [--stdout] [--overwrite] [--dry-run]
+                       [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
+                       [--quiet] [--silent] [--normalize {none,peak,rms}]
+                       [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
+                       [--target-lufs TARGET_LUFS]
+                       [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
+                       [--compressor-ratio COMPRESSOR_RATIO]
+                       [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
+                       [--compressor-release-ms COMPRESSOR_RELEASE_MS]
+                       [--compressor-makeup-db COMPRESSOR_MAKEUP_DB]
+                       [--expander-threshold-db EXPANDER_THRESHOLD_DB]
+                       [--expander-ratio EXPANDER_RATIO]
+                       [--expander-attack-ms EXPANDER_ATTACK_MS]
+                       [--expander-release-ms EXPANDER_RELEASE_MS]
+                       [--compander-threshold-db COMPANDER_THRESHOLD_DB]
+                       [--compander-compress-ratio COMPANDER_COMPRESS_RATIO]
+                       [--compander-expand-ratio COMPANDER_EXPAND_RATIO]
+                       [--compander-attack-ms COMPANDER_ATTACK_MS]
+                       [--compander-release-ms COMPANDER_RELEASE_MS]
+                       [--compander-makeup-db COMPANDER_MAKEUP_DB]
+                       [--limiter-threshold LIMITER_THRESHOLD]
+                       [--soft-clip-level SOFT_CLIP_LEVEL]
+                       [--soft-clip-type {tanh,arctan,cubic}]
+                       [--soft-clip-drive SOFT_CLIP_DRIVE]
+                       [--hard-clip-level HARD_CLIP_LEVEL] [--clip]
+                       [--subtype SUBTYPE] [--bit-depth {inherit,16,24,32f}]
+                       [--dither {none,tpdf}] [--dither-seed DITHER_SEED]
+                       [--true-peak-max-dbtp TRUE_PEAK_MAX_DBTP]
+                       [--metadata-policy {none,sidecar,copy}] [--n-fft N_FFT]
+                       [--win-length WIN_LENGTH] [--hop-size HOP_SIZE]
+                       [--window {hann,hamming,blackman,blackmanharris,nuttall,flattop,blackman_nuttall,exact_blackman,sine,bartlett,boxcar,triangular,bartlett_hann,tukey,tukey_0p1,tukey_0p25,tukey_0p75,tukey_0p9,parzen,lanczos,welch,gaussian_0p25,gaussian_0p35,gaussian_0p45,gaussian_0p55,gaussian_0p65,general_gaussian_1p5_0p35,general_gaussian_2p0_0p35,general_gaussian_3p0_0p35,general_gaussian_4p0_0p35,exponential_0p25,exponential_0p5,exponential_1p0,cauchy_0p5,cauchy_1p0,cauchy_2p0,cosine_power_2,cosine_power_3,cosine_power_4,hann_poisson_0p5,hann_poisson_1p0,hann_poisson_2p0,general_hamming_0p50,general_hamming_0p60,general_hamming_0p70,general_hamming_0p80,bohman,cosine,kaiser,rect}]
+                       [--kaiser-beta KAISER_BETA]
+                       [--transform {fft,dft,czt,dct,dst,hartley}]
+                       [--phase-engine {propagate,hybrid,random}]
+                       [--ambient-phase-mix AMBIENT_PHASE_MIX]
+                       [--phase-random-seed PHASE_RANDOM_SEED]
+                       [--onset-time-credit]
+                       [--onset-credit-pull ONSET_CREDIT_PULL]
+                       [--onset-credit-max ONSET_CREDIT_MAX]
+                       [--no-onset-realign] [--no-center]
+                       [--device {auto,cpu,cuda}] [--cuda-device CUDA_DEVICE]
+                       [--operator {chordmapper,inharmonator}]
+                       [--root-hz ROOT_HZ]
+                       [--chord {aug,dim,dom7,maj7,major,min7,minor,power,sus2,sus4}]
+                       [--strength STRENGTH]
+                       [--tolerance-cents TOLERANCE_CENTS]
+                       [--boost-db BOOST_DB] [--attenuation ATTENUATION]
+                       [--inharmonic-f0-hz INHARMONIC_F0_HZ]
+                       [--inharmonicity INHARMONICITY]
+                       [--inharmonic-mix INHARMONIC_MIX] [--dry-mix DRY_MIX]
+                       inputs [inputs ...]
+
+Harmonic/chord mapping and inharmonic spectral warping.
+
+positional arguments:
+  inputs                Input files/globs or '-' for stdin
+
+options:
+  -h, --help            show this help message and exit
+  -o, --output-dir OUTPUT_DIR
+                        Output directory
+  --output, --out OUTPUT
+                        Explicit output file path (single-input mode only). Alias: --out
+  --suffix SUFFIX       Output filename suffix (default: _harm)
+  --output-format OUTPUT_FORMAT
+                        Output extension/format
+  --stdout              Write processed audio to stdout stream (for piping); requires exactly one input
+  --overwrite           Overwrite existing outputs
+  --dry-run             Resolve and print, but do not write files
+  --verbosity {silent,quiet,normal,verbose,debug}
+                        Console verbosity level
+  -v, --verbose         Increase verbosity (repeat for
+... [truncated]
+```
+
+### Module Docstring
+
+```text
+Compatibility wrapper for `pvx.cli.pvxchordmapper`.
 ```
 
 ## `pvxcommon.py`
@@ -782,6 +1051,105 @@ This root module forwards imports/execution to `pvx.cli.pvxdeverb` after the
 src-layout migration.
 ```
 
+## `pvxfilter.py`
+
+**Purpose:** Compatibility wrapper for `pvx.cli.pvxfilter`.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvxfilter.py --help`
+
+### CLI Help Snapshot
+
+```text
+usage: pvx filter [-h] [-o OUTPUT_DIR] [--output OUTPUT] [--suffix SUFFIX]
+                  [--output-format OUTPUT_FORMAT] [--stdout] [--overwrite]
+                  [--dry-run]
+                  [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
+                  [--quiet] [--silent] [--normalize {none,peak,rms}]
+                  [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
+                  [--target-lufs TARGET_LUFS]
+                  [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
+                  [--compressor-ratio COMPRESSOR_RATIO]
+                  [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
+                  [--compressor-release-ms COMPRESSOR_RELEASE_MS]
+                  [--compressor-makeup-db COMPRESSOR_MAKEUP_DB]
+                  [--expander-threshold-db EXPANDER_THRESHOLD_DB]
+                  [--expander-ratio EXPANDER_RATIO]
+                  [--expander-attack-ms EXPANDER_ATTACK_MS]
+                  [--expander-release-ms EXPANDER_RELEASE_MS]
+                  [--compander-threshold-db COMPANDER_THRESHOLD_DB]
+                  [--compander-compress-ratio COMPANDER_COMPRESS_RATIO]
+                  [--compander-expand-ratio COMPANDER_EXPAND_RATIO]
+                  [--compander-attack-ms COMPANDER_ATTACK_MS]
+                  [--compander-release-ms COMPANDER_RELEASE_MS]
+                  [--compander-makeup-db COMPANDER_MAKEUP_DB]
+                  [--limiter-threshold LIMITER_THRESHOLD]
+                  [--soft-clip-level SOFT_CLIP_LEVEL]
+                  [--soft-clip-type {tanh,arctan,cubic}]
+                  [--soft-clip-drive SOFT_CLIP_DRIVE]
+                  [--hard-clip-level HARD_CLIP_LEVEL] [--clip]
+                  [--subtype SUBTYPE] [--bit-depth {inherit,16,24,32f}]
+                  [--dither {none,tpdf}] [--dither-seed DITHER_SEED]
+                  [--true-peak-max-dbtp TRUE_PEAK_MAX_DBTP]
+                  [--metadata-policy {none,sidecar,copy}] [--n-fft N_FFT]
+                  [--win-length WIN_LENGTH] [--hop-size HOP_SIZE]
+                  [--window {hann,hamming,blackman,blackmanharris,nuttall,flattop,blackman_nuttall,exact_blackman,sine,bartlett,boxcar,triangular,bartlett_hann,tukey,tukey_0p1,tukey_0p25,tukey_0p75,tukey_0p9,parzen,lanczos,welch,gaussian_0p25,gaussian_0p35,gaussian_0p45,gaussian_0p55,gaussian_0p65,general_gaussian_1p5_0p35,general_gaussian_2p0_0p35,general_gaussian_3p0_0p35,general_gaussian_4p0_0p35,exponential_0p25,exponential_0p5,exponential_1p0,cauchy_0p5,cauchy_1p0,cauchy_2p0,cosine_power_2,cosine_power_3,cosine_power_4,hann_poisson_0p5,hann_poisson_1p0,hann_poisson_2p0,general_hamming_0p50,general_hamming_0p60,general_hamming_0p70,general_hamming_0p80,bohman,cosine,kaiser,rect}]
+                  [--kaiser-beta KAISER_BETA]
+                  [--transform {fft,dft,czt,dct,dst,hartley}]
+                  [--phase-engine {propagate,hybrid,random}]
+                  [--ambient-phase-mix AMBIENT_PHASE_MIX]
+                  [--phase-random-seed PHASE_RANDOM_SEED]
+                  [--onset-time-credit]
+                  [--onset-credit-pull ONSET_CREDIT_PULL]
+                  [--onset-credit-max ONSET_CREDIT_MAX] [--no-onset-realign]
+                  [--no-center] [--device {auto,cpu,cuda}]
+                  [--cuda-device CUDA_DEVICE]
+                  [--operator {filter,tvfilter,noisefilter,bandamp,spec-compander}]
+                  --response RESPONSE [--response-mix RESPONSE_MIX]
+                  [--dry-mix DRY_MIX] [--response-gain-db RESPONSE_GAIN_DB]
+                  [--transpose-semitones TRANSPOSE_SEMITONES]
+                  [--shift-bins SHIFT_BINS] [--tv-map TV_MAP]
+                  [--tv-key TV_KEY]
+                  [--tv-interp {none,stairstep,nearest,linear,cubic,polynomial}]
+                  [--tv-order TV_ORDER] [--noise-floor NOISE_FLOOR]
+                  [--band-gain-db BAND_GAIN_DB]
+                  [--band-width-bins BAND_WIDTH_BINS]
+                  [--peak-count PEAK_COUNT]
+                  [--comp-threshold-db COMP_THRESHOLD_DB]
+                  [--comp-ratio COMP_RATIO] [--expand-ratio EXPAND_RATIO]
+                  inputs [inputs ...]
+
+Response-driven spectral processing using PVXRF artifacts.
+
+positional arguments:
+  inputs                Input files/globs or '-' for stdin
+
+options:
+  -h, --help            show this help message and exit
+  -o, --output-dir OUTPUT_DIR
+                        Output directory
+  --output, --out OUTPUT
+                        Explicit output file path (single-input mode only). Alias: --out
+  --suffix SUFFIX       Output filename suffix (default: _filter)
+  --output-format OUTPUT_FORMAT
+                        Output extension/format
+  --stdout              Write processed audio to stdout stream (for piping); requires exactly one input
+  --overwrite           Overwrite existing outputs
+  --dry-run             Resolve and print, but do not write files
+  --verbosity {silent,quiet,normal,verbose,debug}
+                        Console verbosity level
+  -v, --verbose 
+... [truncated]
+```
+
+### Module Docstring
+
+```text
+Compatibility wrapper for `pvx.cli.pvxfilter`.
+```
+
 ## `pvxformant.py`
 
 **Purpose:** Compatibility wrapper.
@@ -987,6 +1355,101 @@ This root module forwards imports/execution to `pvx.cli.pvxfreeze` after the
 src-layout migration.
 ```
 
+## `pvxharmmap.py`
+
+**Purpose:** Compatibility wrapper for `pvx.cli.pvxharmmap`.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvxharmmap.py --help`
+
+### CLI Help Snapshot
+
+```text
+usage: pvx chordmapper [-h] [-o OUTPUT_DIR] [--output OUTPUT]
+                       [--suffix SUFFIX] [--output-format OUTPUT_FORMAT]
+                       [--stdout] [--overwrite] [--dry-run]
+                       [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
+                       [--quiet] [--silent] [--normalize {none,peak,rms}]
+                       [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
+                       [--target-lufs TARGET_LUFS]
+                       [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
+                       [--compressor-ratio COMPRESSOR_RATIO]
+                       [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
+                       [--compressor-release-ms COMPRESSOR_RELEASE_MS]
+                       [--compressor-makeup-db COMPRESSOR_MAKEUP_DB]
+                       [--expander-threshold-db EXPANDER_THRESHOLD_DB]
+                       [--expander-ratio EXPANDER_RATIO]
+                       [--expander-attack-ms EXPANDER_ATTACK_MS]
+                       [--expander-release-ms EXPANDER_RELEASE_MS]
+                       [--compander-threshold-db COMPANDER_THRESHOLD_DB]
+                       [--compander-compress-ratio COMPANDER_COMPRESS_RATIO]
+                       [--compander-expand-ratio COMPANDER_EXPAND_RATIO]
+                       [--compander-attack-ms COMPANDER_ATTACK_MS]
+                       [--compander-release-ms COMPANDER_RELEASE_MS]
+                       [--compander-makeup-db COMPANDER_MAKEUP_DB]
+                       [--limiter-threshold LIMITER_THRESHOLD]
+                       [--soft-clip-level SOFT_CLIP_LEVEL]
+                       [--soft-clip-type {tanh,arctan,cubic}]
+                       [--soft-clip-drive SOFT_CLIP_DRIVE]
+                       [--hard-clip-level HARD_CLIP_LEVEL] [--clip]
+                       [--subtype SUBTYPE] [--bit-depth {inherit,16,24,32f}]
+                       [--dither {none,tpdf}] [--dither-seed DITHER_SEED]
+                       [--true-peak-max-dbtp TRUE_PEAK_MAX_DBTP]
+                       [--metadata-policy {none,sidecar,copy}] [--n-fft N_FFT]
+                       [--win-length WIN_LENGTH] [--hop-size HOP_SIZE]
+                       [--window {hann,hamming,blackman,blackmanharris,nuttall,flattop,blackman_nuttall,exact_blackman,sine,bartlett,boxcar,triangular,bartlett_hann,tukey,tukey_0p1,tukey_0p25,tukey_0p75,tukey_0p9,parzen,lanczos,welch,gaussian_0p25,gaussian_0p35,gaussian_0p45,gaussian_0p55,gaussian_0p65,general_gaussian_1p5_0p35,general_gaussian_2p0_0p35,general_gaussian_3p0_0p35,general_gaussian_4p0_0p35,exponential_0p25,exponential_0p5,exponential_1p0,cauchy_0p5,cauchy_1p0,cauchy_2p0,cosine_power_2,cosine_power_3,cosine_power_4,hann_poisson_0p5,hann_poisson_1p0,hann_poisson_2p0,general_hamming_0p50,general_hamming_0p60,general_hamming_0p70,general_hamming_0p80,bohman,cosine,kaiser,rect}]
+                       [--kaiser-beta KAISER_BETA]
+                       [--transform {fft,dft,czt,dct,dst,hartley}]
+                       [--phase-engine {propagate,hybrid,random}]
+                       [--ambient-phase-mix AMBIENT_PHASE_MIX]
+                       [--phase-random-seed PHASE_RANDOM_SEED]
+                       [--onset-time-credit]
+                       [--onset-credit-pull ONSET_CREDIT_PULL]
+                       [--onset-credit-max ONSET_CREDIT_MAX]
+                       [--no-onset-realign] [--no-center]
+                       [--device {auto,cpu,cuda}] [--cuda-device CUDA_DEVICE]
+                       [--operator {chordmapper,inharmonator}]
+                       [--root-hz ROOT_HZ]
+                       [--chord {aug,dim,dom7,maj7,major,min7,minor,power,sus2,sus4}]
+                       [--strength STRENGTH]
+                       [--tolerance-cents TOLERANCE_CENTS]
+                       [--boost-db BOOST_DB] [--attenuation ATTENUATION]
+                       [--inharmonic-f0-hz INHARMONIC_F0_HZ]
+                       [--inharmonicity INHARMONICITY]
+                       [--inharmonic-mix INHARMONIC_MIX] [--dry-mix DRY_MIX]
+                       inputs [inputs ...]
+
+Harmonic/chord mapping and inharmonic spectral warping.
+
+positional arguments:
+  inputs                Input files/globs or '-' for stdin
+
+options:
+  -h, --help            show this help message and exit
+  -o, --output-dir OUTPUT_DIR
+                        Output directory
+  --output, --out OUTPUT
+                        Explicit output file path (single-input mode only). Alias: --out
+  --suffix SUFFIX       Output filename suffix (default: _harm)
+  --output-format OUTPUT_FORMAT
+                        Output extension/format
+  --stdout              Write processed audio to stdout stream (for piping); requires exactly one input
+  --overwrite           Overwrite existing outputs
+  --dry-run             Resolve and print, but do not write files
+  --verbosity {silent,quiet,normal,verbose,debug}
+                        Console verbosity level
+  -v, --verbose         Increase verbosity (repeat for
+... [truncated]
+```
+
+### Module Docstring
+
+```text
+Compatibility wrapper for `pvx.cli.pvxharmmap`.
+```
+
 ## `pvxharmonize.py`
 
 **Purpose:** Compatibility wrapper.
@@ -1085,6 +1548,101 @@ Compatibility wrapper.
 
 This root module forwards imports/execution to `pvx.cli.pvxharmonize` after the
 src-layout migration.
+```
+
+## `pvxinharmonator.py`
+
+**Purpose:** Compatibility wrapper for `pvx.cli.pvxinharmonator`.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvxinharmonator.py --help`
+
+### CLI Help Snapshot
+
+```text
+usage: pvx inharmonator [-h] [-o OUTPUT_DIR] [--output OUTPUT]
+                        [--suffix SUFFIX] [--output-format OUTPUT_FORMAT]
+                        [--stdout] [--overwrite] [--dry-run]
+                        [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
+                        [--quiet] [--silent] [--normalize {none,peak,rms}]
+                        [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
+                        [--target-lufs TARGET_LUFS]
+                        [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
+                        [--compressor-ratio COMPRESSOR_RATIO]
+                        [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
+                        [--compressor-release-ms COMPRESSOR_RELEASE_MS]
+                        [--compressor-makeup-db COMPRESSOR_MAKEUP_DB]
+                        [--expander-threshold-db EXPANDER_THRESHOLD_DB]
+                        [--expander-ratio EXPANDER_RATIO]
+                        [--expander-attack-ms EXPANDER_ATTACK_MS]
+                        [--expander-release-ms EXPANDER_RELEASE_MS]
+                        [--compander-threshold-db COMPANDER_THRESHOLD_DB]
+                        [--compander-compress-ratio COMPANDER_COMPRESS_RATIO]
+                        [--compander-expand-ratio COMPANDER_EXPAND_RATIO]
+                        [--compander-attack-ms COMPANDER_ATTACK_MS]
+                        [--compander-release-ms COMPANDER_RELEASE_MS]
+                        [--compander-makeup-db COMPANDER_MAKEUP_DB]
+                        [--limiter-threshold LIMITER_THRESHOLD]
+                        [--soft-clip-level SOFT_CLIP_LEVEL]
+                        [--soft-clip-type {tanh,arctan,cubic}]
+                        [--soft-clip-drive SOFT_CLIP_DRIVE]
+                        [--hard-clip-level HARD_CLIP_LEVEL] [--clip]
+                        [--subtype SUBTYPE] [--bit-depth {inherit,16,24,32f}]
+                        [--dither {none,tpdf}] [--dither-seed DITHER_SEED]
+                        [--true-peak-max-dbtp TRUE_PEAK_MAX_DBTP]
+                        [--metadata-policy {none,sidecar,copy}]
+                        [--n-fft N_FFT] [--win-length WIN_LENGTH]
+                        [--hop-size HOP_SIZE]
+                        [--window {hann,hamming,blackman,blackmanharris,nuttall,flattop,blackman_nuttall,exact_blackman,sine,bartlett,boxcar,triangular,bartlett_hann,tukey,tukey_0p1,tukey_0p25,tukey_0p75,tukey_0p9,parzen,lanczos,welch,gaussian_0p25,gaussian_0p35,gaussian_0p45,gaussian_0p55,gaussian_0p65,general_gaussian_1p5_0p35,general_gaussian_2p0_0p35,general_gaussian_3p0_0p35,general_gaussian_4p0_0p35,exponential_0p25,exponential_0p5,exponential_1p0,cauchy_0p5,cauchy_1p0,cauchy_2p0,cosine_power_2,cosine_power_3,cosine_power_4,hann_poisson_0p5,hann_poisson_1p0,hann_poisson_2p0,general_hamming_0p50,general_hamming_0p60,general_hamming_0p70,general_hamming_0p80,bohman,cosine,kaiser,rect}]
+                        [--kaiser-beta KAISER_BETA]
+                        [--transform {fft,dft,czt,dct,dst,hartley}]
+                        [--phase-engine {propagate,hybrid,random}]
+                        [--ambient-phase-mix AMBIENT_PHASE_MIX]
+                        [--phase-random-seed PHASE_RANDOM_SEED]
+                        [--onset-time-credit]
+                        [--onset-credit-pull ONSET_CREDIT_PULL]
+                        [--onset-credit-max ONSET_CREDIT_MAX]
+                        [--no-onset-realign] [--no-center]
+                        [--device {auto,cpu,cuda}] [--cuda-device CUDA_DEVICE]
+                        [--operator {chordmapper,inharmonator}]
+                        [--root-hz ROOT_HZ]
+                        [--chord {aug,dim,dom7,maj7,major,min7,minor,power,sus2,sus4}]
+                        [--strength STRENGTH]
+                        [--tolerance-cents TOLERANCE_CENTS]
+                        [--boost-db BOOST_DB] [--attenuation ATTENUATION]
+                        [--inharmonic-f0-hz INHARMONIC_F0_HZ]
+                        [--inharmonicity INHARMONICITY]
+                        [--inharmonic-mix INHARMONIC_MIX] [--dry-mix DRY_MIX]
+                        inputs [inputs ...]
+
+Harmonic/chord mapping and inharmonic spectral warping.
+
+positional arguments:
+  inputs                Input files/globs or '-' for stdin
+
+options:
+  -h, --help            show this help message and exit
+  -o, --output-dir OUTPUT_DIR
+                        Output directory
+  --output, --out OUTPUT
+                        Explicit output file path (single-input mode only). Alias: --out
+  --suffix SUFFIX       Output filename suffix (default: _harm)
+  --output-format OUTPUT_FORMAT
+                        Output extension/format
+  --stdout              Write processed audio to stdout stream (for piping); requires exactly one input
+  --overwrite           Overwrite existing outputs
+  --dry-run             Resolve and print, but do not write files
+  --verbosity {silent,quiet,normal,verbose,debug}
+                        C
+... [truncated]
+```
+
+### Module Docstring
+
+```text
+Compatibility wrapper for `pvx.cli.pvxinharmonator`.
 ```
 
 ## `pvxlayer.py`
@@ -1279,6 +1837,144 @@ This root module forwards imports/execution to `pvx.cli.pvxmorph` after the
 src-layout migration.
 ```
 
+## `pvxnoisefilter.py`
+
+**Purpose:** Compatibility wrapper for `pvx.cli.pvxnoisefilter`.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvxnoisefilter.py --help`
+
+### CLI Help Snapshot
+
+```text
+usage: pvx noisefilter [-h] [-o OUTPUT_DIR] [--output OUTPUT]
+                       [--suffix SUFFIX] [--output-format OUTPUT_FORMAT]
+                       [--stdout] [--overwrite] [--dry-run]
+                       [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
+                       [--quiet] [--silent] [--normalize {none,peak,rms}]
+                       [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
+                       [--target-lufs TARGET_LUFS]
+                       [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
+                       [--compressor-ratio COMPRESSOR_RATIO]
+                       [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
+                       [--compressor-release-ms COMPRESSOR_RELEASE_MS]
+                       [--compressor-makeup-db COMPRESSOR_MAKEUP_DB]
+                       [--expander-threshold-db EXPANDER_THRESHOLD_DB]
+                       [--expander-ratio EXPANDER_RATIO]
+                       [--expander-attack-ms EXPANDER_ATTACK_MS]
+                       [--expander-release-ms EXPANDER_RELEASE_MS]
+                       [--compander-threshold-db COMPANDER_THRESHOLD_DB]
+                       [--compander-compress-ratio COMPANDER_COMPRESS_RATIO]
+                       [--compander-expand-ratio COMPANDER_EXPAND_RATIO]
+                       [--compander-attack-ms COMPANDER_ATTACK_MS]
+                       [--compander-release-ms COMPANDER_RELEASE_MS]
+                       [--compander-makeup-db COMPANDER_MAKEUP_DB]
+                       [--limiter-threshold LIMITER_THRESHOLD]
+                       [--soft-clip-level SOFT_CLIP_LEVEL]
+                       [--soft-clip-type {tanh,arctan,cubic}]
+                       [--soft-clip-drive SOFT_CLIP_DRIVE]
+                       [--hard-clip-level HARD_CLIP_LEVEL] [--clip]
+                       [--subtype SUBTYPE] [--bit-depth {inherit,16,24,32f}]
+                       [--dither {none,tpdf}] [--dither-seed DITHER_SEED]
+                       [--true-peak-max-dbtp TRUE_PEAK_MAX_DBTP]
+                       [--metadata-policy {none,sidecar,copy}] [--n-fft N_FFT]
+                       [--win-length WIN_LENGTH] [--hop-size HOP_SIZE]
+                       [--window {hann,hamming,blackman,blackmanharris,nuttall,flattop,blackman_nuttall,exact_blackman,sine,bartlett,boxcar,triangular,bartlett_hann,tukey,tukey_0p1,tukey_0p25,tukey_0p75,tukey_0p9,parzen,lanczos,welch,gaussian_0p25,gaussian_0p35,gaussian_0p45,gaussian_0p55,gaussian_0p65,general_gaussian_1p5_0p35,general_gaussian_2p0_0p35,general_gaussian_3p0_0p35,general_gaussian_4p0_0p35,exponential_0p25,exponential_0p5,exponential_1p0,cauchy_0p5,cauchy_1p0,cauchy_2p0,cosine_power_2,cosine_power_3,cosine_power_4,hann_poisson_0p5,hann_poisson_1p0,hann_poisson_2p0,general_hamming_0p50,general_hamming_0p60,general_hamming_0p70,general_hamming_0p80,bohman,cosine,kaiser,rect}]
+                       [--kaiser-beta KAISER_BETA]
+                       [--transform {fft,dft,czt,dct,dst,hartley}]
+                       [--phase-engine {propagate,hybrid,random}]
+                       [--ambient-phase-mix AMBIENT_PHASE_MIX]
+                       [--phase-random-seed PHASE_RANDOM_SEED]
+                       [--onset-time-credit]
+                       [--onset-credit-pull ONSET_CREDIT_PULL]
+                       [--onset-credit-max ONSET_CREDIT_MAX]
+                       [--no-onset-realign] [--no-center]
+                       [--device {auto,cpu,cuda}] [--cuda-device CUDA_DEVICE]
+                       [--operator {filter,tvfilter,noisefilter,bandamp,spec-compander}]
+                       --response RESPONSE [--response-mix RESPONSE_MIX]
+                       [--dry-mix DRY_MIX]
+                       [--response-gain-db RESPONSE_GAIN_DB]
+                       [--transpose-semitones TRANSPOSE_SEMITONES]
+                       [--shift-bins SHIFT_BINS] [--tv-map TV_MAP]
+                       [--tv-key TV_KEY]
+                       [--tv-interp {none,stairstep,nearest,linear,cubic,polynomial}]
+                       [--tv-order TV_ORDER] [--noise-floor NOISE_FLOOR]
+                       [--band-gain-db BAND_GAIN_DB]
+                       [--band-width-bins BAND_WIDTH_BINS]
+                       [--peak-count PEAK_COUNT]
+                       [--comp-threshold-db COMP_THRESHOLD_DB]
+                       [--comp-ratio COMP_RATIO] [--expand-ratio EXPAND_RATIO]
+                       inputs [inputs ...]
+
+Response-driven spectral processing using PVXRF artifacts.
+
+positional arguments:
+  inputs                Input files/globs or '-' for stdin
+
+options:
+  -h, --help            show this help message and exit
+  -o, --output-dir OUTPUT_DIR
+                        Output directory
+  --output, --out OUTPUT
+                        Explicit output file path (single-input mode only). Alias: --out
+  --suffix SUFFIX       Output filename suffix (default: _filter)
+  --output-format OUTPUT_FORMAT
+                        Output extension/format
+  --stdout              Wri
+... [truncated]
+```
+
+### Module Docstring
+
+```text
+Compatibility wrapper for `pvx.cli.pvxnoisefilter`.
+```
+
+## `pvxresponse.py`
+
+**Purpose:** Compatibility wrapper.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvxresponse.py --help`
+
+### CLI Help Snapshot
+
+```text
+usage: pvx response [-h] {create,inspect} ...
+
+Create and inspect PVXRF frequency-response artifacts derived from PVXAN analyses.
+
+positional arguments:
+  {create,inspect}
+    create          Derive response artifact from analysis artifact
+    inspect         Inspect existing PVXRF artifact
+
+options:
+  -h, --help        show this help message and exit
+
+Examples:
+  pvx response create input.pvxan.npz --output input.pvxrf.npz --method median --normalize peak
+  pvx response inspect input.pvxrf.npz
+  pvxresponse.py input.pvxan.npz --phase-mode zero --normalize rms
+
+Notes:
+  - When command is omitted, create mode is assumed for convenience.
+  - PVXRF stores per-channel response magnitude/phase vectors and frequency bins.
+```
+
+### Module Docstring
+
+```text
+Compatibility wrapper.
+
+This root module forwards imports/execution to `pvx.cli.pvxresponse` after the
+src-layout migration.
+```
+
 ## `pvxretune.py`
 
 **Purpose:** Compatibility wrapper.
@@ -1381,6 +2077,391 @@ This root module forwards imports/execution to `pvx.cli.pvxretune` after the
 src-layout migration.
 ```
 
+## `pvxring.py`
+
+**Purpose:** Compatibility wrapper for `pvx.cli.pvxring`.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvxring.py --help`
+
+### CLI Help Snapshot
+
+```text
+usage: pvx ring [-h] [-o OUTPUT_DIR] [--output OUTPUT] [--suffix SUFFIX]
+                [--output-format OUTPUT_FORMAT] [--stdout] [--overwrite]
+                [--dry-run] [--verbosity {silent,quiet,normal,verbose,debug}]
+                [-v] [--quiet] [--silent] [--normalize {none,peak,rms}]
+                [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
+                [--target-lufs TARGET_LUFS]
+                [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
+                [--compressor-ratio COMPRESSOR_RATIO]
+                [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
+                [--compressor-release-ms COMPRESSOR_RELEASE_MS]
+                [--compressor-makeup-db COMPRESSOR_MAKEUP_DB]
+                [--expander-threshold-db EXPANDER_THRESHOLD_DB]
+                [--expander-ratio EXPANDER_RATIO]
+                [--expander-attack-ms EXPANDER_ATTACK_MS]
+                [--expander-release-ms EXPANDER_RELEASE_MS]
+                [--compander-threshold-db COMPANDER_THRESHOLD_DB]
+                [--compander-compress-ratio COMPANDER_COMPRESS_RATIO]
+                [--compander-expand-ratio COMPANDER_EXPAND_RATIO]
+                [--compander-attack-ms COMPANDER_ATTACK_MS]
+                [--compander-release-ms COMPANDER_RELEASE_MS]
+                [--compander-makeup-db COMPANDER_MAKEUP_DB]
+                [--limiter-threshold LIMITER_THRESHOLD]
+                [--soft-clip-level SOFT_CLIP_LEVEL]
+                [--soft-clip-type {tanh,arctan,cubic}]
+                [--soft-clip-drive SOFT_CLIP_DRIVE]
+                [--hard-clip-level HARD_CLIP_LEVEL] [--clip]
+                [--subtype SUBTYPE] [--bit-depth {inherit,16,24,32f}]
+                [--dither {none,tpdf}] [--dither-seed DITHER_SEED]
+                [--true-peak-max-dbtp TRUE_PEAK_MAX_DBTP]
+                [--metadata-policy {none,sidecar,copy}] [--n-fft N_FFT]
+                [--win-length WIN_LENGTH] [--hop-size HOP_SIZE]
+                [--window {hann,hamming,blackman,blackmanharris,nuttall,flattop,blackman_nuttall,exact_blackman,sine,bartlett,boxcar,triangular,bartlett_hann,tukey,tukey_0p1,tukey_0p25,tukey_0p75,tukey_0p9,parzen,lanczos,welch,gaussian_0p25,gaussian_0p35,gaussian_0p45,gaussian_0p55,gaussian_0p65,general_gaussian_1p5_0p35,general_gaussian_2p0_0p35,general_gaussian_3p0_0p35,general_gaussian_4p0_0p35,exponential_0p25,exponential_0p5,exponential_1p0,cauchy_0p5,cauchy_1p0,cauchy_2p0,cosine_power_2,cosine_power_3,cosine_power_4,hann_poisson_0p5,hann_poisson_1p0,hann_poisson_2p0,general_hamming_0p50,general_hamming_0p60,general_hamming_0p70,general_hamming_0p80,bohman,cosine,kaiser,rect}]
+                [--kaiser-beta KAISER_BETA]
+                [--transform {fft,dft,czt,dct,dst,hartley}]
+                [--phase-engine {propagate,hybrid,random}]
+                [--ambient-phase-mix AMBIENT_PHASE_MIX]
+                [--phase-random-seed PHASE_RANDOM_SEED] [--onset-time-credit]
+                [--onset-credit-pull ONSET_CREDIT_PULL]
+                [--onset-credit-max ONSET_CREDIT_MAX] [--no-onset-realign]
+                [--no-center] [--device {auto,cpu,cuda}]
+                [--cuda-device CUDA_DEVICE]
+                [--operator {ring,ringfilter,ringtvfilter}]
+                [--frequency-hz FREQUENCY_HZ] [--depth DEPTH] [--mix MIX]
+                [--feedback FEEDBACK] [--resonance-hz RESONANCE_HZ]
+                [--resonance-q RESONANCE_Q] [--resonance-mix RESONANCE_MIX]
+                [--resonance-decay RESONANCE_DECAY] [--tv-map TV_MAP]
+                [--tv-interp {none,stairstep,nearest,linear,cubic,polynomial}]
+                [--tv-order TV_ORDER]
+                inputs [inputs ...]
+
+Ring modulation and resonator filtering with PVC-style controls.
+
+positional arguments:
+  inputs                Input files/globs or '-' for stdin
+
+options:
+  -h, --help            show this help message and exit
+  -o, --output-dir OUTPUT_DIR
+                        Output directory
+  --output, --out OUTPUT
+                        Explicit output file path (single-input mode only). Alias: --out
+  --suffix SUFFIX       Output filename suffix (default: _ring)
+  --output-format OUTPUT_FORMAT
+                        Output extension/format
+  --stdout              Write processed audio to stdout stream (for piping); requires exactly one input
+  --overwrite           Overwrite existing outputs
+  --dry-run             Resolve and print, but do not write files
+  --verbosity {silent,quiet,normal,verbose,debug}
+                        Console verbosity level
+  -v, --verbose         Increase verbosity (repeat for extra detail)
+  --quiet               Reduce output and hide status bars
+  --silent              Suppress all console output
+  --normalize {none,peak,rms}
+                        Output normalization mode
+  --peak-dbfs PEAK_DBFS
+                        Target peak dBFS when --normalize peak
+  --rms-dbfs RMS_DBFS   Target RMS dBFS when --normalize rms
+  --target-lufs TARGET_LUFS
+                        Integrated loudness ta
+... [truncated]
+```
+
+### Module Docstring
+
+```text
+Compatibility wrapper for `pvx.cli.pvxring`.
+```
+
+## `pvxringfilter.py`
+
+**Purpose:** Compatibility wrapper for `pvx.cli.pvxringfilter`.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvxringfilter.py --help`
+
+### CLI Help Snapshot
+
+```text
+usage: pvx ringfilter [-h] [-o OUTPUT_DIR] [--output OUTPUT] [--suffix SUFFIX]
+                      [--output-format OUTPUT_FORMAT] [--stdout] [--overwrite]
+                      [--dry-run]
+                      [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
+                      [--quiet] [--silent] [--normalize {none,peak,rms}]
+                      [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
+                      [--target-lufs TARGET_LUFS]
+                      [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
+                      [--compressor-ratio COMPRESSOR_RATIO]
+                      [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
+                      [--compressor-release-ms COMPRESSOR_RELEASE_MS]
+                      [--compressor-makeup-db COMPRESSOR_MAKEUP_DB]
+                      [--expander-threshold-db EXPANDER_THRESHOLD_DB]
+                      [--expander-ratio EXPANDER_RATIO]
+                      [--expander-attack-ms EXPANDER_ATTACK_MS]
+                      [--expander-release-ms EXPANDER_RELEASE_MS]
+                      [--compander-threshold-db COMPANDER_THRESHOLD_DB]
+                      [--compander-compress-ratio COMPANDER_COMPRESS_RATIO]
+                      [--compander-expand-ratio COMPANDER_EXPAND_RATIO]
+                      [--compander-attack-ms COMPANDER_ATTACK_MS]
+                      [--compander-release-ms COMPANDER_RELEASE_MS]
+                      [--compander-makeup-db COMPANDER_MAKEUP_DB]
+                      [--limiter-threshold LIMITER_THRESHOLD]
+                      [--soft-clip-level SOFT_CLIP_LEVEL]
+                      [--soft-clip-type {tanh,arctan,cubic}]
+                      [--soft-clip-drive SOFT_CLIP_DRIVE]
+                      [--hard-clip-level HARD_CLIP_LEVEL] [--clip]
+                      [--subtype SUBTYPE] [--bit-depth {inherit,16,24,32f}]
+                      [--dither {none,tpdf}] [--dither-seed DITHER_SEED]
+                      [--true-peak-max-dbtp TRUE_PEAK_MAX_DBTP]
+                      [--metadata-policy {none,sidecar,copy}] [--n-fft N_FFT]
+                      [--win-length WIN_LENGTH] [--hop-size HOP_SIZE]
+                      [--window {hann,hamming,blackman,blackmanharris,nuttall,flattop,blackman_nuttall,exact_blackman,sine,bartlett,boxcar,triangular,bartlett_hann,tukey,tukey_0p1,tukey_0p25,tukey_0p75,tukey_0p9,parzen,lanczos,welch,gaussian_0p25,gaussian_0p35,gaussian_0p45,gaussian_0p55,gaussian_0p65,general_gaussian_1p5_0p35,general_gaussian_2p0_0p35,general_gaussian_3p0_0p35,general_gaussian_4p0_0p35,exponential_0p25,exponential_0p5,exponential_1p0,cauchy_0p5,cauchy_1p0,cauchy_2p0,cosine_power_2,cosine_power_3,cosine_power_4,hann_poisson_0p5,hann_poisson_1p0,hann_poisson_2p0,general_hamming_0p50,general_hamming_0p60,general_hamming_0p70,general_hamming_0p80,bohman,cosine,kaiser,rect}]
+                      [--kaiser-beta KAISER_BETA]
+                      [--transform {fft,dft,czt,dct,dst,hartley}]
+                      [--phase-engine {propagate,hybrid,random}]
+                      [--ambient-phase-mix AMBIENT_PHASE_MIX]
+                      [--phase-random-seed PHASE_RANDOM_SEED]
+                      [--onset-time-credit]
+                      [--onset-credit-pull ONSET_CREDIT_PULL]
+                      [--onset-credit-max ONSET_CREDIT_MAX]
+                      [--no-onset-realign] [--no-center]
+                      [--device {auto,cpu,cuda}] [--cuda-device CUDA_DEVICE]
+                      [--operator {ring,ringfilter,ringtvfilter}]
+                      [--frequency-hz FREQUENCY_HZ] [--depth DEPTH]
+                      [--mix MIX] [--feedback FEEDBACK]
+                      [--resonance-hz RESONANCE_HZ]
+                      [--resonance-q RESONANCE_Q]
+                      [--resonance-mix RESONANCE_MIX]
+                      [--resonance-decay RESONANCE_DECAY] [--tv-map TV_MAP]
+                      [--tv-interp {none,stairstep,nearest,linear,cubic,polynomial}]
+                      [--tv-order TV_ORDER]
+                      inputs [inputs ...]
+
+Ring modulation and resonator filtering with PVC-style controls.
+
+positional arguments:
+  inputs                Input files/globs or '-' for stdin
+
+options:
+  -h, --help            show this help message and exit
+  -o, --output-dir OUTPUT_DIR
+                        Output directory
+  --output, --out OUTPUT
+                        Explicit output file path (single-input mode only). Alias: --out
+  --suffix SUFFIX       Output filename suffix (default: _ring)
+  --output-format OUTPUT_FORMAT
+                        Output extension/format
+  --stdout              Write processed audio to stdout stream (for piping); requires exactly one input
+  --overwrite           Overwrite existing outputs
+  --dry-run             Resolve and print, but do not write files
+  --verbosity {silent,quiet,normal,verbose,debug}
+                        Console verbosity level
+  -v, --verbose         Increase verbosity (repeat for extra detail)
+  --quiet               Reduce 
+... [truncated]
+```
+
+### Module Docstring
+
+```text
+Compatibility wrapper for `pvx.cli.pvxringfilter`.
+```
+
+## `pvxringtvfilter.py`
+
+**Purpose:** Compatibility wrapper for `pvx.cli.pvxringtvfilter`.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvxringtvfilter.py --help`
+
+### CLI Help Snapshot
+
+```text
+usage: pvx ringtvfilter [-h] [-o OUTPUT_DIR] [--output OUTPUT]
+                        [--suffix SUFFIX] [--output-format OUTPUT_FORMAT]
+                        [--stdout] [--overwrite] [--dry-run]
+                        [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
+                        [--quiet] [--silent] [--normalize {none,peak,rms}]
+                        [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
+                        [--target-lufs TARGET_LUFS]
+                        [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
+                        [--compressor-ratio COMPRESSOR_RATIO]
+                        [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
+                        [--compressor-release-ms COMPRESSOR_RELEASE_MS]
+                        [--compressor-makeup-db COMPRESSOR_MAKEUP_DB]
+                        [--expander-threshold-db EXPANDER_THRESHOLD_DB]
+                        [--expander-ratio EXPANDER_RATIO]
+                        [--expander-attack-ms EXPANDER_ATTACK_MS]
+                        [--expander-release-ms EXPANDER_RELEASE_MS]
+                        [--compander-threshold-db COMPANDER_THRESHOLD_DB]
+                        [--compander-compress-ratio COMPANDER_COMPRESS_RATIO]
+                        [--compander-expand-ratio COMPANDER_EXPAND_RATIO]
+                        [--compander-attack-ms COMPANDER_ATTACK_MS]
+                        [--compander-release-ms COMPANDER_RELEASE_MS]
+                        [--compander-makeup-db COMPANDER_MAKEUP_DB]
+                        [--limiter-threshold LIMITER_THRESHOLD]
+                        [--soft-clip-level SOFT_CLIP_LEVEL]
+                        [--soft-clip-type {tanh,arctan,cubic}]
+                        [--soft-clip-drive SOFT_CLIP_DRIVE]
+                        [--hard-clip-level HARD_CLIP_LEVEL] [--clip]
+                        [--subtype SUBTYPE] [--bit-depth {inherit,16,24,32f}]
+                        [--dither {none,tpdf}] [--dither-seed DITHER_SEED]
+                        [--true-peak-max-dbtp TRUE_PEAK_MAX_DBTP]
+                        [--metadata-policy {none,sidecar,copy}]
+                        [--n-fft N_FFT] [--win-length WIN_LENGTH]
+                        [--hop-size HOP_SIZE]
+                        [--window {hann,hamming,blackman,blackmanharris,nuttall,flattop,blackman_nuttall,exact_blackman,sine,bartlett,boxcar,triangular,bartlett_hann,tukey,tukey_0p1,tukey_0p25,tukey_0p75,tukey_0p9,parzen,lanczos,welch,gaussian_0p25,gaussian_0p35,gaussian_0p45,gaussian_0p55,gaussian_0p65,general_gaussian_1p5_0p35,general_gaussian_2p0_0p35,general_gaussian_3p0_0p35,general_gaussian_4p0_0p35,exponential_0p25,exponential_0p5,exponential_1p0,cauchy_0p5,cauchy_1p0,cauchy_2p0,cosine_power_2,cosine_power_3,cosine_power_4,hann_poisson_0p5,hann_poisson_1p0,hann_poisson_2p0,general_hamming_0p50,general_hamming_0p60,general_hamming_0p70,general_hamming_0p80,bohman,cosine,kaiser,rect}]
+                        [--kaiser-beta KAISER_BETA]
+                        [--transform {fft,dft,czt,dct,dst,hartley}]
+                        [--phase-engine {propagate,hybrid,random}]
+                        [--ambient-phase-mix AMBIENT_PHASE_MIX]
+                        [--phase-random-seed PHASE_RANDOM_SEED]
+                        [--onset-time-credit]
+                        [--onset-credit-pull ONSET_CREDIT_PULL]
+                        [--onset-credit-max ONSET_CREDIT_MAX]
+                        [--no-onset-realign] [--no-center]
+                        [--device {auto,cpu,cuda}] [--cuda-device CUDA_DEVICE]
+                        [--operator {ring,ringfilter,ringtvfilter}]
+                        [--frequency-hz FREQUENCY_HZ] [--depth DEPTH]
+                        [--mix MIX] [--feedback FEEDBACK]
+                        [--resonance-hz RESONANCE_HZ]
+                        [--resonance-q RESONANCE_Q]
+                        [--resonance-mix RESONANCE_MIX]
+                        [--resonance-decay RESONANCE_DECAY] [--tv-map TV_MAP]
+                        [--tv-interp {none,stairstep,nearest,linear,cubic,polynomial}]
+                        [--tv-order TV_ORDER]
+                        inputs [inputs ...]
+
+Ring modulation and resonator filtering with PVC-style controls.
+
+positional arguments:
+  inputs                Input files/globs or '-' for stdin
+
+options:
+  -h, --help            show this help message and exit
+  -o, --output-dir OUTPUT_DIR
+                        Output directory
+  --output, --out OUTPUT
+                        Explicit output file path (single-input mode only). Alias: --out
+  --suffix SUFFIX       Output filename suffix (default: _ring)
+  --output-format OUTPUT_FORMAT
+                        Output extension/format
+  --stdout              Write processed audio to stdout stream (for piping); requires exactly one input
+  --overwrite           Overwrite existing outputs
+  --dry-run             Resolve and print, but do not write files
+  --verbosity {silent,quiet,normal,verbose,debug}
+                  
+... [truncated]
+```
+
+### Module Docstring
+
+```text
+Compatibility wrapper for `pvx.cli.pvxringtvfilter`.
+```
+
+## `pvxspeccompander.py`
+
+**Purpose:** Compatibility wrapper for `pvx.cli.pvxspeccompander`.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvxspeccompander.py --help`
+
+### CLI Help Snapshot
+
+```text
+usage: pvx spec-compander [-h] [-o OUTPUT_DIR] [--output OUTPUT]
+                          [--suffix SUFFIX] [--output-format OUTPUT_FORMAT]
+                          [--stdout] [--overwrite] [--dry-run]
+                          [--verbosity {silent,quiet,normal,verbose,debug}]
+                          [-v] [--quiet] [--silent]
+                          [--normalize {none,peak,rms}]
+                          [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
+                          [--target-lufs TARGET_LUFS]
+                          [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
+                          [--compressor-ratio COMPRESSOR_RATIO]
+                          [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
+                          [--compressor-release-ms COMPRESSOR_RELEASE_MS]
+                          [--compressor-makeup-db COMPRESSOR_MAKEUP_DB]
+                          [--expander-threshold-db EXPANDER_THRESHOLD_DB]
+                          [--expander-ratio EXPANDER_RATIO]
+                          [--expander-attack-ms EXPANDER_ATTACK_MS]
+                          [--expander-release-ms EXPANDER_RELEASE_MS]
+                          [--compander-threshold-db COMPANDER_THRESHOLD_DB]
+                          [--compander-compress-ratio COMPANDER_COMPRESS_RATIO]
+                          [--compander-expand-ratio COMPANDER_EXPAND_RATIO]
+                          [--compander-attack-ms COMPANDER_ATTACK_MS]
+                          [--compander-release-ms COMPANDER_RELEASE_MS]
+                          [--compander-makeup-db COMPANDER_MAKEUP_DB]
+                          [--limiter-threshold LIMITER_THRESHOLD]
+                          [--soft-clip-level SOFT_CLIP_LEVEL]
+                          [--soft-clip-type {tanh,arctan,cubic}]
+                          [--soft-clip-drive SOFT_CLIP_DRIVE]
+                          [--hard-clip-level HARD_CLIP_LEVEL] [--clip]
+                          [--subtype SUBTYPE]
+                          [--bit-depth {inherit,16,24,32f}]
+                          [--dither {none,tpdf}] [--dither-seed DITHER_SEED]
+                          [--true-peak-max-dbtp TRUE_PEAK_MAX_DBTP]
+                          [--metadata-policy {none,sidecar,copy}]
+                          [--n-fft N_FFT] [--win-length WIN_LENGTH]
+                          [--hop-size HOP_SIZE]
+                          [--window {hann,hamming,blackman,blackmanharris,nuttall,flattop,blackman_nuttall,exact_blackman,sine,bartlett,boxcar,triangular,bartlett_hann,tukey,tukey_0p1,tukey_0p25,tukey_0p75,tukey_0p9,parzen,lanczos,welch,gaussian_0p25,gaussian_0p35,gaussian_0p45,gaussian_0p55,gaussian_0p65,general_gaussian_1p5_0p35,general_gaussian_2p0_0p35,general_gaussian_3p0_0p35,general_gaussian_4p0_0p35,exponential_0p25,exponential_0p5,exponential_1p0,cauchy_0p5,cauchy_1p0,cauchy_2p0,cosine_power_2,cosine_power_3,cosine_power_4,hann_poisson_0p5,hann_poisson_1p0,hann_poisson_2p0,general_hamming_0p50,general_hamming_0p60,general_hamming_0p70,general_hamming_0p80,bohman,cosine,kaiser,rect}]
+                          [--kaiser-beta KAISER_BETA]
+                          [--transform {fft,dft,czt,dct,dst,hartley}]
+                          [--phase-engine {propagate,hybrid,random}]
+                          [--ambient-phase-mix AMBIENT_PHASE_MIX]
+                          [--phase-random-seed PHASE_RANDOM_SEED]
+                          [--onset-time-credit]
+                          [--onset-credit-pull ONSET_CREDIT_PULL]
+                          [--onset-credit-max ONSET_CREDIT_MAX]
+                          [--no-onset-realign] [--no-center]
+                          [--device {auto,cpu,cuda}]
+                          [--cuda-device CUDA_DEVICE]
+                          [--operator {filter,tvfilter,noisefilter,bandamp,spec-compander}]
+                          --response RESPONSE [--response-mix RESPONSE_MIX]
+                          [--dry-mix DRY_MIX]
+                          [--response-gain-db RESPONSE_GAIN_DB]
+                          [--transpose-semitones TRANSPOSE_SEMITONES]
+                          [--shift-bins SHIFT_BINS] [--tv-map TV_MAP]
+                          [--tv-key TV_KEY]
+                          [--tv-interp {none,stairstep,nearest,linear,cubic,polynomial}]
+                          [--tv-order TV_ORDER] [--noise-floor NOISE_FLOOR]
+                          [--band-gain-db BAND_GAIN_DB]
+                          [--band-width-bins BAND_WIDTH_BINS]
+                          [--peak-count PEAK_COUNT]
+                          [--comp-threshold-db COMP_THRESHOLD_DB]
+                          [--comp-ratio COMP_RATIO]
+                          [--expand-ratio EXPAND_RATIO]
+                          inputs [inputs ...]
+
+Response-driven spectral processing using PVXRF artifacts.
+
+positional arguments:
+  inputs                Input files/globs or '-' for stdin
+
+options:
+  -h, --help            show this help message and exit
+  -o, --output-dir OUTPUT_DIR
+                        
+... [truncated]
+```
+
+### Module Docstring
+
+```text
+Compatibility wrapper for `pvx.cli.pvxspeccompander`.
+```
+
 ## `pvxtransient.py`
 
 **Purpose:** Compatibility wrapper.
@@ -1478,6 +2559,103 @@ Compatibility wrapper.
 
 This root module forwards imports/execution to `pvx.cli.pvxtransient` after the
 src-layout migration.
+```
+
+## `pvxtvfilter.py`
+
+**Purpose:** Compatibility wrapper for `pvx.cli.pvxtvfilter`.
+
+**Classes:** None
+**Functions:** None
+
+**Help commands:** `python3 pvxtvfilter.py --help`
+
+### CLI Help Snapshot
+
+```text
+usage: pvx tvfilter [-h] [-o OUTPUT_DIR] [--output OUTPUT] [--suffix SUFFIX]
+                    [--output-format OUTPUT_FORMAT] [--stdout] [--overwrite]
+                    [--dry-run]
+                    [--verbosity {silent,quiet,normal,verbose,debug}] [-v]
+                    [--quiet] [--silent] [--normalize {none,peak,rms}]
+                    [--peak-dbfs PEAK_DBFS] [--rms-dbfs RMS_DBFS]
+                    [--target-lufs TARGET_LUFS]
+                    [--compressor-threshold-db COMPRESSOR_THRESHOLD_DB]
+                    [--compressor-ratio COMPRESSOR_RATIO]
+                    [--compressor-attack-ms COMPRESSOR_ATTACK_MS]
+                    [--compressor-release-ms COMPRESSOR_RELEASE_MS]
+                    [--compressor-makeup-db COMPRESSOR_MAKEUP_DB]
+                    [--expander-threshold-db EXPANDER_THRESHOLD_DB]
+                    [--expander-ratio EXPANDER_RATIO]
+                    [--expander-attack-ms EXPANDER_ATTACK_MS]
+                    [--expander-release-ms EXPANDER_RELEASE_MS]
+                    [--compander-threshold-db COMPANDER_THRESHOLD_DB]
+                    [--compander-compress-ratio COMPANDER_COMPRESS_RATIO]
+                    [--compander-expand-ratio COMPANDER_EXPAND_RATIO]
+                    [--compander-attack-ms COMPANDER_ATTACK_MS]
+                    [--compander-release-ms COMPANDER_RELEASE_MS]
+                    [--compander-makeup-db COMPANDER_MAKEUP_DB]
+                    [--limiter-threshold LIMITER_THRESHOLD]
+                    [--soft-clip-level SOFT_CLIP_LEVEL]
+                    [--soft-clip-type {tanh,arctan,cubic}]
+                    [--soft-clip-drive SOFT_CLIP_DRIVE]
+                    [--hard-clip-level HARD_CLIP_LEVEL] [--clip]
+                    [--subtype SUBTYPE] [--bit-depth {inherit,16,24,32f}]
+                    [--dither {none,tpdf}] [--dither-seed DITHER_SEED]
+                    [--true-peak-max-dbtp TRUE_PEAK_MAX_DBTP]
+                    [--metadata-policy {none,sidecar,copy}] [--n-fft N_FFT]
+                    [--win-length WIN_LENGTH] [--hop-size HOP_SIZE]
+                    [--window {hann,hamming,blackman,blackmanharris,nuttall,flattop,blackman_nuttall,exact_blackman,sine,bartlett,boxcar,triangular,bartlett_hann,tukey,tukey_0p1,tukey_0p25,tukey_0p75,tukey_0p9,parzen,lanczos,welch,gaussian_0p25,gaussian_0p35,gaussian_0p45,gaussian_0p55,gaussian_0p65,general_gaussian_1p5_0p35,general_gaussian_2p0_0p35,general_gaussian_3p0_0p35,general_gaussian_4p0_0p35,exponential_0p25,exponential_0p5,exponential_1p0,cauchy_0p5,cauchy_1p0,cauchy_2p0,cosine_power_2,cosine_power_3,cosine_power_4,hann_poisson_0p5,hann_poisson_1p0,hann_poisson_2p0,general_hamming_0p50,general_hamming_0p60,general_hamming_0p70,general_hamming_0p80,bohman,cosine,kaiser,rect}]
+                    [--kaiser-beta KAISER_BETA]
+                    [--transform {fft,dft,czt,dct,dst,hartley}]
+                    [--phase-engine {propagate,hybrid,random}]
+                    [--ambient-phase-mix AMBIENT_PHASE_MIX]
+                    [--phase-random-seed PHASE_RANDOM_SEED]
+                    [--onset-time-credit]
+                    [--onset-credit-pull ONSET_CREDIT_PULL]
+                    [--onset-credit-max ONSET_CREDIT_MAX] [--no-onset-realign]
+                    [--no-center] [--device {auto,cpu,cuda}]
+                    [--cuda-device CUDA_DEVICE]
+                    [--operator {filter,tvfilter,noisefilter,bandamp,spec-compander}]
+                    --response RESPONSE [--response-mix RESPONSE_MIX]
+                    [--dry-mix DRY_MIX] [--response-gain-db RESPONSE_GAIN_DB]
+                    [--transpose-semitones TRANSPOSE_SEMITONES]
+                    [--shift-bins SHIFT_BINS] [--tv-map TV_MAP]
+                    [--tv-key TV_KEY]
+                    [--tv-interp {none,stairstep,nearest,linear,cubic,polynomial}]
+                    [--tv-order TV_ORDER] [--noise-floor NOISE_FLOOR]
+                    [--band-gain-db BAND_GAIN_DB]
+                    [--band-width-bins BAND_WIDTH_BINS]
+                    [--peak-count PEAK_COUNT]
+                    [--comp-threshold-db COMP_THRESHOLD_DB]
+                    [--comp-ratio COMP_RATIO] [--expand-ratio EXPAND_RATIO]
+                    inputs [inputs ...]
+
+Response-driven spectral processing using PVXRF artifacts.
+
+positional arguments:
+  inputs                Input files/globs or '-' for stdin
+
+options:
+  -h, --help            show this help message and exit
+  -o, --output-dir OUTPUT_DIR
+                        Output directory
+  --output, --out OUTPUT
+                        Explicit output file path (single-input mode only). Alias: --out
+  --suffix SUFFIX       Output filename suffix (default: _filter)
+  --output-format OUTPUT_FORMAT
+                        Output extension/format
+  --stdout              Write processed audio to stdout stream (for piping); requires exactly one input
+  --overwrite           Overwrite existing outputs
+  --dry-run             Resolve and print, but do not write files
+
+... [truncated]
+```
+
+### Module Docstring
+
+```text
+Compatibility wrapper for `pvx.cli.pvxtvfilter`.
 ```
 
 ## `pvxunison.py`
@@ -1981,7 +3159,7 @@ Analysis, QA, and Automation algorithm scaffolds.
 **Algorithm ID:** `analysis_qa_and_automation.auto_parameter_tuning_bayesian_optimization`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2011,7 +3189,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `analysis_qa_and_automation.batch_preset_recommendation_based_on_source_features`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2041,7 +3219,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `analysis_qa_and_automation.clip_hum_buzz_artifact_detection`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2071,7 +3249,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `analysis_qa_and_automation.key_chord_detection`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2101,7 +3279,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `analysis_qa_and_automation.onset_beat_downbeat_tracking`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2131,7 +3309,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `analysis_qa_and_automation.pesq_stoi_visqol_quality_metrics`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2161,7 +3339,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `analysis_qa_and_automation.silence_speech_music_classifiers`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2191,7 +3369,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `analysis_qa_and_automation.structure_segmentation_verse_chorus_sections`
 **Theme:** `Analysis, QA, and Automation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2247,7 +3425,7 @@ Creative Spectral Effects algorithm scaffolds.
 **Algorithm ID:** `creative_spectral_effects.cross_synthesis_vocoder`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2277,7 +3455,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `creative_spectral_effects.formant_painting_warping`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2307,7 +3485,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `creative_spectral_effects.phase_randomization_textures`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2337,7 +3515,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `creative_spectral_effects.resonator_filterbank_morphing`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2367,7 +3545,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `creative_spectral_effects.spectral_blur_smear`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2397,7 +3575,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `creative_spectral_effects.spectral_contrast_exaggeration`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2427,7 +3605,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `creative_spectral_effects.spectral_convolution_effects`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2457,7 +3635,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `creative_spectral_effects.spectral_freeze_banks`
 **Theme:** `Creative Spectral Effects`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2500,7 +3678,7 @@ Denoise and Restoration algorithm scaffolds.
 **Algorithm ID:** `denoise_and_restoration.declick_decrackle_median_wavelet_interpolation`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2530,7 +3708,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `denoise_and_restoration.declip_via_sparse_reconstruction`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2560,7 +3738,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `denoise_and_restoration.diffusion_based_speech_audio_denoise`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2590,7 +3768,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `denoise_and_restoration.log_mmse`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2620,7 +3798,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `denoise_and_restoration.minimum_statistics_noise_tracking`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2650,7 +3828,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `denoise_and_restoration.mmse_stsa`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2680,7 +3858,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `denoise_and_restoration.rnnoise_style_denoiser`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2710,7 +3888,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `denoise_and_restoration.wiener_denoising`
 **Theme:** `Denoise and Restoration`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2753,7 +3931,7 @@ Dereverb and Room Correction algorithm scaffolds.
 **Algorithm ID:** `dereverb_and_room_correction.blind_deconvolution_dereverb`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2783,7 +3961,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dereverb_and_room_correction.drr_guided_dereverb`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2813,7 +3991,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dereverb_and_room_correction.late_reverb_suppression_via_coherence`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2843,7 +4021,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dereverb_and_room_correction.multi_band_adaptive_deverb`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2873,7 +4051,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dereverb_and_room_correction.neural_dereverb_module`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2903,7 +4081,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dereverb_and_room_correction.room_impulse_inverse_filtering`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2933,7 +4111,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dereverb_and_room_correction.spectral_decay_subtraction`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -2963,7 +4141,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dereverb_and_room_correction.wpe_dereverberation`
 **Theme:** `Dereverb and Room Correction`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3006,7 +4184,7 @@ Dynamics and Loudness algorithm scaffolds.
 **Algorithm ID:** `dynamics_and_loudness.ebu_r128_normalization`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3036,7 +4214,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dynamics_and_loudness.itu_bs_1770_loudness_measurement_gating`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3066,7 +4244,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dynamics_and_loudness.lufs_target_mastering_chain`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3096,7 +4274,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dynamics_and_loudness.multi_band_compression`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3126,7 +4304,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dynamics_and_loudness.spectral_dynamics_bin_wise_compressor_expander`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3156,7 +4334,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dynamics_and_loudness.transient_shaping`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3186,7 +4364,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dynamics_and_loudness.true_peak_limiting`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3216,7 +4394,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `dynamics_and_loudness.upward_compression`
 **Theme:** `Dynamics and Loudness`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3259,7 +4437,7 @@ Granular and Modulation algorithm scaffolds.
 **Algorithm ID:** `granular_and_modulation.am_fm_ring_modulation_blocks`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3289,7 +4467,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `granular_and_modulation.envelope_followed_modulation_routing`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3319,7 +4497,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `granular_and_modulation.formant_lfo_modulation`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3349,7 +4527,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `granular_and_modulation.freeze_grain_morphing`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3379,7 +4557,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `granular_and_modulation.grain_cloud_pitch_textures`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3409,7 +4587,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `granular_and_modulation.granular_time_stretch_engine`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3439,7 +4617,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `granular_and_modulation.rhythmic_gate_stutter_quantizer`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3469,7 +4647,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `granular_and_modulation.spectral_tremolo`
 **Theme:** `Granular and Modulation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3512,7 +4690,7 @@ Pitch Detection and Tracking algorithm scaffolds.
 **Algorithm ID:** `pitch_detection_and_tracking.crepe_style_neural_f0`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3542,7 +4720,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `pitch_detection_and_tracking.harmonic_product_spectrum_hps`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3572,7 +4750,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `pitch_detection_and_tracking.pyin`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3602,7 +4780,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `pitch_detection_and_tracking.rapt`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3632,7 +4810,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `pitch_detection_and_tracking.subharmonic_summation`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3662,7 +4840,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `pitch_detection_and_tracking.swipe`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3692,7 +4870,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `pitch_detection_and_tracking.viterbi_smoothed_pitch_contour_tracking`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3722,7 +4900,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `pitch_detection_and_tracking.yin`
 **Theme:** `Pitch Detection and Tracking`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3778,7 +4956,7 @@ Retune and Intonation algorithm scaffolds.
 **Algorithm ID:** `retune_and_intonation.adaptive_intonation_context_sensitive_intervals`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3808,7 +4986,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `retune_and_intonation.chord_aware_retuning`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3838,7 +5016,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `retune_and_intonation.just_intonation_mapping_per_key_center`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3868,7 +5046,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `retune_and_intonation.key_aware_retuning_with_confidence_weighting`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3898,7 +5076,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `retune_and_intonation.portamento_aware_retune_curves`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3928,7 +5106,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `retune_and_intonation.scala_mts_scale_import_and_quantization`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3958,7 +5136,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `retune_and_intonation.time_varying_cents_maps`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -3988,7 +5166,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `retune_and_intonation.vibrato_preserving_correction`
 **Theme:** `Retune and Intonation`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4031,7 +5209,7 @@ Separation and Decomposition algorithm scaffolds.
 **Algorithm ID:** `separation_and_decomposition.demucs_style_stem_separation_backend`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4061,7 +5239,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `separation_and_decomposition.ica_bss_for_multichannel_stems`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4091,7 +5269,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `separation_and_decomposition.nmf_decomposition`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4121,7 +5299,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `separation_and_decomposition.probabilistic_latent_component_separation`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4151,7 +5329,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `separation_and_decomposition.rpca_hpss`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4181,7 +5359,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `separation_and_decomposition.sinusoidal_residual_transient_decomposition`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4211,7 +5389,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `separation_and_decomposition.tensor_decomposition_cp_tucker`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4241,7 +5419,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `separation_and_decomposition.u_net_vocal_accompaniment_split`
 **Theme:** `Separation and Decomposition`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4297,7 +5475,7 @@ Spatial and multichannel: creative spatial fx.
 **Algorithm ID:** `spatial_and_multichannel.binaural_motion_trajectory_designer`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4327,7 +5505,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.decorrelated_reverb_upmix`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4357,7 +5535,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.rotating_speaker_doppler_field`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4387,7 +5565,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.spatial_freeze_resynthesis`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4417,7 +5595,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.spectral_spatial_granulator`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4447,7 +5625,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.stochastic_spatial_diffusion_cloud`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4490,7 +5668,7 @@ Spatial and multichannel: imaging and panning.
 **Algorithm ID:** `spatial_and_multichannel.binaural_itd_ild_synthesis`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4520,7 +5698,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.dbap_distance_based_amplitude_panning`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4550,7 +5728,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.phase_aligned_mid_side_field_rotation`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4580,7 +5758,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.stereo_width_frequency_dependent_control`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4610,7 +5788,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.transaural_crosstalk_cancellation`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4640,7 +5818,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.vbap_adaptive_panning`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4683,7 +5861,7 @@ Spatial and multichannel: multichannel restoration.
 **Algorithm ID:** `spatial_and_multichannel.coherence_based_dereverb_multichannel`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4713,7 +5891,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.cross_channel_click_pop_repair`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4743,7 +5921,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.microphone_array_calibration_tones`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4773,7 +5951,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.multichannel_noise_psd_tracking`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4803,7 +5981,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.multichannel_wiener_postfilter`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4833,7 +6011,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.phase_consistent_multichannel_denoise`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4876,7 +6054,7 @@ Spatial and multichannel: phase vocoder spatial.
 **Algorithm ID:** `spatial_and_multichannel.pvx_directional_spectral_warp`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4906,7 +6084,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.pvx_interaural_coherence_shaping`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4936,7 +6114,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.pvx_interchannel_phase_locking`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4966,7 +6144,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.pvx_multichannel_time_alignment`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -4996,7 +6174,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.pvx_spatial_freeze_and_trajectory`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5026,7 +6204,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spatial_and_multichannel.pvx_spatial_transient_preservation`
 **Theme:** `Spatial and Multichannel`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5069,7 +6247,7 @@ Spectral and Time-Frequency Transforms algorithm scaffolds.
 **Algorithm ID:** `spectral_time_frequency_transforms.chirplet_transform_analysis`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5099,7 +6277,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spectral_time_frequency_transforms.constant_q_transform_cqt_processing`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5129,7 +6307,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spectral_time_frequency_transforms.multi_window_stft_fusion`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5159,7 +6337,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spectral_time_frequency_transforms.nsgt_based_processing`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5189,7 +6367,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spectral_time_frequency_transforms.reassigned_spectrogram_methods`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5219,7 +6397,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spectral_time_frequency_transforms.synchrosqueezed_stft`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5249,7 +6427,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spectral_time_frequency_transforms.variable_q_transform_vqt`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5279,7 +6457,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `spectral_time_frequency_transforms.wavelet_packet_processing`
 **Theme:** `Spectral and Time-Frequency Transforms`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5322,7 +6500,7 @@ Time-Scale and Pitch Core algorithm scaffolds.
 **Algorithm ID:** `time_scale_and_pitch_core.beat_synchronous_time_warping`
 **Theme:** `Time-Scale and Pitch Core`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5352,7 +6530,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `time_scale_and_pitch_core.harmonic_percussive_split_tsm`
 **Theme:** `Time-Scale and Pitch Core`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5382,7 +6560,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `time_scale_and_pitch_core.lp_psola`
 **Theme:** `Time-Scale and Pitch Core`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5412,7 +6590,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `time_scale_and_pitch_core.multi_resolution_phase_vocoder`
 **Theme:** `Time-Scale and Pitch Core`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5442,7 +6620,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `time_scale_and_pitch_core.nonlinear_time_maps`
 **Theme:** `Time-Scale and Pitch Core`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5472,7 +6650,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `time_scale_and_pitch_core.td_psola`
 **Theme:** `Time-Scale and Pitch Core`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5502,7 +6680,7 @@ I/O contract, and parameter-routing behavior.
 **Algorithm ID:** `time_scale_and_pitch_core.wsola_waveform_similarity_overlap_add`
 **Theme:** `Time-Scale and Pitch Core`
 **Primary API:** `process(audio, sample_rate, **params) -> AlgorithmResult`
-**Parameter docs:** see `/Users/cleider/dev/pvx/docs/pvx_ALGORITHM_PARAMS.md`.
+**Parameter docs:** see [docs/PVX_ALGORITHM_PARAMS.md](PVX_ALGORITHM_PARAMS.md).
 
 **Classes:** None
 **Functions:** `process`, `module_help_text`, `build_parser`, `main`
@@ -5583,6 +6761,51 @@ Compatibility entrypoint for the unified pvx CLI.
 Unified top-level CLI for the pvx command suite.
 ```
 
+## `src/pvx/cli/pvxanalysis.py`
+
+**Purpose:** Persist and inspect reusable phase-vocoder analysis artifacts (PVXAN).
+
+**Classes:** None
+**Functions:** `_normalize_argv`, `_default_output_path`, `_print_summary`, `_write_json`, `build_parser`, `_validate_create_args`, `_run_create`, `_run_inspect`, `main`
+
+**Help commands:** `python3 src/pvx/cli/pvxanalysis.py`, `python3 src/pvx/cli/pvxanalysis.py --help`
+
+### Module Docstring
+
+```text
+Persist and inspect reusable phase-vocoder analysis artifacts (PVXAN).
+```
+
+## `src/pvx/cli/pvxbandamp.py`
+
+**Purpose:** Response-peak band emphasis wrapper.
+
+**Classes:** None
+**Functions:** `main`
+
+**Help commands:** `python3 src/pvx/cli/pvxbandamp.py`
+
+### Module Docstring
+
+```text
+Response-peak band emphasis wrapper.
+```
+
+## `src/pvx/cli/pvxchordmapper.py`
+
+**Purpose:** Chordmapper wrapper.
+
+**Classes:** None
+**Functions:** `main`
+
+**Help commands:** `python3 src/pvx/cli/pvxchordmapper.py`
+
+### Module Docstring
+
+```text
+Chordmapper wrapper.
+```
+
 ## `src/pvx/cli/pvxconform.py`
 
 **Purpose:** Conform timing and pitch to a user-provided segment map.
@@ -5628,6 +6851,21 @@ Phase-consistent spectral denoiser.
 Spectral tail suppression for dereverberation-like cleanup.
 ```
 
+## `src/pvx/cli/pvxfilter.py`
+
+**Purpose:** PVC-inspired response-driven spectral operators.
+
+**Classes:** None
+**Functions:** `build_parser`, `run_filter_cli`, `main`
+
+**Help commands:** `python3 src/pvx/cli/pvxfilter.py`, `python3 src/pvx/cli/pvxfilter.py --help`
+
+### Module Docstring
+
+```text
+PVC-inspired response-driven spectral operators.
+```
+
 ## `src/pvx/cli/pvxformant.py`
 
 **Purpose:** Formant processing tool with optional pitch shifting.
@@ -5658,6 +6896,21 @@ Formant processing tool with optional pitch shifting.
 Spectral freeze tool built on pvx phase-vocoder primitives.
 ```
 
+## `src/pvx/cli/pvxharmmap.py`
+
+**Purpose:** PVC-inspired harmonic/chord spectral mapping CLI.
+
+**Classes:** None
+**Functions:** `build_parser`, `run_harmmap_cli`, `main`
+
+**Help commands:** `python3 src/pvx/cli/pvxharmmap.py`, `python3 src/pvx/cli/pvxharmmap.py --help`
+
+### Module Docstring
+
+```text
+PVC-inspired harmonic/chord spectral mapping CLI.
+```
+
 ## `src/pvx/cli/pvxharmonize.py`
 
 **Purpose:** Multi-voice harmonizer built from phase-vocoder pitch shifts.
@@ -5671,6 +6924,21 @@ Spectral freeze tool built on pvx phase-vocoder primitives.
 
 ```text
 Multi-voice harmonizer built from phase-vocoder pitch shifts.
+```
+
+## `src/pvx/cli/pvxinharmonator.py`
+
+**Purpose:** Inharmonator wrapper.
+
+**Classes:** None
+**Functions:** `main`
+
+**Help commands:** `python3 src/pvx/cli/pvxinharmonator.py`
+
+### Module Docstring
+
+```text
+Inharmonator wrapper.
 ```
 
 ## `src/pvx/cli/pvxlayer.py`
@@ -5703,6 +6971,36 @@ Layered harmonic/percussive processing with independent controls.
 Spectral morphing between two input files.
 ```
 
+## `src/pvx/cli/pvxnoisefilter.py`
+
+**Purpose:** Response-profile noise filter wrapper.
+
+**Classes:** None
+**Functions:** `main`
+
+**Help commands:** `python3 src/pvx/cli/pvxnoisefilter.py`
+
+### Module Docstring
+
+```text
+Response-profile noise filter wrapper.
+```
+
+## `src/pvx/cli/pvxresponse.py`
+
+**Purpose:** Create and inspect reusable frequency-response artifacts (PVXRF).
+
+**Classes:** None
+**Functions:** `_normalize_argv`, `_default_output_path`, `_print_summary`, `_write_json`, `build_parser`, `_run_create`, `_run_inspect`, `main`
+
+**Help commands:** `python3 src/pvx/cli/pvxresponse.py`, `python3 src/pvx/cli/pvxresponse.py --help`
+
+### Module Docstring
+
+```text
+Create and inspect reusable frequency-response artifacts (PVXRF).
+```
+
 ## `src/pvx/cli/pvxretune.py`
 
 **Purpose:** Monophonic retuning with phase-vocoder segment processing.
@@ -5718,6 +7016,66 @@ Spectral morphing between two input files.
 Monophonic retuning with phase-vocoder segment processing.
 ```
 
+## `src/pvx/cli/pvxring.py`
+
+**Purpose:** PVC-inspired ring and resonator operators.
+
+**Classes:** None
+**Functions:** `build_parser`, `run_ring_cli`, `main`
+
+**Help commands:** `python3 src/pvx/cli/pvxring.py`, `python3 src/pvx/cli/pvxring.py --help`
+
+### Module Docstring
+
+```text
+PVC-inspired ring and resonator operators.
+```
+
+## `src/pvx/cli/pvxringfilter.py`
+
+**Purpose:** Ring + resonator filter wrapper.
+
+**Classes:** None
+**Functions:** `main`
+
+**Help commands:** `python3 src/pvx/cli/pvxringfilter.py`
+
+### Module Docstring
+
+```text
+Ring + resonator filter wrapper.
+```
+
+## `src/pvx/cli/pvxringtvfilter.py`
+
+**Purpose:** Time-varying ring + resonator filter wrapper.
+
+**Classes:** None
+**Functions:** `main`
+
+**Help commands:** `python3 src/pvx/cli/pvxringtvfilter.py`
+
+### Module Docstring
+
+```text
+Time-varying ring + resonator filter wrapper.
+```
+
+## `src/pvx/cli/pvxspeccompander.py`
+
+**Purpose:** Response-referenced spectral compander wrapper.
+
+**Classes:** None
+**Functions:** `main`
+
+**Help commands:** `python3 src/pvx/cli/pvxspeccompander.py`
+
+### Module Docstring
+
+```text
+Response-referenced spectral compander wrapper.
+```
+
 ## `src/pvx/cli/pvxtransient.py`
 
 **Purpose:** Transient-aware time/pitch processing.
@@ -5731,6 +7089,21 @@ Monophonic retuning with phase-vocoder segment processing.
 
 ```text
 Transient-aware time/pitch processing.
+```
+
+## `src/pvx/cli/pvxtvfilter.py`
+
+**Purpose:** Time-varying response filter wrapper.
+
+**Classes:** None
+**Functions:** `main`
+
+**Help commands:** `python3 src/pvx/cli/pvxtvfilter.py`
+
+### Module Docstring
+
+```text
+Time-varying response filter wrapper.
 ```
 
 ## `src/pvx/cli/pvxunison.py`
@@ -5774,6 +7147,26 @@ Time-warp an input according to a user-provided stretch map.
 
 ```text
 Core DSP/runtime internals shared by pvx CLI tools.
+```
+
+## `src/pvx/core/analysis_store.py`
+
+**Purpose:** Persistent phase-vocoder analysis artifact storage.
+
+**Classes:** `AnalysisArtifact`
+**Functions:** `_utc_now_iso`, `_as_complex_spectrum`, `_canonical_meta`, `analysis_digest`, `summarize_analysis_artifact`, `analyze_audio`, `save_analysis_artifact`, `load_analysis_artifact`
+
+### Module Docstring
+
+```text
+Persistent phase-vocoder analysis artifact storage.
+
+PVXAN schema:
+- container: NumPy NPZ (compressed)
+- required members:
+  - meta_json: UTF-8 JSON metadata payload
+  - spectrum_real: float64 array, shape (channels, frames, bins)
+  - spectrum_imag: float64 array, shape (channels, frames, bins)
 ```
 
 ## `src/pvx/core/attribution.py`
@@ -5865,6 +7258,82 @@ Shared output policy helpers for bit depth, dither, true-peak, and metadata side
 
 ```text
 Preset definitions for pvx processing intent modes.
+```
+
+## `src/pvx/core/pvc_harmony.py`
+
+**Purpose:** PVC-inspired harmonic/chord spectral mapping for pvx.
+
+**Classes:** None
+**Functions:** `_coerce_audio`, `chord_mapper_mask`, `_inharmonic_inverse_map`, `_interp_mag_phase_from_freq`, `process_harmony_operator`
+
+### Module Docstring
+
+```text
+PVC-inspired harmonic/chord spectral mapping for pvx.
+
+Phase 5 coverage:
+- chordmapper
+- inharmonator
+```
+
+## `src/pvx/core/pvc_ops.py`
+
+**Purpose:** PVC-inspired response-driven spectral operators for pvx.
+
+**Classes:** None
+**Functions:** `db_to_amp`, `_coerce_audio`, `_resize_curve`, `_shift_response_curve`, `_read_rows_from_map`, `load_scalar_control_points`, `evaluate_scalar_control`, `_frame_times`, `_blend_dry_wet`, `_compute_band_shape`, `process_response_operator`
+
+### Module Docstring
+
+```text
+PVC-inspired response-driven spectral operators for pvx.
+
+Phase 3 coverage:
+- filter
+- tvfilter
+- noisefilter
+- bandamp
+- spec-compander
+```
+
+## `src/pvx/core/pvc_resonators.py`
+
+**Purpose:** PVC-inspired ring/resonator operators for pvx.
+
+**Classes:** None
+**Functions:** `_coerce_audio`, `_sample_times`, `_ring_modulate`, `_resonant_peak_filter`, `process_ring_operator`
+
+### Module Docstring
+
+```text
+PVC-inspired ring/resonator operators for pvx.
+
+Phase 4 coverage:
+- ring
+- ringfilter
+- ringtvfilter
+```
+
+## `src/pvx/core/response_store.py`
+
+**Purpose:** Persistent frequency-response artifact storage.
+
+**Classes:** `ResponseArtifact`
+**Functions:** `_canonical_meta`, `_moving_average_1d`, `_aggregate_magnitude`, `_aggregate_phase`, `_normalize_magnitude`, `response_digest`, `summarize_response_artifact`, `response_from_analysis`, `save_response_artifact`, `load_response_artifact`
+
+### Module Docstring
+
+```text
+Persistent frequency-response artifact storage.
+
+PVXRF schema:
+- container: NumPy NPZ (compressed)
+- required members:
+  - meta_json: UTF-8 JSON metadata payload
+  - frequencies_hz: float64 array, shape (bins,)
+  - magnitude: float64 array, shape (channels, bins)
+  - phase: float64 array, shape (channels, bins)
 ```
 
 ## `src/pvx/core/stereo.py`
@@ -6018,6 +7487,21 @@ Regression smoke tests for all generated pvx algorithm modules.
 This test verifies that every algorithm listed in `pvxalgorithms.registry`
 is importable and can process a synthetic stereo signal while returning
 finite 2D output and implemented metadata status.
+```
+
+## `tests/test_analysis_response_store.py`
+
+**Purpose:** Unit tests for PVXAN/PVXRF artifact storage and determinism.
+
+**Classes:** `TestAnalysisResponseStore`
+**Functions:** None
+
+**Help commands:** `python3 tests/test_analysis_response_store.py`
+
+### Module Docstring
+
+```text
+Unit tests for PVXAN/PVXRF artifact storage and determinism.
 ```
 
 ## `tests/test_audio_metrics.py`
@@ -6180,6 +7664,21 @@ microtonal pitch controls produce expected conversion outputs.
 
 ```text
 Unit tests for shared output policy helpers.
+```
+
+## `tests/test_pvc_phase3_5.py`
+
+**Purpose:** Unit tests for PVC-inspired Phase 3-5 core operators.
+
+**Classes:** `TestPVCPhase3To5`
+**Functions:** None
+
+**Help commands:** `python3 tests/test_pvc_phase3_5.py`
+
+### Module Docstring
+
+```text
+Unit tests for PVC-inspired Phase 3-5 core operators.
 ```
 
 ## `tests/test_transient_and_stereo.py`

@@ -2612,7 +2612,10 @@ def render_cli_flags_page() -> None:
     sections.append(
         "<div class=\"card\">"
         f"<p>Total unique long flags: <strong>{len(payload.get('unique_flags', [])) if isinstance(payload, dict) else 0}</strong></p>"
-        "<p>Source index: <code>docs/CLI_FLAGS_REFERENCE.md</code> and <code>docs/cli_flags_reference.json</code>.</p>"
+        "<p>Source index: "
+        "<a href=\"../CLI_FLAGS_REFERENCE.md\"><code>docs/CLI_FLAGS_REFERENCE.md</code></a> and "
+        "<a href=\"../cli_flags_reference.json\"><code>docs/cli_flags_reference.json</code></a>."
+        "</p>"
         "</div>"
     )
 
@@ -2795,7 +2798,9 @@ def render_cookbook_page() -> None:
     sections.append(
         "<div class=\"card\">"
         "<p>Pipeline cookbook for practical one-liners, including Unix pipes and mastering chains.</p>"
-        "<p>Markdown source: <code>docs/PIPELINE_COOKBOOK.md</code>.</p>"
+        "<p>Markdown source: "
+        "<a href=\"../PIPELINE_COOKBOOK.md\"><code>docs/PIPELINE_COOKBOOK.md</code></a>."
+        "</p>"
         "</div>"
     )
     for category, rows in by_cat.items():

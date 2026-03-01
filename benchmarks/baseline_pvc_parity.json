@@ -1,0 +1,65 @@
+{
+  "aggregate": {
+    "envelope_correlation": 0.9999999999997717,
+    "log_spectral_distance": 7.441028015702233e-07,
+    "modulation_spectrum_distance": 1.9538681814470894e-09,
+    "peak_abs": 0.9631674878103942,
+    "rms_out": 0.36067019817980067,
+    "runtime_seconds": 0.005164916248759255,
+    "snr_db": 111.14220516961815
+  },
+  "generated_utc": "2026-03-01T01:02:29Z",
+  "input_samples": 28800,
+  "quick": true,
+  "rows": [
+    {
+      "description": "Response filter with flat response should be near-identity.",
+      "envelope_correlation": 0.9999999999997717,
+      "expected_identity": true,
+      "log_spectral_distance": 9.921370687602978e-07,
+      "modulation_spectrum_distance": 2.605157575262786e-09,
+      "name": "filter_identity_flat",
+      "peak_abs": 0.9631674878103941,
+      "rms_out": 0.36067019817980067,
+      "runtime_seconds": 0.005671125021763146,
+      "snr_db": 111.14220516961815
+    },
+    {
+      "description": "Ring modulation with depth=0 should be near-identity.",
+      "envelope_correlation": 0.9999999999997718,
+      "expected_identity": true,
+      "log_spectral_distance": 0.0,
+      "modulation_spectrum_distance": 0.0,
+      "name": "ring_identity_depth0",
+      "peak_abs": 0.9631674878103942,
+      "rms_out": 0.36067019817980067,
+      "runtime_seconds": 0.0006770410109311342,
+      "snr_db": 111.14220516961815
+    },
+    {
+      "description": "Chordmapper with zero strength should be near-identity.",
+      "envelope_correlation": 0.9999999999997717,
+      "expected_identity": true,
+      "log_spectral_distance": 9.921370687602978e-07,
+      "modulation_spectrum_distance": 2.605157575262786e-09,
+      "name": "chordmapper_identity_strength0",
+      "peak_abs": 0.9631674878103941,
+      "rms_out": 0.36067019817980067,
+      "runtime_seconds": 0.007416665961500257,
+      "snr_db": 111.14220516961815
+    },
+    {
+      "description": "Inharmonator with mix=0 should be near-identity.",
+      "envelope_correlation": 0.9999999999997717,
+      "expected_identity": true,
+      "log_spectral_distance": 9.921370687602978e-07,
+      "modulation_spectrum_distance": 2.605157575262786e-09,
+      "name": "inharmonator_identity_mix0",
+      "peak_abs": 0.9631674878103941,
+      "rms_out": 0.36067019817980067,
+      "runtime_seconds": 0.006894833000842482,
+      "snr_db": 111.14220516961815
+    }
+  ],
+  "sample_rate": 24000
+}

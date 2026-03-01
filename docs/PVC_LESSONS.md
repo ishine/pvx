@@ -24,6 +24,7 @@ Why it matters:
 `pvx` carry-forward:
 - subcommands such as `voc`, `freeze`, `harmonize`, `conform`, `retune`, `morph`, `denoise`, `deverb`
 - managed composition with `pvx chain`
+- reusable artifact tools: `analysis` (PVXAN) and `response` (PVXRF)
 
 ## 1.2 Dynamic control from external files
 
@@ -68,12 +69,18 @@ Why it matters:
 - consistent processing recipes are as important as raw algorithms
 
 `pvx` carry-forward:
-- cookbook recipes (`docs/EXAMPLES.md`)
+- cookbook recipes ([docs/EXAMPLES.md](EXAMPLES.md))
 - `pvx examples <name>`
 - benchmark, regression, and documentation generation scripts
 
 ## 2) Where pvx Can Improve Further (PVC-Inspired)
 
+Phase 3-5 implementations now cover:
+- response-driven operators (`filter`, `tvfilter`, `noisefilter`, `bandamp`, `spec-compander`)
+- ring/resonator family (`ring`, `ringfilter`, `ringtvfilter`)
+- harmonic mapping (`chordmapper`, `inharmonator`)
+
+Remaining PVC-inspired opportunities:
 1. Keep adding "single-purpose tools with shared conventions" over monolithic flags.
 2. Preserve plain-text control formats and avoid opaque binary automation formats.
 3. Keep command help readable and practical before adding new flags.
@@ -84,7 +91,7 @@ Why it matters:
 
 - For every new algorithm:
   - add one direct one-liner example in `--help`
-  - add one entry in `docs/EXAMPLES.md`
+  - add one entry in [docs/EXAMPLES.md](EXAMPLES.md)
   - add one "when not to use" note
 - For every new dynamic parameter:
   - document scalar usage

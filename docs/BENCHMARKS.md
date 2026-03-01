@@ -2,7 +2,7 @@
 
 # pvx Benchmarks
 
-_Generated from commit `e37ec44` (commit date: 2026-02-23T14:07:50-05:00)._
+_Generated from commit `ef577fc` (commit date: 2026-02-23T14:24:44-05:00)._
 
 Reproducible benchmark summary for core short-time Fourier transform/inverse short-time Fourier transform (STFT/ISTFT) path across central processing unit/Compute Unified Device Architecture/Apple-Silicon-native contexts.
 
@@ -27,6 +27,18 @@ pvx --help
 
 ```bash
 python3 scripts/scripts_generate_docs_extras.py --run-benchmarks
+```
+
+PVC-style parity benchmark (phase 3-7 operators):
+
+```bash
+python3 benchmarks/run_pvc_parity.py --quick --out-dir benchmarks/out_pvc_parity --baseline benchmarks/baseline_pvc_parity.json --gate --gate-tolerance 0.20
+```
+
+With `uv`:
+
+```bash
+uv run python3 benchmarks/run_pvc_parity.py --quick --out-dir benchmarks/out_pvc_parity --baseline benchmarks/baseline_pvc_parity.json --gate --gate-tolerance 0.20
 ```
 
 ## Benchmark Spec

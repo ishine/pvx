@@ -94,9 +94,9 @@ Work:
 ### Phase 5: UX and docs
 
 Files:
-- `README.md`
-- `docs/QUALITY_GUIDE.md`
-- `docs/EXAMPLES.md`
+- [README.md](../README.md)
+- [docs/QUALITY_GUIDE.md](QUALITY_GUIDE.md)
+- [docs/EXAMPLES.md](EXAMPLES.md)
 
 Work:
 - Add "phasiness reduction" intent preset.

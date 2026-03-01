@@ -450,8 +450,8 @@ flowchart LR
 ```
 
 Use this atlas together with:
-- `docs/MATHEMATICAL_FOUNDATIONS.md` for equation-level details
-- `docs/EXAMPLES.md` for copy-paste command recipes
+- [docs/MATHEMATICAL_FOUNDATIONS.md](MATHEMATICAL_FOUNDATIONS.md) for equation-level details
+- [docs/EXAMPLES.md](EXAMPLES.md) for copy-paste command recipes
 
 ## Attribution
 

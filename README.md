@@ -199,7 +199,7 @@ pvx retune vocal.wav --root C --scale major --strength 0.85 --output vocal_retun
 pvx denoise noisy.wav --reduction-db 8 --stdout | pvx deverb - --strength 0.3 --output cleaned.wav
 ```
 
-More runnable recipes (72): `docs/EXAMPLES.md`
+More runnable recipes (72): [docs/EXAMPLES.md](docs/EXAMPLES.md)
 
 If you run these and everything sounds exactly the same, either the command failed quietly or your source was already suspiciously perfect.
 
@@ -561,8 +561,10 @@ Start
 | Tempo stretch with transient care | `pvx voc` | `pvx voc drums.wav --stretch 1.2 --transient-preserve --phase-locking identity --output drums_120.wav` |
 | Harmonic layering | `pvx harmonize` | `pvx harmonize lead.wav --intervals 0,4,7 --gains 1,0.8,0.7 --output-dir out` |
 | Cross-source morphing / cross-synthesis | `pvx morph` | `pvx morph a.wav b.wav --blend-mode carrier_a_envelope_b --alpha 0.7 --output morph.wav` |
+| Build control envelope map | `pvx envelope` | `pvx envelope --mode adsr --duration 8 --rate 20 --key stretch --output stretch_env.csv` |
+| Reshape control map | `pvx reshape` | `pvx reshape stretch_env.csv --key stretch --operation resample --rate 50 --interp polynomial --order 5 --output stretch_dense.csv` |
 
-More complete examples and use-case playbooks (72+ runnable recipes): `docs/EXAMPLES.md`
+More complete examples and use-case playbooks (72+ runnable recipes): [docs/EXAMPLES.md](docs/EXAMPLES.md)
 
 ## Supported File Types
 
@@ -570,11 +572,11 @@ More complete examples and use-case playbooks (72+ runnable recipes): `docs/EXAM
 | --- | --- |
 | Audio file input/output | All formats provided by the active `soundfile/libsndfile` build |
 | Stream output (`--stdout`) | `wav`, `flac`, `aiff`/`aif`, `ogg`/`oga`, `caf` |
-| Control maps | `csv` |
+| Control maps | `csv`, `json` |
 | Run manifests | `json` |
 | Generated docs | `html`, `pdf` |
 
-Full table of all currently supported audio container types: `docs/FILE_TYPES.md`
+Full table of all currently supported audio container types: [docs/FILE_TYPES.md](docs/FILE_TYPES.md)
 
 ## Performance and GPU (Quality-First)
 
@@ -679,7 +681,7 @@ Stage 2 reproducibility controls:
 - corpus manifest + hash validation: `--dataset-manifest`, `--strict-corpus`, `--refresh-manifest`
 - deterministic CPU checks: `--deterministic-cpu`, `--determinism-runs`
 - stronger gates: `--gate-row-level`, `--gate-signatures`
-- automatic quality diagnostics are emitted in `report.md` and `report.json`
+- automatic quality diagnostics are emitted in [benchmarks/out/report.md](benchmarks/out/report.md) and `report.json`
 
 Interpret benchmark priorities:
 - quality metrics are primary acceptance criteria
@@ -715,9 +717,21 @@ python3 benchmarks/run_bench.py --quick --out-dir benchmarks/out --strict-corpus
 uv run python3 benchmarks/run_bench.py --quick --out-dir benchmarks/out --strict-corpus --determinism-runs 2 --baseline benchmarks/baseline_small.json --gate --gate-row-level --gate-signatures
 ```
 
+PVC-style parity benchmark for phase 3-7 operators:
+
+```bash
+python3 benchmarks/run_pvc_parity.py --quick --out-dir benchmarks/out_pvc_parity --baseline benchmarks/baseline_pvc_parity.json --gate --gate-tolerance 0.20
+```
+
+`uv` equivalent:
+
+```bash
+uv run python3 benchmarks/run_pvc_parity.py --quick --out-dir benchmarks/out_pvc_parity --baseline benchmarks/baseline_pvc_parity.json --gate --gate-tolerance 0.20
+```
+
 ## Visual Documentation
 
-See `docs/DIAGRAMS.md` for:
+See [docs/DIAGRAMS.md](docs/DIAGRAMS.md) for:
 - expanded architecture and DSP atlas (Mermaid + ASCII)
 - quality-first tuning and metrics-flow diagrams
 - STFT analysis/resynthesis timelines
@@ -879,7 +893,7 @@ What translates well into modern `pvx`:
 
 | PVC idea | Why it still matters | How `pvx` uses or extends it |
 | --- | --- | --- |
-| Tool-per-task command design (`plainpv`, `twarp`, `harmonizer`, etc.) | Keeps workflows composable and scriptable | `pvx` subcommands (`voc`, `freeze`, `harmonize`, `conform`, `retune`, `morph`, ...) plus `pvx chain` |
+| Tool-per-task command design (`plainpv`, `twarp`, `harmonizer`, etc.) | Keeps workflows composable and scriptable | `pvx` subcommands (`voc`, `freeze`, `harmonize`, `conform`, `retune`, `morph`, `analysis`, `response`, ...) plus `pvx chain` |
 | Command help as a first-class UX surface | Beginners discover flags faster from terminal help than docs | `pvx --help`, grouped flag sections, `--example`, `--guided`, and script-level example blocks |
 | Dynamic parameter control from external data files | Real workflows need time-varying control, not static knobs | Per-parameter CSV/JSON control-rate signals with interpolation (`none`, `linear`, `nearest`, `cubic`, `polynomial`) |
 | Shell-script driven reproducibility | Repeatable runs matter for research and production | Copy-paste recipes, `pvx examples`, benchmark scripts, JSON manifests, and deterministic CPU mode |
@@ -915,6 +929,9 @@ Complete Markdown documentation list (all `.md` documentation files):
 - [docs/PHASINESS_IMPLEMENTATION_PLAN.md](docs/PHASINESS_IMPLEMENTATION_PLAN.md)
 - [docs/PIPELINE_COOKBOOK.md](docs/PIPELINE_COOKBOOK.md)
 - [docs/PVC_LESSONS.md](docs/PVC_LESSONS.md)
+- [docs/PVC_PARITY_MATRIX.md](docs/PVC_PARITY_MATRIX.md)
+- [docs/PVC_PHASE3_5_ARCHITECTURE.md](docs/PVC_PHASE3_5_ARCHITECTURE.md)
+- [docs/PVC_PHASE6_7_ARCHITECTURE.md](docs/PVC_PHASE6_7_ARCHITECTURE.md)
 - [docs/PVX_ALGORITHM_PARAMS.md](docs/PVX_ALGORITHM_PARAMS.md)
 - [docs/PYTHON_FILE_HELP.md](docs/PYTHON_FILE_HELP.md)
 - [docs/QUALITY_GUIDE.md](docs/QUALITY_GUIDE.md)
@@ -955,11 +972,11 @@ Portable Document Format (PDF) bundle:
 
 ## Community and Governance
 
-- Contributing guide: `CONTRIBUTING.md`
-- Code of conduct: `CODE_OF_CONDUCT.md`
-- Security policy: `SECURITY.md`
-- Support guidance: `SUPPORT.md`
-- Release process: `RELEASE.md`
+- Contributing guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Code of conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- Security policy: [SECURITY.md](SECURITY.md)
+- Support guidance: [SUPPORT.md](SUPPORT.md)
+- Release process: [RELEASE.md](RELEASE.md)
 
 ## License
 

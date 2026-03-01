@@ -490,7 +490,7 @@ pvx pitch-track A.wav --feature-set all --mfcc-count 13 --output - \
 ```
 
 More feature-follow and feature-vector routing recipes:
-- `docs/FEATURE_SIDECHAIN_EXAMPLES.md`
+- [docs/FEATURE_SIDECHAIN_EXAMPLES.md](FEATURE_SIDECHAIN_EXAMPLES.md)
 
 Built-in `pvx follow` recipe printer:
 
@@ -1989,6 +1989,87 @@ time_sec,value
 **Artifacts to listen for**
 - chunk-boundary texture changes if `--chunk-seconds` is too short
 - abrupt pacing changes from steep control curves
+
+---
+
+## 73) Generate a Stretch Envelope (Function Stream)
+
+**Command**
+```bash
+pvx envelope --mode adsr --duration 8 --rate 20 --attack-sec 0.2 --decay-sec 0.6 --sustain 1.1 --release-sec 1.0 --key stretch --output controls/stretch_env.csv
+```
+
+**Explanation**
+- Generates a control-rate trajectory directly from the command line for later reuse in `pvx voc`, `pvx tvfilter`, and other map-driven tools.
+- Keeps control authoring reproducible and scriptable in shell pipelines.
+
+**Before/After**
+- Before: manual spreadsheet editing for every map revision.
+- After: deterministic, one-command control-map generation.
+
+**Parameters that matter most**
+- `--mode`
+- `--duration`
+- `--rate`
+- `--key`
+
+**Artifacts to listen for**
+- abrupt transitions if envelope segment times are too short
+- over-aggressive modulation ranges for stretch/pitch controls
+
+---
+
+## 74) Reshape and Densify a Control Map
+
+**Command**
+```bash
+pvx reshape controls/stretch_env.csv --key stretch --operation resample --rate 50 --interp polynomial --order 5 --output controls/stretch_env_dense.csv
+```
+
+**Explanation**
+- Resamples sparse control points into a denser trajectory for smoother frame-level sampling in downstream tools.
+- Supports additional transform operations (`scale`, `offset`, `clip`, `normalize`, `smooth`, `time-scale`, and others).
+
+**Before/After**
+- Before: coarse control points with larger step size.
+- After: denser curve with smoother interpolation behavior.
+
+**Parameters that matter most**
+- `--operation`
+- `--rate`
+- `--interp`
+- `--order`
+
+**Artifacts to listen for**
+- overshoot if high-order polynomial interpolation is used on sparse/irregular points
+- excessive smoothing reducing intended modulation detail
+
+---
+
+## 75) Run PVC Parity Benchmark Gate
+
+**Command**
+```bash
+python3 benchmarks/run_pvc_parity.py --quick --out-dir benchmarks/out_pvc_parity --baseline benchmarks/baseline_pvc_parity.json --gate --gate-tolerance 0.20
+```
+
+**Explanation**
+- Runs deterministic parity scenarios for PVC-inspired phase 3-7 operators, then compares metrics to a committed baseline.
+- Useful for regression gating in local workflows and continuous integration (CI).
+
+**Before/After**
+- Before: no focused parity regression coverage for the new operator family.
+- After: repeatable identity/effect scenario checks with a hard pass/fail gate.
+
+**Parameters that matter most**
+- `--baseline`
+- `--gate`
+- `--gate-tolerance`
+- `--quick`
+
+**Artifacts to listen for**
+- identity-case drift (unexpected coloration when effect depth should be near-neutral)
+- unstable runtime or metric jumps between revisions
 
 ## Attribution
 
