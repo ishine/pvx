@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/pvx_logo.png" alt="pvx logo" width="192" /></p>
+<p align="center"><img src="assets/pvx_logo.png" alt="pvx logo" width="420" /></p>
 
 # pvx
 
