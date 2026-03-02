@@ -12,7 +12,6 @@ Total Python files documented: **225**
 - [`benchmarks/metrics.py`](#benchmarksmetricspy)
 - [`benchmarks/run_bench.py`](#benchmarksrunbenchpy)
 - [`benchmarks/run_pvc_parity.py`](#benchmarksrunpvcparitypy)
-- [`fix_test_docs.py`](#fixtestdocspy)
 - [`pvxalgorithms/__init__.py`](#pvxalgorithmsinitpy)
 - [`pvxalgorithms/base.py`](#pvxalgorithmsbasepy)
 - [`pvxalgorithms/registry.py`](#pvxalgorithmsregistrypy)
@@ -233,6 +232,7 @@ Total Python files documented: **225**
 - [`tests/test_pvc_phase3_5.py`](#teststestpvcphase35py)
 - [`tests/test_pvc_phase6.py`](#teststestpvcphase6py)
 - [`tests/test_transient_and_stereo.py`](#teststesttransientandstereopy)
+- [`update_readme.py`](#updatereadmepy)
 
 ## `benchmarks/__init__.py`
 
@@ -289,13 +289,6 @@ Reproducible quality benchmark: pvx vs Rubber Band vs librosa baseline.
 ```text
 PVC-style parity benchmark suite for phase 3-7 operators.
 ```
-
-## `fix_test_docs.py`
-
-**Purpose:** No module docstring present.
-
-**Classes:** None
-**Functions:** None
 
 ## `pvxalgorithms/__init__.py`
 
@@ -5662,6 +5655,13 @@ Unit tests for PVC-inspired Phase 6 function-stream utilities.
 ```text
 Tests for hybrid transient processing and stereo coherence modes.
 ```
+
+## `update_readme.py`
+
+**Purpose:** No module docstring present.
+
+**Classes:** None
+**Functions:** None
 
 ## Attribution
 
