@@ -44,6 +44,7 @@ pvx --help
 | Pumping/flat loudness | aggressive mastering chain | reduce compressor/limiter settings; disable unused mastering stages |
 | Grainy extreme stretch | ratio too high for single-stage path | `--stretch-mode multistage`; lower `--max-stage-stretch`; optionally `--multires-fusion` |
 | Unexpected overs/clipped delivery files | output policy not constrained | set `--true-peak-max-dbtp` and target `--bit-depth`; use `--dither tpdf` for PCM exports |
+| Chirpy/watery denoise residuals | overly aggressive subtraction or weak profile estimate | lower `--reduction-db`; raise `--smooth`; raise `--floor`; provide `--noise-file` room tone |
 
 ## 3. Practical Recipes
 
@@ -75,6 +76,17 @@ pvx voc mix.wav \
   --coherence-strength 0.9 \
   --stretch 1.2 \
   --output mix_locked.wav
+```
+
+### Denoise without musical-noise artifacts
+
+```bash
+pvx denoise speech.wav \
+  --noise-seconds 0.4 \
+  --reduction-db 5 \
+  --floor 0.2 \
+  --smooth 9 \
+  --output speech_clean.wav
 ```
 
 ## 4. Parameter Ranges That Usually Work

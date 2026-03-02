@@ -154,7 +154,27 @@ pvx voc input.wav --stretch 1.25 --pitch 0 --output stretched.wav
 pvx voc input.wav --stretch 1.0 --pitch 3 --output pitched.wav
 ```
 
-## 3.1 Time-Varying Parameter Control (CSV/JSON)
+## 3.1 Denoising with Phase-Consistent STFT Processing
+
+`pvx denoise` uses short-time Fourier transform (STFT) spectral subtraction while preserving phase continuity in overlap-add resynthesis.
+
+Starter profiles:
+
+```bash
+# Speech-safe (conservative)
+pvx denoise speech.wav --noise-seconds 0.4 --reduction-db 5 --floor 0.2 --smooth 9 --output speech_clean.wav
+
+# Music-safe (preserve more ambience/harmonics)
+pvx denoise mix.wav --noise-seconds 0.3 --reduction-db 4 --floor 0.25 --smooth 7 --output mix_clean.wav
+```
+
+If you hear chirpy/watery artifacts:
+- reduce `--reduction-db`
+- increase `--smooth`
+- raise `--floor` slightly
+- use `--noise-file roomtone.wav` when the beginning of the source is not a clean noise-only segment
+
+## 3.2 Time-Varying Parameter Control (CSV/JSON)
 
 You can pass a control file directly to many core phase-vocoder numeric flags.
 
@@ -536,6 +556,9 @@ pvx retune vocal.wav --recommend-root --scale minor --output vocal_auto_root.wav
 
 # Denoise then dereverb
 pvx denoise noisy.wav --reduction-db 8 --stdout | pvx deverb - --strength 0.3 --output noisy_clean.wav
+
+# Denoise then stretch
+pvx denoise noisy.wav --reduction-db 6 --stdout | pvx voc - --stretch 2.0 --output noisy_clean_stretch.wav
 
 # Generate an LFO control map (triangle) and apply it as time-varying stretch
 pvx lfo --wave triangle --duration 12 --frequency-hz 0.4 --center 1.0 --amplitude 0.2 --key stretch --output controls/stretch_tri.csv

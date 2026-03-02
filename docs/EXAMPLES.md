@@ -403,6 +403,22 @@ pvx denoise field.wav --noise-seconds 0.5 --reduction-db 10 --smooth 7 --output-
 - musical noise
 - dullness in high frequencies
 
+**Useful variants**
+```bash
+# Speech-safe denoise (preserve intelligibility and avoid over-subtraction)
+pvx denoise speech.wav --noise-seconds 0.4 --reduction-db 5 --floor 0.2 --smooth 9 --output speech_clean.wav
+
+# Music-safe denoise (retain more ambience/harmonic detail)
+pvx denoise mix.wav --noise-seconds 0.3 --reduction-db 4 --floor 0.25 --smooth 7 --output mix_clean.wav
+
+# Denoise before stretching
+pvx denoise noisy.wav --reduction-db 6 --stdout | pvx voc - --stretch 2.0 --output noisy_clean_stretch.wav
+```
+
+**Variant notes**
+- Lower `--reduction-db` and higher `--smooth` generally reduce metallic residual artifacts.
+- `--noise-file` is recommended when the file start is not representative noise.
+
 ---
 
 ## 12) De-Reverb a Room Recording

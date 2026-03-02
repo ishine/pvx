@@ -666,6 +666,7 @@ Start
 | Tempo stretch with transient care | `pvx voc` | `pvx voc drums.wav --stretch 1.2 --transient-preserve --phase-locking identity --output drums_120.wav` |
 | Harmonic layering | `pvx harmonize` | `pvx harmonize lead.wav --intervals 0,4,7 --gains 1,0.8,0.7 --output-dir out` |
 | Cross-source morphing / cross-synthesis | `pvx morph` | `pvx morph a.wav b.wav --blend-mode carrier_a_envelope_b --alpha 0.7 --output morph.wav` |
+| Phase-consistent denoising | `pvx denoise` / `pvx noisefilter` | `pvx denoise speech.wav --noise-seconds 0.4 --reduction-db 5 --smooth 9 --output speech_clean.wav` |
 | Build control envelope map | `pvx envelope` / `pvx lfo` | `pvx envelope --mode adsr --duration 8 --rate 20 --key stretch --output stretch_env.csv` |
 | Build periodic LFO map (sine/triangle/square/saw) | `pvx lfo` | `pvx lfo --wave triangle --duration 8 --frequency-hz 0.5 --center 1.0 --amplitude 0.2 --key stretch --output stretch_lfo.csv` |
 | Reshape control map | `pvx reshape` | `pvx reshape stretch_env.csv --key stretch --operation resample --rate 50 --interp polynomial --order 5 --output stretch_dense.csv` |
@@ -872,6 +873,12 @@ See [docs/DIAGRAMS.md](docs/DIAGRAMS.md) for:
 - reduce semitone magnitude
 - increase overlap (`--hop-size` smaller relative to `--win-length`)
 
+### Denoise sounds chirpy or watery
+- reduce `--reduction-db` (for example from `8` to `5`)
+- increase `--smooth` by `2` to `4` frames
+- increase `--floor` slightly (for example `0.1` to `0.2`)
+- if possible, use `--noise-file` with clean room tone instead of inferred leading-noise estimation
+
 ### CUDA requested but falls back
 - ensure CuPy install matches your CUDA runtime
 - test with `--device cuda` to force explicit failure if unavailable
@@ -897,6 +904,20 @@ Yes. `--stretch > 1` lengthens, `--stretch < 1` shortens.
 
 ### Can I shift pitch without changing duration?
 Yes. Use pitch flags with `--stretch 1.0`, e.g. `--pitch`, `--cents`, or `--ratio`.
+
+### Can I use the phase-vocoder path for denoising?
+Yes. Use `pvx denoise` for phase-consistent short-time Fourier transform (STFT) spectral subtraction, or `pvx noisefilter` with a reusable response profile.
+
+```bash
+# Speech-safe denoise (conservative)
+pvx denoise speech.wav --noise-seconds 0.4 --reduction-db 5 --floor 0.2 --smooth 9 --output speech_clean.wav
+
+# Music-safe denoise (retain ambience/harmonics)
+pvx denoise mix.wav --noise-seconds 0.3 --reduction-db 4 --floor 0.25 --smooth 7 --output mix_clean.wav
+
+# Denoise then stretch in one pipe
+pvx denoise noisy.wav --reduction-db 6 --stdout | pvx voc - --stretch 2.0 --output clean_stretch.wav
+```
 
 ### I installed pvx but get `zsh: command not found: pvx`. What now?
 Use one of these immediately:
