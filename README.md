@@ -904,7 +904,8 @@ pvx follow --example mfcc_flux
 ```
 
 ### Does pvx support microtonal workflows?
-Yes. Use ratio/cents/semitone controls and CSV map modes.
+Yes. Use ratio/cents/semitone controls and CSV map modes, plus `pvx retune --scale-cents`,
+`--a4-reference-hz`, `--root-hz`, or `--recommend-root`.
 
 ### Is every algorithm phase-vocoder-based?
 No. The repo includes non-phase-vocoder modules too (analysis, denoise, dereverb, decomposition, etc.).

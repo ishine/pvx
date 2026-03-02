@@ -346,6 +346,26 @@ class TestCLIRegression(unittest.TestCase):
         self.assertIn("--root-hz", proc.stdout)
         self.assertIn("--recommend-root", proc.stdout)
 
+    def test_unified_cli_retune_rejects_root_hz_with_recommend_root(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            in_path = tmp_path / "retune_root_conflict.wav"
+            write_mono_tone(in_path, duration=0.25, freq_hz=220.0)
+
+            cmd = [
+                *UNIFIED_CLI,
+                "retune",
+                str(in_path),
+                "--root-hz",
+                "261.6256",
+                "--recommend-root",
+                "--output",
+                str(tmp_path / "retune_root_conflict_out.wav"),
+            ]
+            proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertIn("--recommend-root and --root-hz are mutually exclusive", proc.stderr)
+
     def test_unified_cli_follow_example_basic(self) -> None:
         cmd = [*UNIFIED_CLI, "follow", "--example"]
         proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)

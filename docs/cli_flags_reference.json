@@ -1,6 +1,6 @@
 {
-  "commit": "516e06f",
-  "commit_date": "2026-03-01T18:35:10-05:00",
+  "commit": "b9f5c0e",
+  "commit_date": "2026-03-01T19:08:12-05:00",
   "entries": [
     {
       "action": "",
@@ -2176,6 +2176,16 @@
       "tool": "pvxretune.py"
     },
     {
+      "action": "store_true",
+      "choices": [],
+      "default": null,
+      "flag": "--recommend-root",
+      "help": "Estimate and use a per-file root fundamental from tracked F0.",
+      "required": false,
+      "source": "src/pvx/cli/pvxretune.py",
+      "tool": "pvxretune.py"
+    },
+    {
       "action": "",
       "choices": [
         "auto",
@@ -2195,6 +2205,16 @@
       "default": "C",
       "flag": "--root",
       "help": "Scale root note (C,C#,D,...,B)",
+      "required": false,
+      "source": "src/pvx/cli/pvxretune.py",
+      "tool": "pvxretune.py"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--root-hz",
+      "help": "Optional root fundamental in Hz (overrides --root when provided).",
       "required": false,
       "source": "src/pvx/cli/pvxretune.py",
       "tool": "pvxretune.py"
@@ -4054,6 +4074,7 @@
     "--ratio-min",
     "--ratio-reference",
     "--reduction-db",
+    "--recommend-root",
     "--ref-channel",
     "--reference-hz",
     "--release-sec",
