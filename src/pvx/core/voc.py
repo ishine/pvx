@@ -145,11 +145,29 @@ LowConfidenceMode = Literal["hold", "unity", "interp"]
 TransientMode = Literal["off", "reset", "hybrid", "wsola"]
 StereoMode = Literal["independent", "mid_side_lock", "ref_channel_lock"]
 ProgressCallback = Callable[[int, int], None]
-ControlInterpolationMode = Literal["none", "linear", "nearest", "cubic", "polynomial"]
+ControlInterpolationMode = Literal[
+    "none",
+    "linear",
+    "nearest",
+    "cubic",
+    "polynomial",
+    "exponential",
+    "s_curve",
+    "smootherstep",
+]
 
 TRANSFORM_CHOICES: tuple[TransformMode, ...] = ("fft", "dft", "czt", "dct", "dst", "hartley")
 PHASE_ENGINE_CHOICES: tuple[PhaseEngineMode, ...] = ("propagate", "hybrid", "random")
-CONTROL_INTERP_CHOICES: tuple[ControlInterpolationMode, ...] = ("none", "linear", "nearest", "cubic", "polynomial")
+CONTROL_INTERP_CHOICES: tuple[ControlInterpolationMode, ...] = (
+    "none",
+    "linear",
+    "nearest",
+    "cubic",
+    "polynomial",
+    "exponential",
+    "s_curve",
+    "smootherstep",
+)
 QUALITY_PROFILE_CHOICES: tuple[str, ...] = (
     "neutral",
     "speech",
@@ -1261,6 +1279,46 @@ def load_dynamic_control_signal(
     )
 
 
+def _smoothstep(u: np.ndarray) -> np.ndarray:
+    return (u * u) * (3.0 - 2.0 * u)
+
+
+def _smootherstep(u: np.ndarray) -> np.ndarray:
+    return (u * u * u) * (u * (u * 6.0 - 15.0) + 10.0)
+
+
+def _exp_ease(u: np.ndarray, *, strength: float) -> np.ndarray:
+    k = max(0.0, float(strength))
+    if k <= 1e-9:
+        return u
+    den = np.expm1(k)
+    if abs(den) <= 1e-12:
+        return u
+    return np.expm1(k * u) / den
+
+
+def _piecewise_ease_sample(
+    query_sec: np.ndarray,
+    x: np.ndarray,
+    y: np.ndarray,
+    *,
+    mode: str,
+) -> np.ndarray:
+    idx = np.searchsorted(x, query_sec, side="right") - 1
+    idx = np.clip(idx, 0, x.size - 2)
+    x0 = x[idx]
+    x1 = x[idx + 1]
+    u = (query_sec - x0) / np.maximum(1e-12, x1 - x0)
+    u = np.clip(u, 0.0, 1.0)
+    if mode == "exponential":
+        eased = _exp_ease(u, strength=4.0)
+    elif mode == "s_curve":
+        eased = _smoothstep(u)
+    else:  # smootherstep
+        eased = _smootherstep(u)
+    return y[idx] + (y[idx + 1] - y[idx]) * eased
+
+
 def _sample_dynamic_signal(signal: DynamicControlSignal, query_sec: np.ndarray) -> np.ndarray:
     if signal.times_sec.size == 0:
         raise ValueError("Dynamic control signal has no points")
@@ -1294,6 +1352,14 @@ def _sample_dynamic_signal(signal: DynamicControlSignal, query_sec: np.ndarray) 
             spline = scipy_cubic_spline(x, y, bc_type="natural", extrapolate=True)
             return np.asarray(spline(query_sec), dtype=np.float64)
         return np.interp(query_sec, x, y)
+
+    if mode in {"exponential", "s_curve", "smootherstep"}:
+        return _piecewise_ease_sample(
+            query_sec,
+            x,
+            y,
+            mode=mode,
+        )
 
     if mode == "polynomial":
         degree = min(max(1, int(signal.order)), x.size - 1)

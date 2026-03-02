@@ -48,7 +48,16 @@ BLEND_MODE_CHOICES: tuple[str, ...] = (
     "max_mag",
     "min_mag",
 )
-CONTROL_INTERP_CHOICES: tuple[str, ...] = ("none", "linear", "nearest", "cubic", "polynomial")
+CONTROL_INTERP_CHOICES: tuple[str, ...] = (
+    "none",
+    "linear",
+    "nearest",
+    "cubic",
+    "polynomial",
+    "exponential",
+    "s_curve",
+    "smootherstep",
+)
 
 EPS = 1e-12
 
@@ -237,6 +246,46 @@ def _sample_cubic_local(x: np.ndarray, y: np.ndarray, query: np.ndarray) -> np.n
     return out
 
 
+def _smoothstep(u: np.ndarray) -> np.ndarray:
+    return (u * u) * (3.0 - 2.0 * u)
+
+
+def _smootherstep(u: np.ndarray) -> np.ndarray:
+    return (u * u * u) * (u * (u * 6.0 - 15.0) + 10.0)
+
+
+def _exp_ease(u: np.ndarray, *, strength: float) -> np.ndarray:
+    k = max(0.0, float(strength))
+    if k <= 1e-9:
+        return u
+    den = np.expm1(k)
+    if abs(den) <= 1e-12:
+        return u
+    return np.expm1(k * u) / den
+
+
+def _sample_piecewise_ease(
+    x: np.ndarray,
+    y: np.ndarray,
+    q: np.ndarray,
+    *,
+    mode: str,
+) -> np.ndarray:
+    idx = np.searchsorted(x, q, side="right") - 1
+    idx = np.clip(idx, 0, x.size - 2)
+    x0 = x[idx]
+    x1 = x[idx + 1]
+    u = (q - x0) / np.maximum(1e-12, x1 - x0)
+    u = np.clip(u, 0.0, 1.0)
+    if mode == "exponential":
+        eased = _exp_ease(u, strength=4.0)
+    elif mode == "s_curve":
+        eased = _smoothstep(u)
+    else:  # smootherstep
+        eased = _smootherstep(u)
+    return y[idx] + (y[idx + 1] - y[idx]) * eased
+
+
 def _sample_control_signal(signal: MorphControlSignal, query_sec: np.ndarray) -> np.ndarray:
     x = np.asarray(signal.times_sec, dtype=np.float64)
     y = np.asarray(signal.values, dtype=np.float64)
@@ -262,6 +311,8 @@ def _sample_control_signal(signal: MorphControlSignal, query_sec: np.ndarray) ->
         return np.interp(q, x, y, left=float(y[0]), right=float(y[-1]))
     if mode == "cubic":
         return _sample_cubic_local(x, y, q)
+    if mode in {"exponential", "s_curve", "smootherstep"}:
+        return _sample_piecewise_ease(x, y, q, mode=mode)
     if mode == "polynomial":
         degree = min(max(1, int(signal.order)), int(x.size) - 1)
         with warnings.catch_warnings():

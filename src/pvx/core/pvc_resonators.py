@@ -25,7 +25,17 @@ except Exception:  # pragma: no cover - optional at import-time
     lfilter = None
 
 RingOperatorName = Literal["ring", "ringfilter", "ringtvfilter"]
-InterpMode = Literal["none", "stairstep", "nearest", "linear", "cubic", "polynomial"]
+InterpMode = Literal[
+    "none",
+    "stairstep",
+    "nearest",
+    "linear",
+    "cubic",
+    "polynomial",
+    "exponential",
+    "s_curve",
+    "smootherstep",
+]
 
 
 def _coerce_audio(audio: np.ndarray) -> np.ndarray:

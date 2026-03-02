@@ -2,7 +2,7 @@
 
 # pvx Mathematical Foundations
 
-_Generated from commit `c16cda3` (commit date: 2026-03-01T17:07:51-05:00)._
+_Generated from commit `77bdfde` (commit date: 2026-03-02T01:29:29-05:00)._
 
 This document explains the core signal-processing equations used by pvx, with plain-English interpretation.
 All equations are written in GitHub-renderable LaTeX and are intended to render directly in normal GitHub Markdown view.
@@ -134,7 +134,8 @@ $$
 where $M$ is the number of control points. In command-line interface (CLI) usage, `--order` accepts any integer $\ge 1$.
 The effective degree is automatically capped to avoid over-specification when there are too few points.
 
-Nearest/linear/cubic are local interpolation modes; `none` is sample-and-hold (stairstep).
+Nearest/linear/cubic/exponential/S-curve are local interpolation modes; `none` is sample-and-hold (stairstep).
+`exponential` uses piecewise exponential easing and `s_curve`/`smootherstep` use Hermite S-shaped easing between adjacent control points.
 Legend used in each plot: blue solid line = interpolated control curve $u(t)$, red dashed line = piecewise connection of control points, red circles labeled $p_i$ = original control points.
 
 | Interpolation mode | CLI form | Example plot |
@@ -143,6 +144,9 @@ Legend used in each plot: blue solid line = interpolated control curve $u(t)$, r
 | nearest | `--interp nearest` | ![nearest](assets/interpolation/interp_nearest.svg) |
 | linear | `--interp linear` | ![linear](assets/interpolation/interp_linear.svg) |
 | cubic | `--interp cubic` | ![cubic](assets/interpolation/interp_cubic.svg) |
+| exponential | `--interp exponential` | ![exponential](assets/interpolation/interp_exponential.svg) |
+| S-curve (smoothstep) | `--interp s_curve` | ![S-curve (smoothstep)](assets/interpolation/interp_s_curve.svg) |
+| S-curve (smootherstep) | `--interp smootherstep` | ![S-curve (smootherstep)](assets/interpolation/interp_smootherstep.svg) |
 | polynomial order 1 | `--interp polynomial --order 1` | ![polynomial order 1](assets/interpolation/interp_polynomial_order_1.svg) |
 | polynomial order 2 | `--interp polynomial --order 2` | ![polynomial order 2](assets/interpolation/interp_polynomial_order_2.svg) |
 | polynomial order 3 | `--interp polynomial --order 3` | ![polynomial order 3](assets/interpolation/interp_polynomial_order_3.svg) |

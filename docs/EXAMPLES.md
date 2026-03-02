@@ -1882,6 +1882,9 @@ Interpolation order quick visual:
 | `none` | ![none interpolation](assets/interpolation/interp_none.svg) |
 | `linear` | ![linear interpolation](assets/interpolation/interp_linear.svg) |
 | `cubic` | ![cubic interpolation](assets/interpolation/interp_cubic.svg) |
+| `exponential` | ![exponential interpolation](assets/interpolation/interp_exponential.svg) |
+| `s_curve` | ![s_curve interpolation](assets/interpolation/interp_s_curve.svg) |
+| `smootherstep` | ![smootherstep interpolation](assets/interpolation/interp_smootherstep.svg) |
 | `polynomial --order 1` | ![polynomial order 1](assets/interpolation/interp_polynomial_order_1.svg) |
 | `polynomial --order 2` | ![polynomial order 2](assets/interpolation/interp_polynomial_order_2.svg) |
 | `polynomial --order 3` | ![polynomial order 3](assets/interpolation/interp_polynomial_order_3.svg) |
@@ -2016,6 +2019,14 @@ time_sec,value
 pvx envelope --mode adsr --duration 8 --rate 20 --attack-sec 0.2 --decay-sec 0.6 --sustain 1.1 --release-sec 1.0 --key stretch --output controls/stretch_env.csv
 ```
 
+**Periodic LFO variants (same tool, `pvx lfo` alias)**
+```bash
+pvx lfo --wave sine --duration 12 --cycles 6 --center 1.0 --amplitude 0.25 --key stretch --output controls/stretch_sine.csv
+pvx lfo --wave triangle --duration 8 --frequency-hz 0.5 --center 1.0 --amplitude 0.2 --key stretch --output controls/stretch_triangle.csv
+pvx lfo --wave square --duration 8 --frequency-hz 2.0 --center 1.0 --amplitude 0.3 --duty-cycle 0.35 --key pitch_ratio --output controls/pitch_square.csv
+pvx lfo --wave saw_up --duration 8 --frequency-hz 0.5 --center 1.0 --amplitude 0.2 --key stretch --output controls/stretch_saw_up.csv
+```
+
 **Explanation**
 - Generates a control-rate trajectory directly from the command line for later reuse in `pvx voc`, `pvx tvfilter`, and other map-driven tools.
 - Keeps control authoring reproducible and scriptable in shell pipelines.
@@ -2026,8 +2037,11 @@ pvx envelope --mode adsr --duration 8 --rate 20 --attack-sec 0.2 --decay-sec 0.6
 
 **Parameters that matter most**
 - `--mode`
+- `--wave` (alias for `--mode`)
 - `--duration`
 - `--rate`
+- `--frequency-hz` or `--cycles` for periodic shapes
+- `--center` and `--amplitude` for periodic offsets/depth
 - `--key`
 
 **Artifacts to listen for**

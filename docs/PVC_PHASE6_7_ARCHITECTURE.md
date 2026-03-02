@@ -31,7 +31,7 @@ Packaging scripts:
 1. Deterministic control-map generation and transformation with no random branches.
 2. Text-first map formats (`csv` and `json`) for shell and version-control friendliness.
 3. Interpolation compatibility with existing control-map conventions:
-   - `none`, `stairstep`, `nearest`, `linear`, `cubic`, `polynomial`
+   - `none`, `stairstep`, `nearest`, `linear`, `cubic`, `exponential`, `s_curve`, `smootherstep`, `polynomial`
 4. Direct interoperability with `pvx voc` and PVC-style operators by emitting explicit key columns (for example `stretch` or `pitch_ratio`).
 
 ## 2) Phase 7 Benchmark Layout

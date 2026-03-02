@@ -27,7 +27,17 @@ from pvx.core.common import (
 from pvx.core.pvc_resonators import InterpMode, RingOperatorName, process_ring_operator
 
 OPERATOR_CHOICES: tuple[RingOperatorName, ...] = ("ring", "ringfilter", "ringtvfilter")
-INTERP_CHOICES: tuple[InterpMode, ...] = ("none", "stairstep", "nearest", "linear", "cubic", "polynomial")
+INTERP_CHOICES: tuple[InterpMode, ...] = (
+    "none",
+    "stairstep",
+    "nearest",
+    "linear",
+    "cubic",
+    "polynomial",
+    "exponential",
+    "s_curve",
+    "smootherstep",
+)
 
 
 def build_parser(default_operator: RingOperatorName = "ring", prog: str = "pvx ring") -> argparse.ArgumentParser:

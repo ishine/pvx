@@ -2,7 +2,7 @@
 
 # pvx Benchmarks
 
-_Generated from commit `cd4e579` (commit date: 2026-03-01T19:15:37-05:00)._
+_Generated from commit `77bdfde` (commit date: 2026-03-02T01:29:29-05:00)._
 
 Reproducible benchmark summary for core short-time Fourier transform/inverse short-time Fourier transform (STFT/ISTFT) path across central processing unit/Compute Unified Device Architecture/Apple-Silicon-native contexts.
 
@@ -80,21 +80,6 @@ Interpretation notes:
 - `Quality (/100)` is a composite from core artifact metrics; use it as a quick ranking aid, not as a single acceptance criterion.
 - Lower is better for LSD, ModSpec, Smear, Coherence Drift, Phasiness, and Musical Noise.
 - Higher is better for SNR, SI-SDR, and Envelope Correlation.
-
-## Additional Comparison Axes to Add
-
-For deeper quality validation, compare:
-
-- onset localization error (milliseconds) on transient-heavy material
-- harmonic tracking drift (fundamental frequency and overtone alignment stability)
-- formant drift for vocal material (formant-f1/formant-f2 stability)
-- beat consistency under tempo warps (inter-onset interval variance)
-- stereo image drift by band (low/mid/high coherence deltas)
-- loudness trajectory error over time (not only integrated LUFS)
-- cumulative latency and memory ceiling under long-form chunked runs
-- repeatability under deterministic mode across different host machines
-- robustness to non-power-of-two frame sizes and alternative transforms
-- artifact incidence at extreme settings (buzzing/choppiness/outage counters)
 
 Raw machine-readable benchmark output: `docs/benchmarks/latest.json`.
 

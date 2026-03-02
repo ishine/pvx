@@ -40,7 +40,17 @@ OPERATOR_CHOICES: tuple[OperatorName, ...] = (
     "bandamp",
     "spec-compander",
 )
-INTERP_CHOICES: tuple[InterpMode, ...] = ("none", "stairstep", "nearest", "linear", "cubic", "polynomial")
+INTERP_CHOICES: tuple[InterpMode, ...] = (
+    "none",
+    "stairstep",
+    "nearest",
+    "linear",
+    "cubic",
+    "polynomial",
+    "exponential",
+    "s_curve",
+    "smootherstep",
+)
 
 
 def build_parser(default_operator: OperatorName = "filter", prog: str = "pvx filter") -> argparse.ArgumentParser:

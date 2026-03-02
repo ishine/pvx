@@ -252,6 +252,9 @@ Interpolation choices:
 - `--interp linear` (default)
 - `--interp nearest`
 - `--interp cubic`
+- `--interp exponential` (piecewise exponential easing)
+- `--interp s_curve` (piecewise smoothstep S-curve easing)
+- `--interp smootherstep` (piecewise quintic S-curve easing)
 - `--interp polynomial --order N` (any integer `N >= 1`, default `N=3`; effective degree is capped to `min(N, control_points-1)`)
 
 Polynomial order examples:
@@ -325,6 +328,9 @@ Interpolation graph examples (same control points, different interpolation mode/
 | `nearest` | ![nearest interpolation](docs/assets/interpolation/interp_nearest.svg) |
 | `linear` | ![linear interpolation](docs/assets/interpolation/interp_linear.svg) |
 | `cubic` | ![cubic interpolation](docs/assets/interpolation/interp_cubic.svg) |
+| `exponential` | ![exponential interpolation](docs/assets/interpolation/interp_exponential.svg) |
+| `s_curve (smoothstep)` | ![s_curve smoothstep interpolation](docs/assets/interpolation/interp_s_curve.svg) |
+| `smootherstep` | ![smootherstep interpolation](docs/assets/interpolation/interp_smootherstep.svg) |
 | `polynomial order 1` | ![polynomial order 1](docs/assets/interpolation/interp_polynomial_order_1.svg) |
 | `polynomial order 2` | ![polynomial order 2](docs/assets/interpolation/interp_polynomial_order_2.svg) |
 | `polynomial order 3` | ![polynomial order 3](docs/assets/interpolation/interp_polynomial_order_3.svg) |
@@ -615,7 +621,8 @@ Start
 | Tempo stretch with transient care | `pvx voc` | `pvx voc drums.wav --stretch 1.2 --transient-preserve --phase-locking identity --output drums_120.wav` |
 | Harmonic layering | `pvx harmonize` | `pvx harmonize lead.wav --intervals 0,4,7 --gains 1,0.8,0.7 --output-dir out` |
 | Cross-source morphing / cross-synthesis | `pvx morph` | `pvx morph a.wav b.wav --blend-mode carrier_a_envelope_b --alpha 0.7 --output morph.wav` |
-| Build control envelope map | `pvx envelope` | `pvx envelope --mode adsr --duration 8 --rate 20 --key stretch --output stretch_env.csv` |
+| Build control envelope map | `pvx envelope` / `pvx lfo` | `pvx envelope --mode adsr --duration 8 --rate 20 --key stretch --output stretch_env.csv` |
+| Build periodic LFO map (sine/triangle/square/saw) | `pvx lfo` | `pvx lfo --wave triangle --duration 8 --frequency-hz 0.5 --center 1.0 --amplitude 0.2 --key stretch --output stretch_lfo.csv` |
 | Reshape control map | `pvx reshape` | `pvx reshape stretch_env.csv --key stretch --operation resample --rate 50 --interp polynomial --order 5 --output stretch_dense.csv` |
 
 More complete examples and use-case playbooks (72+ runnable recipes): [docs/EXAMPLES.md](docs/EXAMPLES.md)
@@ -953,6 +960,29 @@ pvx pitch-track A.wav --output - \
   | pvx voc B.wav --control-stdin --route stretch=pitch_ratio --route pitch_ratio=const(1.0) --output B_time_follow.wav
 ```
 
+### Can I generate LFOs from the command line (sine/triangle/ramp/square/saw)?
+Yes. Use `pvx lfo` (alias for `pvx envelope`) and select `--wave`:
+
+```bash
+# Triangle LFO using frequency in Hz
+pvx lfo --wave triangle --duration 8 --frequency-hz 0.5 --center 1.0 --amplitude 0.2 --key stretch --output stretch_tri.csv
+
+# Sine LFO using cycle count over clip duration
+pvx lfo --wave sine --duration 12 --cycles 6 --center 1.0 --amplitude 0.25 --key stretch --output stretch_sine.csv
+
+# Square LFO with duty cycle
+pvx lfo --wave square --duration 8 --frequency-hz 2.0 --center 1.0 --amplitude 0.3 --duty-cycle 0.35 --key pitch_ratio --output pitch_square.csv
+
+# Ramp envelope (non-periodic)
+pvx lfo --wave ramp --duration 6 --start 1.0 --end 0.5 --key stretch --output stretch_ramp.csv
+```
+
+Then apply with control-bus routing:
+
+```bash
+pvx voc input.wav --stretch stretch_tri.csv --interp linear --output out.wav
+```
+
 ### How large can stretch get before it becomes impractical?
 Use:
 
@@ -1041,7 +1071,7 @@ What translates well into modern `pvx`:
 | --- | --- | --- |
 | Tool-per-task command design (`plainpv`, `twarp`, `harmonizer`, etc.) | Keeps workflows composable and scriptable | `pvx` subcommands (`voc`, `freeze`, `harmonize`, `conform`, `retune`, `morph`, `analysis`, `response`, ...) plus `pvx chain` |
 | Command help as a first-class UX surface | Beginners discover flags faster from terminal help than docs | `pvx --help`, grouped flag sections, `--example`, `--guided`, and script-level example blocks |
-| Dynamic parameter control from external data files | Real workflows need time-varying control, not static knobs | Per-parameter CSV/JSON control-rate signals with interpolation (`none`, `linear`, `nearest`, `cubic`, `polynomial`) |
+| Dynamic parameter control from external data files | Real workflows need time-varying control, not static knobs | Per-parameter CSV/JSON control-rate signals with interpolation (`none`, `linear`, `nearest`, `cubic`, `exponential`, `s_curve`, `smootherstep`, `polynomial`) |
 | Shell-script driven reproducibility | Repeatable runs matter for research and production | Copy-paste recipes, `pvx examples`, benchmark scripts, JSON manifests, and deterministic CPU mode |
 | Explicit defaults shown in help | Makes behavior predictable and debuggable | Shared defaults + output policy + ASCII metric tables for every non-silent run |
 | Analysis/synthesis experimentation mindset | Quality work needs inspectable internals and comparisons | Transform selection (`fft`, `dft`, `czt`, `dct`, `dst`, `hartley`) and benchmark gates vs baselines |

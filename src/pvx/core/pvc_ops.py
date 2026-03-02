@@ -24,7 +24,56 @@ from pvx.core.response_store import ResponseArtifact
 from pvx.core.voc import VocoderConfig, istft, stft
 
 OperatorName = Literal["filter", "tvfilter", "noisefilter", "bandamp", "spec-compander"]
-InterpMode = Literal["none", "stairstep", "nearest", "linear", "cubic", "polynomial"]
+InterpMode = Literal[
+    "none",
+    "stairstep",
+    "nearest",
+    "linear",
+    "cubic",
+    "polynomial",
+    "exponential",
+    "s_curve",
+    "smootherstep",
+]
+
+
+def _piecewise_segment_fraction(
+    query_t: np.ndarray,
+    control_t: np.ndarray,
+    *,
+    side: str = "right",
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Map query times to control-point segments and normalized local fractions."""
+    idx = np.searchsorted(control_t, query_t, side=side) - 1
+    idx = np.clip(idx, 0, control_t.size - 2)
+    t0 = control_t[idx]
+    t1 = control_t[idx + 1]
+    span = np.maximum(1e-12, t1 - t0)
+    u = (query_t - t0) / span
+    u = np.clip(u, 0.0, 1.0)
+    return idx, t0, u
+
+
+def _smoothstep(u: np.ndarray) -> np.ndarray:
+    # Cubic Hermite easing in [0,1] with zero first derivative at boundaries.
+    return (u * u) * (3.0 - 2.0 * u)
+
+
+def _smootherstep(u: np.ndarray) -> np.ndarray:
+    # Quintic Hermite easing with zero first and second derivatives at boundaries.
+    return (u * u * u) * (u * (u * 6.0 - 15.0) + 10.0)
+
+
+def _exp_ease(u: np.ndarray, *, strength: float) -> np.ndarray:
+    # Normalized exponential ease-in curve; strength>=0 controls convexity.
+    k = max(0.0, float(strength))
+    if k <= 1e-9:
+        return u
+    num = np.expm1(k * u)
+    den = np.expm1(k)
+    if abs(den) <= 1e-12:
+        return u
+    return num / den
 
 
 def db_to_amp(db: float) -> float:
@@ -199,6 +248,18 @@ def evaluate_scalar_control(
         coef = np.polyfit(t, v, deg=deg)
         out = np.polyval(coef, times)
         return np.asarray(out, dtype=np.float64)
+    if interp == "exponential":
+        seg_idx, _, u = _piecewise_segment_fraction(times, t, side="right")
+        eased = _exp_ease(u, strength=4.0)
+        return v[seg_idx] + (v[seg_idx + 1] - v[seg_idx]) * eased
+    if interp == "s_curve":
+        seg_idx, _, u = _piecewise_segment_fraction(times, t, side="right")
+        eased = _smoothstep(u)
+        return v[seg_idx] + (v[seg_idx + 1] - v[seg_idx]) * eased
+    if interp == "smootherstep":
+        seg_idx, _, u = _piecewise_segment_fraction(times, t, side="right")
+        eased = _smootherstep(u)
+        return v[seg_idx] + (v[seg_idx + 1] - v[seg_idx]) * eased
     if interp == "polynomial":
         deg = max(1, min(int(order), v.size - 1))
         coef = np.polyfit(t, v, deg=deg)

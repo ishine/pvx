@@ -801,6 +801,36 @@ def _sample_interpolation_curve(
     *,
     order: int = 3,
 ) -> np.ndarray:
+    def _smoothstep(u: np.ndarray) -> np.ndarray:
+        return (u * u) * (3.0 - 2.0 * u)
+
+    def _smootherstep(u: np.ndarray) -> np.ndarray:
+        return (u * u * u) * (u * (u * 6.0 - 15.0) + 10.0)
+
+    def _exp_ease(u: np.ndarray, strength: float) -> np.ndarray:
+        k = max(0.0, float(strength))
+        if k <= 1e-9:
+            return u
+        den = np.expm1(k)
+        if abs(den) <= 1e-12:
+            return u
+        return np.expm1(k * u) / den
+
+    def _piecewise_ease(mode_name: str) -> np.ndarray:
+        idx = np.searchsorted(x_control, x_query, side="right") - 1
+        idx = np.clip(idx, 0, x_control.size - 2)
+        x0 = x_control[idx]
+        x1 = x_control[idx + 1]
+        u = (x_query - x0) / np.maximum(1e-12, x1 - x0)
+        u = np.clip(u, 0.0, 1.0)
+        if mode_name == "exponential":
+            eased = _exp_ease(u, max(1, int(order)))
+        elif mode_name == "s_curve":
+            eased = _smoothstep(u)
+        else:
+            eased = _smootherstep(u)
+        return y_control[idx] + (y_control[idx + 1] - y_control[idx]) * eased
+
     mode_key = str(mode).strip().lower()
     if mode_key == "none":
         idx = np.searchsorted(x_control, x_query, side="right") - 1
@@ -819,6 +849,8 @@ def _sample_interpolation_curve(
         return np.interp(x_query, x_control, y_control)
     if mode_key == "cubic":
         return _natural_cubic_spline_eval(x_control, y_control, x_query)
+    if mode_key in {"exponential", "s_curve", "smootherstep"}:
+        return _piecewise_ease(mode_key)
     if mode_key == "polynomial":
         degree = min(max(1, int(order)), x_control.size - 1)
         coeffs = np.polyfit(x_control, y_control, deg=degree)
@@ -905,6 +937,9 @@ def generate_interpolation_assets() -> dict[str, object]:
         ("nearest", "nearest", None),
         ("linear", "linear", None),
         ("cubic", "cubic", None),
+        ("exponential", "exponential", None),
+        ("s_curve", "S-curve (smoothstep)", None),
+        ("smootherstep", "S-curve (smootherstep)", None),
         ("polynomial", "polynomial order 1", 1),
         ("polynomial", "polynomial order 2", 2),
         ("polynomial", "polynomial order 3", 3),
@@ -1158,7 +1193,8 @@ def write_math_foundations(interpolation_gallery: dict[str, object], function_ga
     lines.append("where $M$ is the number of control points. In command-line interface (CLI) usage, `--order` accepts any integer $\\ge 1$.")
     lines.append("The effective degree is automatically capped to avoid over-specification when there are too few points.")
     lines.append("")
-    lines.append("Nearest/linear/cubic are local interpolation modes; `none` is sample-and-hold (stairstep).")
+    lines.append("Nearest/linear/cubic/exponential/S-curve are local interpolation modes; `none` is sample-and-hold (stairstep).")
+    lines.append("`exponential` uses piecewise exponential easing and `s_curve`/`smootherstep` use Hermite S-shaped easing between adjacent control points.")
     lines.append("Legend used in each plot: blue solid line = interpolated control curve $u(t)$, red dashed line = piecewise connection of control points, red circles labeled $p_i$ = original control points.")
     lines.append("")
     lines.append("| Interpolation mode | CLI form | Example plot |")

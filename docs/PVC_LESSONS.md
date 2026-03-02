@@ -35,7 +35,7 @@ Why it matters:
 
 `pvx` carry-forward:
 - CSV/JSON control-rate signals on core numeric parameters
-- interpolation modes (`none`, `linear`, `nearest`, `cubic`, `polynomial`)
+- interpolation modes (`none`, `linear`, `nearest`, `cubic`, `exponential`, `s_curve`, `smootherstep`, `polynomial`)
 
 ## 1.3 Terminal-first discoverability
 

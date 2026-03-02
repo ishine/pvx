@@ -19,6 +19,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(1, str(ROOT))
 
 from pvx.cli.pvxenvelope import main as envelope_main
+from pvx.cli.pvx import main as pvx_main
 from pvx.cli.pvxreshape import main as reshape_main
 from pvx.core.pvc_functions import (
     dump_control_points_csv,
@@ -26,6 +27,7 @@ from pvx.core.pvc_functions import (
     parse_control_points_payload,
     reshape_control_points,
 )
+from pvx.core.pvc_ops import evaluate_scalar_control
 
 
 class TestPVCPhase6Utilities(unittest.TestCase):
@@ -76,6 +78,30 @@ class TestPVCPhase6Utilities(unittest.TestCase):
         )
         self.assertEqual(out_t.size, 3)
         self.assertTrue(np.allclose(out_v, v, atol=1e-9))
+
+    def test_generate_triangle_lfo_bounds(self) -> None:
+        times, values = generate_envelope_points(
+            duration_sec=2.0,
+            rate_hz=20.0,
+            mode="triangle",
+            start=1.0,
+            peak=0.25,
+            sine_cycles=2.0,
+        )
+        self.assertGreaterEqual(times.size, 2)
+        self.assertGreaterEqual(float(np.min(values)), 0.75 - 1e-6)
+        self.assertLessEqual(float(np.max(values)), 1.25 + 1e-6)
+
+    def test_new_interpolation_modes_are_supported(self) -> None:
+        frame_t = np.linspace(0.0, 1.0, num=21, dtype=np.float64)
+        ctrl_t = np.asarray([0.0, 0.5, 1.0], dtype=np.float64)
+        ctrl_v = np.asarray([1.0, 2.0, 1.0], dtype=np.float64)
+        for mode in ("exponential", "s_curve", "smootherstep"):
+            out = evaluate_scalar_control(frame_t, ctrl_t, ctrl_v, mode=mode, order=3)
+            self.assertEqual(out.shape, frame_t.shape)
+            self.assertTrue(np.isfinite(out).all())
+            self.assertAlmostEqual(float(out[0]), 1.0, places=6)
+            self.assertAlmostEqual(float(out[-1]), 1.0, places=6)
 
 
 class TestPVCPhase6Cli(unittest.TestCase):
@@ -128,6 +154,76 @@ class TestPVCPhase6Cli(unittest.TestCase):
             text = dst.read_text(encoding="utf-8")
             self.assertIn("0.500000000", text)
             self.assertIn("1.000000000", text)
+
+    def test_envelope_cli_lfo_alias_args_write_csv(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="pvx-p6-lfo-") as tmp:
+            out = Path(tmp) / "lfo.csv"
+            code = envelope_main(
+                [
+                    "--wave",
+                    "triangle",
+                    "--duration",
+                    "2.0",
+                    "--rate",
+                    "10",
+                    "--frequency-hz",
+                    "0.5",
+                    "--center",
+                    "1.0",
+                    "--amplitude",
+                    "0.2",
+                    "--key",
+                    "stretch",
+                    "--output",
+                    str(out),
+                    "--quiet",
+                ]
+            )
+            self.assertEqual(code, 0)
+            text = out.read_text(encoding="utf-8")
+            self.assertIn("time_sec,stretch", text)
+
+    def test_envelope_cli_rejects_cycles_and_frequency_together(self) -> None:
+        with self.assertRaises(SystemExit):
+            envelope_main(
+                [
+                    "--wave",
+                    "sine",
+                    "--duration",
+                    "1.0",
+                    "--cycles",
+                    "2",
+                    "--frequency-hz",
+                    "2.0",
+                    "--quiet",
+                ]
+            )
+
+    def test_pvx_lfo_alias_dispatches_envelope_tool(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="pvx-p6-lfo-dispatch-") as tmp:
+            out = Path(tmp) / "dispatch.csv"
+            code = pvx_main(
+                [
+                    "lfo",
+                    "--wave",
+                    "sine",
+                    "--duration",
+                    "1.0",
+                    "--cycles",
+                    "2",
+                    "--center",
+                    "1.0",
+                    "--amplitude",
+                    "0.1",
+                    "--key",
+                    "stretch",
+                    "--output",
+                    str(out),
+                    "--quiet",
+                ]
+            )
+            self.assertEqual(code, 0)
+            self.assertTrue(out.exists())
 
 
 if __name__ == "__main__":

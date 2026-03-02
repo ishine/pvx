@@ -177,6 +177,9 @@ The same control points produce different trajectories depending on `--interp` a
 | `nearest` | ![nearest interpolation](assets/interpolation/interp_nearest.svg) |
 | `linear` | ![linear interpolation](assets/interpolation/interp_linear.svg) |
 | `cubic` | ![cubic interpolation](assets/interpolation/interp_cubic.svg) |
+| `exponential` | ![exponential interpolation](assets/interpolation/interp_exponential.svg) |
+| `s_curve` | ![s_curve interpolation](assets/interpolation/interp_s_curve.svg) |
+| `smootherstep` | ![smootherstep interpolation](assets/interpolation/interp_smootherstep.svg) |
 | `polynomial --order 1` | ![polynomial order 1](assets/interpolation/interp_polynomial_order_1.svg) |
 | `polynomial --order 2` | ![polynomial order 2](assets/interpolation/interp_polynomial_order_2.svg) |
 | `polynomial --order 3` | ![polynomial order 3](assets/interpolation/interp_polynomial_order_3.svg) |

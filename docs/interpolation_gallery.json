@@ -1,6 +1,6 @@
 {
-  "commit": "c16cda3",
-  "commit_date": "2026-03-01T17:07:51-05:00",
+  "commit": "77bdfde",
+  "commit_date": "2026-03-02T01:29:29-05:00",
   "control_points": [
     {
       "time_sec": 0.0,
@@ -51,6 +51,24 @@
       "mode": "cubic",
       "order": null,
       "path": "assets/interpolation/interp_cubic.svg"
+    },
+    {
+      "label": "exponential",
+      "mode": "exponential",
+      "order": null,
+      "path": "assets/interpolation/interp_exponential.svg"
+    },
+    {
+      "label": "S-curve (smoothstep)",
+      "mode": "s_curve",
+      "order": null,
+      "path": "assets/interpolation/interp_s_curve.svg"
+    },
+    {
+      "label": "S-curve (smootherstep)",
+      "mode": "smootherstep",
+      "order": null,
+      "path": "assets/interpolation/interp_smootherstep.svg"
     },
     {
       "label": "polynomial order 1",

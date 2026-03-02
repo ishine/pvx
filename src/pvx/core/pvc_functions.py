@@ -21,8 +21,18 @@ import numpy as np
 
 from pvx.core.pvc_ops import evaluate_scalar_control
 
-InterpMode = Literal["none", "stairstep", "nearest", "linear", "cubic", "polynomial"]
-EnvelopeMode = Literal["adsr", "ramp", "exp", "sine"]
+InterpMode = Literal[
+    "none",
+    "stairstep",
+    "nearest",
+    "linear",
+    "cubic",
+    "polynomial",
+    "exponential",
+    "s_curve",
+    "smootherstep",
+]
+EnvelopeMode = Literal["adsr", "ramp", "exp", "sine", "triangle", "square", "saw_up", "saw_down"]
 ReshapeOperation = Literal[
     "scale",
     "offset",
@@ -36,8 +46,27 @@ ReshapeOperation = Literal[
     "resample",
 ]
 
-INTERP_CHOICES: tuple[InterpMode, ...] = ("none", "stairstep", "nearest", "linear", "cubic", "polynomial")
-ENVELOPE_MODES: tuple[EnvelopeMode, ...] = ("adsr", "ramp", "exp", "sine")
+INTERP_CHOICES: tuple[InterpMode, ...] = (
+    "none",
+    "stairstep",
+    "nearest",
+    "linear",
+    "cubic",
+    "polynomial",
+    "exponential",
+    "s_curve",
+    "smootherstep",
+)
+ENVELOPE_MODES: tuple[EnvelopeMode, ...] = (
+    "adsr",
+    "ramp",
+    "exp",
+    "sine",
+    "triangle",
+    "square",
+    "saw_up",
+    "saw_down",
+)
 RESHAPE_OPERATIONS: tuple[ReshapeOperation, ...] = (
     "scale",
     "offset",
@@ -222,6 +251,7 @@ def generate_envelope_points(
     exp_curve: float = 4.0,
     sine_cycles: float = 1.0,
     sine_phase_rad: float = 0.0,
+    duty_cycle: float = 0.5,
     min_value: float | None = None,
     max_value: float | None = None,
 ) -> tuple[np.ndarray, np.ndarray]:
@@ -277,6 +307,31 @@ def generate_envelope_points(
         u = times / max(duration, 1e-12)
         phase = (2.0 * np.pi * float(sine_cycles) * u) + float(sine_phase_rad)
         values = float(start) + float(peak) * np.sin(phase)
+    elif mode_norm == "triangle":
+        cycles = float(sine_cycles)
+        phase_cycles = float(sine_phase_rad) / (2.0 * np.pi)
+        u = np.mod((times / max(duration, 1e-12)) * cycles + phase_cycles, 1.0)
+        tri = 1.0 - 4.0 * np.abs(u - 0.5)
+        values = float(start) + float(peak) * tri
+    elif mode_norm == "square":
+        duty = float(np.clip(float(duty_cycle), 1e-6, 1.0 - 1e-6))
+        cycles = float(sine_cycles)
+        phase_cycles = float(sine_phase_rad) / (2.0 * np.pi)
+        u = np.mod((times / max(duration, 1e-12)) * cycles + phase_cycles, 1.0)
+        sq = np.where(u < duty, 1.0, -1.0)
+        values = float(start) + float(peak) * sq
+    elif mode_norm == "saw_up":
+        cycles = float(sine_cycles)
+        phase_cycles = float(sine_phase_rad) / (2.0 * np.pi)
+        u = np.mod((times / max(duration, 1e-12)) * cycles + phase_cycles, 1.0)
+        saw = (2.0 * u) - 1.0
+        values = float(start) + float(peak) * saw
+    elif mode_norm == "saw_down":
+        cycles = float(sine_cycles)
+        phase_cycles = float(sine_phase_rad) / (2.0 * np.pi)
+        u = np.mod((times / max(duration, 1e-12)) * cycles + phase_cycles, 1.0)
+        saw = 1.0 - (2.0 * u)
+        values = float(start) + float(peak) * saw
     else:
         raise ValueError(f"Unsupported envelope mode: {mode}")
 

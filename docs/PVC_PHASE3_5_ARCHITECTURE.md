@@ -62,7 +62,7 @@ Key design choices:
 - Response artifacts are loaded from PVXRF.
 - Response curves are resized/shifted to match active STFT bins.
 - Time-varying controls are scalar maps with interpolation modes:
-  - `none`, `stairstep`, `nearest`, `linear`, `cubic`, `polynomial`
+  - `none`, `stairstep`, `nearest`, `linear`, `cubic`, `exponential`, `s_curve`, `smootherstep`, `polynomial`
 
 ## 4) Phase 4 Design
 
@@ -102,4 +102,3 @@ Key design choices:
 ## Attribution
 
 Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
-

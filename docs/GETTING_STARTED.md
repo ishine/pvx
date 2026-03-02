@@ -221,7 +221,7 @@ JSON schema quick reference:
 
 | Key | Required | Type | Meaning |
 | --- | --- | --- | --- |
-| `interpolation` / `interp` | no | string | Interpolation override (`none`, `linear`, `nearest`, `cubic`, `polynomial`) |
+| `interpolation` / `interp` | no | string | Interpolation override (`none`, `linear`, `nearest`, `cubic`, `exponential`, `s_curve`, `smootherstep`, `polynomial`) |
 | `order` | no | integer | Polynomial order for `polynomial` interpolation |
 | `points` | yes (point mode) | array | Time/value points |
 | `points[].time_sec` | yes | number | Timestamp in seconds |
@@ -243,6 +243,9 @@ Interpolation graph examples:
 | `nearest` | ![nearest interpolation](assets/interpolation/interp_nearest.svg) |
 | `linear` | ![linear interpolation](assets/interpolation/interp_linear.svg) |
 | `cubic` | ![cubic interpolation](assets/interpolation/interp_cubic.svg) |
+| `exponential` | ![exponential interpolation](assets/interpolation/interp_exponential.svg) |
+| `s_curve (smoothstep)` | ![s_curve interpolation](assets/interpolation/interp_s_curve.svg) |
+| `smootherstep` | ![smootherstep interpolation](assets/interpolation/interp_smootherstep.svg) |
 | `polynomial order 1` | ![polynomial order 1](assets/interpolation/interp_polynomial_order_1.svg) |
 | `polynomial order 2` | ![polynomial order 2](assets/interpolation/interp_polynomial_order_2.svg) |
 | `polynomial order 3` | ![polynomial order 3](assets/interpolation/interp_polynomial_order_3.svg) |
@@ -533,6 +536,10 @@ pvx retune vocal.wav --recommend-root --scale minor --output vocal_auto_root.wav
 
 # Denoise then dereverb
 pvx denoise noisy.wav --reduction-db 8 --stdout | pvx deverb - --strength 0.3 --output noisy_clean.wav
+
+# Generate an LFO control map (triangle) and apply it as time-varying stretch
+pvx lfo --wave triangle --duration 12 --frequency-hz 0.4 --center 1.0 --amplitude 0.2 --key stretch --output controls/stretch_tri.csv
+pvx voc input.wav --stretch controls/stretch_tri.csv --interp linear --output input_tri_stretch.wav
 ```
 
 Run them in order, listen after each step, and resist changing ten parameters at once unless chaos is the objective.

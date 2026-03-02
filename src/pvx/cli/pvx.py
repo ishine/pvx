@@ -135,7 +135,7 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
         name="envelope",
         entrypoint="pvx.cli.pvxenvelope:main",
         summary="Generate control-rate envelope maps (CSV/JSON)",
-        aliases=("pvxenvelope",),
+        aliases=("pvxenvelope", "lfo"),
     ),
     ToolSpec(
         name="reshape",
@@ -280,8 +280,8 @@ EXAMPLE_COMMANDS: dict[str, tuple[str, str]] = {
         "pvx response create input.pvxan.npz --output input.pvxrf.npz --method median --normalize peak",
     ),
     "envelope": (
-        "Generate a stretch envelope control map",
-        "pvx envelope --mode adsr --duration 8 --rate 20 --attack-sec 0.2 --decay-sec 0.6 --sustain 1.1 --release-sec 1.0 --key stretch --output stretch_env.csv",
+        "Generate a stretch envelope/LFO control map",
+        "pvx lfo --wave triangle --duration 8 --frequency-hz 0.5 --center 1.0 --amplitude 0.2 --key stretch --output stretch_lfo.csv",
     ),
     "reshape": (
         "Reshape and resample a control map",
