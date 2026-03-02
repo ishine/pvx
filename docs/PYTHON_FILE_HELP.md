@@ -4192,8 +4192,6 @@ Unified top-level CLI for the pvx command suite.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxanalysis.py", line 15, in <module>
     from pvx.core.analysis_store import (
-    ...<4 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4272,8 +4270,6 @@ Chordmapper wrapper.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxconform.py", line 13, in <module>
     from pvx.core.common import (
-    ...<19 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4300,8 +4296,6 @@ Conform timing and pitch to a user-provided segment map.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxdenoise.py", line 13, in <module>
     from pvx.core.common import (
-    ...<15 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4328,8 +4322,6 @@ Phase-consistent spectral denoiser.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxdeverb.py", line 12, in <module>
     from pvx.core.common import (
-    ...<15 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4356,8 +4348,6 @@ Spectral tail suppression for dereverberation-like cleanup.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxenvelope.py", line 12, in <module>
     from pvx.core.common import (
-    ...<4 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4384,8 +4374,6 @@ PVC-style envelope function-stream generator.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxfilter.py", line 11, in <module>
     from pvx.core.common import (
-    ...<15 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4412,8 +4400,6 @@ PVC-inspired response-driven spectral operators.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxformant.py", line 12, in <module>
     from pvx.core.common import (
-    ...<18 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4440,8 +4426,6 @@ Formant processing tool with optional pitch shifting.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxfreeze.py", line 12, in <module>
     from pvx.core.common import (
-    ...<15 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4468,8 +4452,6 @@ Spectral freeze tool built on pvx phase-vocoder primitives.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxharmmap.py", line 10, in <module>
     from pvx.core.common import (
-    ...<15 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4496,8 +4478,6 @@ PVC-inspired harmonic/chord spectral mapping CLI.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxharmonize.py", line 12, in <module>
     from pvx.core.common import (
-    ...<18 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4550,8 +4530,6 @@ Inharmonator wrapper.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxlayer.py", line 12, in <module>
     from pvx.core.common import (
-    ...<18 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4578,8 +4556,6 @@ Layered harmonic/percussive processing with independent controls.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxmorph.py", line 17, in <module>
     from pvx.core.audio_metrics import (
-    ...<3 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4632,8 +4608,6 @@ Response-profile noise filter wrapper.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxreshape.py", line 12, in <module>
     from pvx.core.common import (
-    ...<4 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4686,8 +4660,6 @@ Create and inspect reusable frequency-response artifacts (PVXRF).
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxretune.py", line 13, in <module>
     from pvx.core.common import (
-    ...<17 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4714,8 +4686,6 @@ Monophonic retuning with phase-vocoder segment processing.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxring.py", line 11, in <module>
     from pvx.core.common import (
-    ...<14 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4820,8 +4790,6 @@ Response-referenced spectral compander wrapper.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxtrajectoryreverb.py", line 13, in <module>
     from pvx.core.common import (
-    ...<12 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4848,8 +4816,6 @@ Trajectory-aware multichannel convolution reverb for mono sources.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxtransient.py", line 12, in <module>
     from pvx.core.common import (
-    ...<19 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4902,8 +4868,6 @@ Time-varying response filter wrapper.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxunison.py", line 13, in <module>
     from pvx.core.common import (
-    ...<16 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -4930,8 +4894,6 @@ Create unison width via micro-detuned phase-vocoder voices.
 Traceback (most recent call last):
   File "/app/src/pvx/cli/pvxwarp.py", line 13, in <module>
     from pvx.core.common import (
-    ...<19 lines>...
-    )
   File "/app/src/pvx/cli/pvx.py", line 26, in <module>
     from pvx.core.streaming import run_stateful_stream
 ModuleNotFoundError: No module named 'pvx.core'; 'pvx' is not a package
@@ -5269,9 +5231,7 @@ usage: voc.py [-h] [-o OUTPUT_DIR] [--suffix SUFFIX]
               [--stereo-mode {independent,mid_side_lock,ref_channel_lock}]
               [--ref-channel REF_CHANNEL]
               [--coherence-strength COHERENCE_STRENGTH]
-              [--pitch-shift-semitones PITCH_SHIFT_SEMITONES |
-              --pitch-shift-cents PITCH_SHIFT_CENTS |
-              --pitch-shift-ratio PITCH_SHIFT_RATIO | --target-f0 TARGET_F0]
+              [--pitch-shift-semitones PITCH_SHIFT_SEMITONES | --pitch-shift-cents PITCH_SHIFT_CENTS | --pitch-shift-ratio PITCH_SHIFT_RATIO | --target-f0 TARGET_F0]
               [--analysis-channel {first,mix}] [--f0-min F0_MIN]
               [--f0-max F0_MAX] [--pitch-mode {standard,formant-preserving}]
               [--formant-lifter FORMANT_LIFTER]
@@ -5293,7 +5253,8 @@ usage: voc.py [-h] [-o OUTPUT_DIR] [--suffix SUFFIX]
               [--compressor-release-ms COMPRESSOR_RELEASE_MS]
               [--compressor-makeup-db COMPRESSOR_MAKEUP_DB]
               [--expander-threshold-db EXPANDER_THRESHOLD_DB]
-              [--expander-ratio EX
+              [--expander-ratio EXPANDER_RATIO]
+
 ... [truncated]
 ```
 
