@@ -1309,7 +1309,7 @@ find sessions -name "*.wav" -print0 | xargs -0 -I{} pvx voc "{}" --stretch 1.05 
 
 **Command**
 ```bash
-pvx retune vocal.wav --scale minor --root A --f0-min 70 --f0-max 1000 --output-dir out --suffix _retune_amin
+pvx retune vocal.wav --scale minor --root A --a4-reference-hz 432 --f0-min 70 --f0-max 1000 --output-dir out --suffix _retune_amin
 ```
 
 **Explanation**
@@ -1321,6 +1321,7 @@ pvx retune vocal.wav --scale minor --root A --f0-min 70 --f0-max 1000 --output-d
 
 **Parameters that matter most**
 - `--scale`, `--root`
+- `--a4-reference-hz`
 - `--f0-min`, `--f0-max`
 
 **Artifacts to listen for**

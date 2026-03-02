@@ -500,6 +500,9 @@ pvx morph A.wav B.wav --alpha controls/alpha_curve.csv --interp linear --blend-m
 # Major-scale retune
 pvx retune vocal.wav --root C --scale major --strength 0.8 --output vocal_c_major.wav
 
+# Alternate concert pitch retune (A4 = 432 Hz)
+pvx retune vocal.wav --root A --scale minor --a4-reference-hz 432 --output vocal_a432.wav
+
 # Denoise then dereverb
 pvx denoise noisy.wav --reduction-db 8 --stdout | pvx deverb - --strength 0.3 --output noisy_clean.wav
 ```

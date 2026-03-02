@@ -17,6 +17,7 @@ import unittest
 import csv
 import io
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -24,9 +25,10 @@ import soundfile as sf
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CLI = ROOT / "pvxvoc.py"
-UNIFIED_CLI = ROOT / "pvx.py"
-HPS_CLI = ROOT / "HPS-pitch-track.py"
+CLI = [sys.executable, "-m", "pvx.core.voc"]
+UNIFIED_CLI = [sys.executable, "-m", "pvx.cli.pvx"]
+HPS_CLI = [sys.executable, "-m", "pvx.cli.hps_pitch_track"]
+os.environ["PYTHONPATH"] = str(ROOT / "src") + os.pathsep + os.environ.get("PYTHONPATH", "")
 
 
 def write_stereo_tone(path: Path, sr: int = 24000, duration: float = 0.5) -> tuple[np.ndarray, int]:
@@ -69,7 +71,7 @@ def write_mono_complex(path: Path, sr: int = 24000, duration: float = 0.5) -> tu
 
 class TestCLIRegression(unittest.TestCase):
     def test_unified_cli_lists_tools(self) -> None:
-        cmd = [sys.executable, str(UNIFIED_CLI), "list"]
+        cmd = [*UNIFIED_CLI, "list"]
         proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, msg=proc.stderr)
         self.assertIn("voc", proc.stdout)
@@ -85,8 +87,7 @@ class TestCLIRegression(unittest.TestCase):
             write_mono_tone(in_path, duration=0.4, freq_hz=220.0)
 
             cmd = [
-                sys.executable,
-                str(UNIFIED_CLI),
+                *UNIFIED_CLI,
                 "stretch-budget",
                 str(in_path),
                 "--disk-budget",
@@ -110,8 +111,7 @@ class TestCLIRegression(unittest.TestCase):
             write_mono_tone(in_path, duration=0.25, freq_hz=250.0)
 
             cmd = [
-                sys.executable,
-                str(UNIFIED_CLI),
+                *UNIFIED_CLI,
                 "stretch-budget",
                 str(in_path),
                 "--disk-budget",
@@ -138,8 +138,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "unified_out.wav"
 
             cmd = [
-                sys.executable,
-                str(UNIFIED_CLI),
+                *UNIFIED_CLI,
                 "voc",
                 str(in_path),
                 "--time-stretch",
@@ -167,8 +166,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "shortcut_out.wav"
 
             cmd = [
-                sys.executable,
-                str(UNIFIED_CLI),
+                *UNIFIED_CLI,
                 str(in_path),
                 "--stretch",
                 "1.10",
@@ -194,8 +192,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "chain_out.wav"
 
             cmd = [
-                sys.executable,
-                str(UNIFIED_CLI),
+                *UNIFIED_CLI,
                 "chain",
                 str(in_path),
                 "--pipeline",
@@ -219,8 +216,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "stream_out.wav"
 
             cmd = [
-                sys.executable,
-                str(UNIFIED_CLI),
+                *UNIFIED_CLI,
                 "stream",
                 str(in_path),
                 "--output",
@@ -247,8 +243,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "stream_wrapper_out.wav"
 
             cmd = [
-                sys.executable,
-                str(UNIFIED_CLI),
+                *UNIFIED_CLI,
                 "stream",
                 str(in_path),
                 "--mode",
@@ -279,8 +274,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "follow_out.wav"
 
             cmd = [
-                sys.executable,
-                str(UNIFIED_CLI),
+                *UNIFIED_CLI,
                 "follow",
                 str(guide_path),
                 str(target_path),
@@ -320,8 +314,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "follow_err_out.wav"
 
             cmd = [
-                sys.executable,
-                str(UNIFIED_CLI),
+                *UNIFIED_CLI,
                 "follow",
                 str(guide_path),
                 str(target_path),
@@ -334,26 +327,32 @@ class TestCLIRegression(unittest.TestCase):
             self.assertIn("Do not pass", proc.stderr)
 
     def test_unified_cli_help_follow_target(self) -> None:
-        cmd = [sys.executable, str(UNIFIED_CLI), "help", "follow"]
+        cmd = [*UNIFIED_CLI, "help", "follow"]
         proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, msg=proc.stderr)
         self.assertIn("pvx follow --help", proc.stdout)
 
     def test_unified_cli_help_stretch_budget_target(self) -> None:
-        cmd = [sys.executable, str(UNIFIED_CLI), "help", "stretch-budget"]
+        cmd = [*UNIFIED_CLI, "help", "stretch-budget"]
         proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, msg=proc.stderr)
         self.assertIn("pvx stretch-budget --help", proc.stdout)
 
+    def test_unified_cli_retune_help_includes_a4_reference_flag(self) -> None:
+        cmd = [*UNIFIED_CLI, "retune", "--help"]
+        proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+        self.assertIn("--a4-reference-hz", proc.stdout)
+
     def test_unified_cli_follow_example_basic(self) -> None:
-        cmd = [sys.executable, str(UNIFIED_CLI), "follow", "--example"]
+        cmd = [*UNIFIED_CLI, "follow", "--example"]
         proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, msg=proc.stderr)
         self.assertIn("[basic]", proc.stdout)
         self.assertIn("pvx follow guide.wav target.wav", proc.stdout)
 
     def test_unified_cli_follow_example_all(self) -> None:
-        cmd = [sys.executable, str(UNIFIED_CLI), "follow", "--example", "all"]
+        cmd = [*UNIFIED_CLI, "follow", "--example", "all"]
         proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, msg=proc.stderr)
         self.assertIn("pvx follow example commands", proc.stdout)
@@ -368,8 +367,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "freeze_out.wav"
 
             cmd = [
-                sys.executable,
-                str(UNIFIED_CLI),
+                *UNIFIED_CLI,
                 "freeze",
                 str(in_path),
                 "--duration",
@@ -393,8 +391,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "morph_env.wav"
 
             cmd = [
-                sys.executable,
-                str(UNIFIED_CLI),
+                *UNIFIED_CLI,
                 "morph",
                 str(a_path),
                 str(b_path),
@@ -429,8 +426,7 @@ class TestCLIRegression(unittest.TestCase):
             out_mask = tmp_path / "morph_mask.wav"
 
             cmd_linear = [
-                sys.executable,
-                str(UNIFIED_CLI),
+                *UNIFIED_CLI,
                 "morph",
                 str(a_path),
                 str(b_path),
@@ -444,8 +440,7 @@ class TestCLIRegression(unittest.TestCase):
                 "--quiet",
             ]
             cmd_mask = [
-                sys.executable,
-                str(UNIFIED_CLI),
+                *UNIFIED_CLI,
                 "morph",
                 str(a_path),
                 str(b_path),
@@ -492,8 +487,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "morph_traj.wav"
 
             cmd = [
-                sys.executable,
-                str(UNIFIED_CLI),
+                *UNIFIED_CLI,
                 "morph",
                 str(a_path),
                 str(b_path),
@@ -541,8 +535,7 @@ class TestCLIRegression(unittest.TestCase):
             write_mono_tone(in_path, duration=0.55, freq_hz=245.0)
 
             cmd = [
-                sys.executable,
-                str(HPS_CLI),
+                *HPS_CLI,
                 str(in_path),
                 "--backend",
                 "acf",
@@ -568,8 +561,7 @@ class TestCLIRegression(unittest.TestCase):
             write_mono_glide(in_path, duration=0.7, f0_start=160.0, f0_end=360.0)
 
             cmd = [
-                sys.executable,
-                str(HPS_CLI),
+                *HPS_CLI,
                 str(in_path),
                 "--backend",
                 "acf",
@@ -600,8 +592,7 @@ class TestCLIRegression(unittest.TestCase):
             write_mono_glide(in_path, duration=0.5, f0_start=150.0, f0_end=340.0)
 
             cmd = [
-                sys.executable,
-                str(HPS_CLI),
+                *HPS_CLI,
                 str(in_path),
                 "--backend",
                 "acf",
@@ -642,8 +633,7 @@ class TestCLIRegression(unittest.TestCase):
             input_audio, sr = write_stereo_tone(proc_src, duration=0.65)
 
             track_cmd = [
-                sys.executable,
-                str(HPS_CLI),
+                *HPS_CLI,
                 str(pitch_src),
                 "--backend",
                 "acf",
@@ -655,8 +645,7 @@ class TestCLIRegression(unittest.TestCase):
 
             out_path = tmp_path / "follow.wav"
             voc_cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(proc_src),
                 "--pitch-follow-stdin",
                 "--pitch-conf-min",
@@ -687,8 +676,7 @@ class TestCLIRegression(unittest.TestCase):
             input_audio, sr = write_stereo_tone(target_path, duration=0.65)
 
             track_cmd = [
-                sys.executable,
-                str(HPS_CLI),
+                *HPS_CLI,
                 str(guide_path),
                 "--backend",
                 "acf",
@@ -705,8 +693,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "feature_route_out.wav"
             # `clip(affine(...))` is expressed as chained routes.
             voc_cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(target_path),
                 "--control-stdin",
                 "--route",
@@ -741,8 +728,7 @@ class TestCLIRegression(unittest.TestCase):
             input_audio, sr = write_stereo_tone(target_path, duration=0.7)
 
             track_cmd = [
-                sys.executable,
-                str(HPS_CLI),
+                *HPS_CLI,
                 str(guide_path),
                 "--backend",
                 "acf",
@@ -758,8 +744,7 @@ class TestCLIRegression(unittest.TestCase):
 
             out_path = tmp_path / "route_follow.wav"
             voc_cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(target_path),
                 "--control-stdin",
                 "--route",
@@ -789,8 +774,7 @@ class TestCLIRegression(unittest.TestCase):
             in_path = tmp_path / "route_err.wav"
             write_mono_tone(in_path, duration=0.3, freq_hz=220.0)
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--route",
                 "stretch=pitch_ratio",
@@ -815,8 +799,7 @@ class TestCLIRegression(unittest.TestCase):
             )
             out_path = tmp_path / "dyn_stretch_out.wav"
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--stretch",
                 str(map_path),
@@ -853,8 +836,7 @@ class TestCLIRegression(unittest.TestCase):
             map_path.write_text(json.dumps(payload), encoding="utf-8")
             out_path = tmp_path / "dyn_pitch_out.wav"
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--time-stretch",
                 "1.0",
@@ -890,8 +872,7 @@ class TestCLIRegression(unittest.TestCase):
             }
             map_path.write_text(json.dumps(payload), encoding="utf-8")
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--pitch-shift-ratio",
                 str(map_path),
@@ -918,8 +899,7 @@ class TestCLIRegression(unittest.TestCase):
                 encoding="utf-8",
             )
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--n-fft",
                 str(map_path),
@@ -948,8 +928,7 @@ class TestCLIRegression(unittest.TestCase):
             )
             out_path = tmp_path / "dyn_formant_out.wav"
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--pitch-mode",
                 "formant-preserving",
@@ -987,8 +966,7 @@ class TestCLIRegression(unittest.TestCase):
             )
             out_path = tmp_path / "stream_dyn_out.wav"
             cmd = [
-                sys.executable,
-                str(UNIFIED_CLI),
+                *UNIFIED_CLI,
                 "stream",
                 str(in_path),
                 "--output",
@@ -1019,8 +997,7 @@ class TestCLIRegression(unittest.TestCase):
             pitch_map = tmp_path / "legacy_map.csv"
             pitch_map.write_text("start_sec,end_sec,stretch,pitch_ratio\n0.0,0.3,1.0,1.0\n", encoding="utf-8")
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--stretch",
                 str(stretch_path),
@@ -1040,8 +1017,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "policy_out.wav"
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--time-stretch",
                 "1.0",
@@ -1080,8 +1056,7 @@ class TestCLIRegression(unittest.TestCase):
             input_audio, sr = write_stereo_tone(in_path)
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--time-stretch",
                 "1.3",
@@ -1119,8 +1094,7 @@ class TestCLIRegression(unittest.TestCase):
             sf.write(out_path, np.zeros((128, 2), dtype=np.float64), 24000)
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--target-f0",
                 "440",
@@ -1142,8 +1116,7 @@ class TestCLIRegression(unittest.TestCase):
             input_audio, sr = write_stereo_tone(in_path, duration=0.4)
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--pitch-shift-cents",
                 "50",
@@ -1169,8 +1142,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "alias_out.wav"
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--time-stretch-factor",
                 "1.12",
@@ -1196,8 +1168,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "extreme_out.wav"
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--time-stretch",
                 "4.0",
@@ -1233,8 +1204,7 @@ class TestCLIRegression(unittest.TestCase):
             input_audio, sr = write_stereo_tone(in_path, duration=0.35)
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--pitch-shift-ratio",
                 "2^(1/12)",
@@ -1257,8 +1227,7 @@ class TestCLIRegression(unittest.TestCase):
             input_audio, sr = write_stereo_tone(in_path, duration=0.3)
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--transform",
                 "dct",
@@ -1285,8 +1254,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "mr_out.wav"
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--multires-fusion",
                 "--multires-ffts",
@@ -1320,8 +1288,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path_b = tmp_path / "cp_b.wav"
 
             base_cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--auto-segment-seconds",
                 "0.10",
@@ -1354,8 +1321,7 @@ class TestCLIRegression(unittest.TestCase):
             write_stereo_tone(in_path, duration=0.25)
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--auto-profile",
                 "--auto-transform",
@@ -1370,8 +1336,7 @@ class TestCLIRegression(unittest.TestCase):
 
     def test_cli_example_mode_outputs_command(self) -> None:
         cmd = [
-            sys.executable,
-            str(CLI),
+                *CLI,
             "--example",
             "basic",
         ]
@@ -1380,13 +1345,13 @@ class TestCLIRegression(unittest.TestCase):
         self.assertIn("pvx voc input.wav", proc.stdout)
 
     def test_unified_stream_help_includes_mode(self) -> None:
-        cmd = [sys.executable, str(UNIFIED_CLI), "stream", "--help"]
+        cmd = [*UNIFIED_CLI, "stream", "--help"]
         proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, msg=proc.stderr)
         self.assertIn("--mode {stateful,wrapper}", proc.stdout)
 
     def test_cli_help_contains_grouped_sections(self) -> None:
-        cmd = [sys.executable, str(CLI), "--help"]
+        cmd = [*CLI, "--help"]
         proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, msg=proc.stderr)
         help_text = proc.stdout
@@ -1413,8 +1378,7 @@ class TestCLIRegression(unittest.TestCase):
             in_path = tmp_path / "legacy_transient.wav"
             write_stereo_tone(in_path, duration=0.2)
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--transient-preserve",
                 "--explain-plan",
@@ -1432,8 +1396,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "alias_preset_out.wav"
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--preset",
                 "vocal",
@@ -1463,8 +1426,7 @@ class TestCLIRegression(unittest.TestCase):
             input_audio, sr = write_stereo_tone(in_path, sr=22050, duration=0.6)
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--fourier-sync",
                 "--n-fft",
@@ -1501,8 +1463,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "hybrid_out.wav"
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--transient-mode",
                 "hybrid",
@@ -1535,8 +1496,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "stereo_lock_out.wav"
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--stereo-mode",
                 "ref_channel_lock",
@@ -1566,8 +1526,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "metrics_out.wav"
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--time-stretch",
                 "1.05",
@@ -1592,8 +1551,7 @@ class TestCLIRegression(unittest.TestCase):
             out_path = tmp_path / "silent_metrics_out.wav"
 
             cmd = [
-                sys.executable,
-                str(CLI),
+                *CLI,
                 str(in_path),
                 "--time-stretch",
                 "1.05",

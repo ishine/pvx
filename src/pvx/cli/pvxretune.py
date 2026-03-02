@@ -60,12 +60,12 @@ SCALES = {
 }
 
 
-def freq_to_midi(freq: float) -> float:
-    return 69.0 + 12.0 * math.log2(freq / 440.0)
+def freq_to_midi(freq: float, *, a4_reference_hz: float = 440.0) -> float:
+    return 69.0 + 12.0 * math.log2(freq / float(a4_reference_hz))
 
 
-def midi_to_freq(midi: float) -> float:
-    return 440.0 * (2.0 ** ((midi - 69.0) / 12.0))
+def midi_to_freq(midi: float, *, a4_reference_hz: float = 440.0) -> float:
+    return float(a4_reference_hz) * (2.0 ** ((midi - 69.0) / 12.0))
 
 
 def normalize_octave_cents(values: list[float]) -> list[float]:
@@ -79,9 +79,10 @@ def nearest_scale_freq(
     scale_name: str,
     *,
     custom_scale_cents: list[float] | None = None,
+    a4_reference_hz: float = 440.0,
 ) -> float:
     root_class = NOTE_TO_CLASS[root.upper()]
-    midi = freq_to_midi(freq)
+    midi = freq_to_midi(freq, a4_reference_hz=float(a4_reference_hz))
     cents = midi * 100.0
     root_cents = float(root_class * 100)
     if custom_scale_cents is None:
@@ -99,7 +100,7 @@ def nearest_scale_freq(
             if err < best_err:
                 best_err = err
                 best = cand_cents
-    return midi_to_freq(best / 100.0)
+    return midi_to_freq(best / 100.0, a4_reference_hz=float(a4_reference_hz))
 
 
 def overlap_add(chunks: list[np.ndarray], starts: list[int], total_len: int) -> np.ndarray:
@@ -131,10 +132,12 @@ def build_parser() -> argparse.ArgumentParser:
             [
                 "pvx retune vocal.wav --root C --scale major --strength 0.8 --output vocal_major.wav",
                 "pvx retune flute.wav --root D --scale-cents 0,112,204,316,498,702,884,1088 --output flute_microtonal.wav",
+                "pvx retune vocal.wav --root A --scale minor --a4-reference-hz 432 --output vocal_a432.wav",
                 "pvx retune lead.wav --root A --scale minor --stdout | pvx unison - --voices 5 --detune-cents 10 --output lead_retune_unison.wav",
             ],
             notes=[
                 "Use --scale-cents for custom microtonal scales within one octave.",
+                "Use --a4-reference-hz for alternate concert pitch (for example 432 Hz).",
                 "Increase --chunk-ms for steadier pitch decisions, reduce for faster note changes.",
             ],
         ),
@@ -154,6 +157,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--strength", type=float, default=0.85, help="Correction strength 0..1")
     parser.add_argument("--chunk-ms", type=float, default=80.0, help="Analysis/process chunk duration in ms")
     parser.add_argument("--overlap-ms", type=float, default=20.0, help="Chunk overlap in ms")
+    parser.add_argument(
+        "--a4-reference-hz",
+        type=float,
+        default=440.0,
+        help="Concert-pitch reference for A4 in Hz (default: 440.0)",
+    )
     parser.add_argument("--f0-min", type=float, default=60.0)
     parser.add_argument("--f0-max", type=float, default=1200.0)
     parser.add_argument("--resample-mode", choices=["auto", "fft", "linear"], default="auto")
@@ -181,6 +190,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--chunk-ms must be > 5")
     if args.overlap_ms < 0:
         parser.error("--overlap-ms must be >= 0")
+    if not np.isfinite(float(args.a4_reference_hz)) or float(args.a4_reference_hz) <= 0.0:
+        parser.error("--a4-reference-hz must be a finite value > 0")
     if args.f0_min <= 0 or args.f0_max <= 0 or args.f0_min >= args.f0_max:
         parser.error("0 < --f0-min < --f0-max required")
 
@@ -215,6 +226,7 @@ def main(argv: list[str] | None = None) -> int:
                         args.root,
                         args.scale,
                         custom_scale_cents=custom_scale_cents,
+                        a4_reference_hz=float(args.a4_reference_hz),
                     )
                     ratio = target / f0
                 except Exception:

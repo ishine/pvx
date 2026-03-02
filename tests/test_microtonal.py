@@ -92,6 +92,17 @@ class TestMicrotonalSupport(unittest.TestCase):
         )
         self.assertAlmostEqual(target, 440.0 * cents_to_ratio(50.0), delta=0.01)
 
+    def test_nearest_scale_freq_supports_custom_a4_reference(self) -> None:
+        source = 432.0 * cents_to_ratio(33.0)
+        target = nearest_scale_freq(
+            source,
+            "A",
+            "chromatic",
+            custom_scale_cents=[0.0, 50.0, 100.0],
+            a4_reference_hz=432.0,
+        )
+        self.assertAlmostEqual(target, 432.0 * cents_to_ratio(50.0), delta=0.01)
+
     def test_choose_pitch_ratio_supports_cents(self) -> None:
         args = type(
             "Args",
