@@ -59,6 +59,7 @@ pvxringtvfilter = "pvx.cli.pvxringtvfilter:main"
 pvxharmmap = "pvx.cli.pvxharmmap:main"
 pvxchordmapper = "pvx.cli.pvxchordmapper:main"
 pvxinharmonator = "pvx.cli.pvxinharmonator:main"
+pvxtrajectoryreverb = "pvx.cli.pvxtrajectoryreverb:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

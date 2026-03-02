@@ -1,0 +1,366 @@
+.TH "PVXVOC" "1" "2026-03-01" "pvx" "User Commands"
+.SH NAME
+pvxvoc \- Phase-vocoder time/pitch processor
+.SH SYNOPSIS
+.B pvxvoc
+.SH DESCRIPTION
+Auto-generated from built-in --help output.
+.SH OPTIONS
+.nf
+usage: python3.14 \-m pvx.core.voc [\-h] [\-o OUTPUT_DIR] [\-\-suffix SUFFIX]
+                                  [\-\-output\-format OUTPUT_FORMAT]
+                                  [\-\-out OUTPUT] [\-\-overwrite] [\-\-dry\-run]
+                                  [\-\-stdout]
+                                  [\-\-verbosity {silent,quiet,normal,verbose,debug}]
+                                  [\-v] [\-\-quiet] [\-\-silent]
+                                  [\-\-preset {none,default,vocal,ambient,extreme,vocal_studio,drums_safe,extreme_ambient,stereo_coherent}]
+                                  [\-\-example {all,basic,vocal,ambient,extreme,drums_safe,stereo_coherent,hybrid,benchmark,gpu,pipeline,csv}]
+                                  [\-\-guided] [\-\-stretch STRETCH] [\-\-gpu]
+                                  [\-\-cpu]
+                                  [\-\-quality\-profile {neutral,speech,music,percussion,ambient,extreme}]
+                                  [\-\-auto\-profile]
+                                  [\-\-auto\-profile\-lookahead\-seconds AUTO_PROFILE_LOOKAHEAD_SECONDS]
+                                  [\-\-auto\-transform] [\-\-n\-fft N_FFT]
+                                  [\-\-win\-length WIN_LENGTH]
+                                  [\-\-hop\-size HOP_SIZE]
+                                  [\-\-window {hann,hamming,blackman,blackmanharris,nuttall,flattop,blackman_nuttall,exact_blackman,sine,bartlett,boxcar,triangular,bartlett_hann,tukey,tukey_0p1,tukey_0p25,tukey_0p75,tukey_0p9,parzen,lanczos,welch,gaussian_0p25,gaussian_0p35,gaussian_0p45,gaussian_0p55,gaussian_0p65,general_gaussian_1p5_0p35,general_gaussian_2p0_0p35,general_gaussian_3p0_0p35,general_gaussian_4p0_0p35,exponential_0p25,exponential_0p5,exponential_1p0,cauchy_0p5,cauchy_1p0,cauchy_2p0,cosine_power_2,cosine_power_3,cosine_power_4,hann_poisson_0p5,hann_poisson_1p0,hann_poisson_2p0,general_hamming_0p50,general_hamming_0p60,general_hamming_0p70,general_hamming_0p80,bohman,cosine,kaiser,rect}]
+                                  [\-\-kaiser\-beta KAISER_BETA]
+                                  [\-\-transform {fft,dft,czt,dct,dst,hartley}]
+                                  [\-\-no\-center]
+                                  [\-\-phase\-locking {off,identity}]
+                                  [\-\-phase\-engine {propagate,hybrid,random}]
+                                  [\-\-ambient\-phase\-mix AMBIENT_PHASE_MIX]
+                                  [\-\-phase\-random\-seed PHASE_RANDOM_SEED]
+                                  [\-\-transient\-preserve]
+                                  [\-\-transient\-threshold TRANSIENT_THRESHOLD]
+                                  [\-\-fourier\-sync]
+                                  [\-\-fourier\-sync\-min\-fft FOURIER_SYNC_MIN_FFT]
+                                  [\-\-fourier\-sync\-max\-fft FOURIER_SYNC_MAX_FFT]
+                                  [\-\-fourier\-sync\-smooth FOURIER_SYNC_SMOOTH]
+                                  [\-\-multires\-fusion]
+                                  [\-\-multires\-ffts MULTIRES_FFTS]
+                                  [\-\-multires\-weights MULTIRES_WEIGHTS]
+                                  [\-\-device {auto,cpu,cuda}]
+                                  [\-\-cuda\-device CUDA_DEVICE]
+                                  [\-\-time\-stretch TIME_STRETCH]
+                                  [\-\-target\-duration TARGET_DURATION]
+                                  [\-\-stretch\-mode {auto,standard,multistage}]
+                                  [\-\-extreme\-time\-stretch]
+                                  [\-\-extreme\-stretch\-threshold EXTREME_STRETCH_THRESHOLD]
+                                  [\-\-max\-stage\-stretch MAX_STAGE_STRETCH]
+                                  [\-\-onset\-time\-credit]
+                                  [\-\-onset\-credit\-pull ONSET_CREDIT_PULL]
+                                  [\-\-onset\-credit\-max ONSET_CREDIT_MAX]
+                                  [\-\-no\-onset\-realign] [\-\-ambient\-preset]
+                                  [\-\-auto\-segment\-seconds AUTO_SEGMENT_SECONDS]
+                                  [\-\-checkpoint\-dir CHECKPOINT_DIR]
+                                  [\-\-checkpoint\-id CHECKPOINT_ID] [\-\-resume]
+                                  [\-\-interp {none,linear,nearest,cubic,polynomial}]
+                                  [\-\-order ORDER]
+                                  [\-\-transient\-mode {off,reset,hybrid,wsola}]
+                                  [\-\-transient\-sensitivity TRANSIENT_SENSITIVITY]
+                                  [\-\-transient\-protect\-ms TRANSIENT_PROTECT_MS]
+                                  [\-\-transient\-crossfade\-ms TRANSIENT_CROSSFADE_MS]
+                                  [\-\-stereo\-mode {independent,mid_side_lock,ref_channel_lock}]
+                                  [\-\-ref\-channel REF_CHANNEL]
+                                  [\-\-coherence\-strength COHERENCE_STRENGTH]
+                                  [\-\-pitch\-shift\-semitones PITCH_SHIFT_SEMITONES |
+                                  \-\-pitch\-shift\-cents PITCH_SHIFT_CENTS |
+                                  \-\-pitch\-shift\-ratio PITCH_SHIFT_RATIO |
+                                  \-\-target\-f0 TARGET_F0]
+                                  [\-\-analysis\-channel {first,mix}]
+                                  [\-\-f0\-min F0_MIN] [\-\-f0\-max F0_MAX]
+                                  [\-\-pitch\-mode {standard,formant\-preserving}]
+                                  [\-\-formant\-lifter FORMANT_LIFTER]
+                                  [\-\-formant\-strength FORMANT_STRENGTH]
+                                  [\-\-formant\-max\-gain\-db FORMANT_MAX_GAIN_DB]
+                                  [\-\-pitch\-map PITCH_MAP] [\-\-pitch\-map\-stdin]
+                                  [\-\-control\-stdin] [\-\-route EXPR]
+                                  [\-\-pitch\-follow\-stdin]
+                                  [\-\-pitch\-conf\-min PITCH_CONF_MIN]
+                                  [\-\-pitch\-lowconf\-mode {hold,unity,interp}]
+                                  [\-\-pitch\-map\-smooth\-ms PITCH_MAP_SMOOTH_MS]
+                                  [\-\-pitch\-map\-crossfade\-ms PITCH_MAP_CROSSFADE_MS]
+                                  [\-\-target\-sample\-rate TARGET_SAMPLE_RATE]
+                                  [\-\-resample\-mode {auto,fft,linear}]
+                                  [\-\-normalize {none,peak,rms}]
+                                  [\-\-peak\-dbfs PEAK_DBFS]
+                                  [\-\-rms\-dbfs RMS_DBFS]
+                                  [\-\-target\-lufs TARGET_LUFS]
+                                  [\-\-compressor\-threshold\-db COMPRESSOR_THRESHOLD_DB]
+                                  [\-\-compressor\-ratio COMPRESSOR_RATIO]
+                                  [\-\-compressor\-attack\-ms COMPRESSOR_ATTACK_MS]
+                                  [\-\-compressor\-release\-ms COMPRESSOR_RELEASE_MS]
+                                  [\-\-compressor\-makeup\-db COMPRESSOR_MAKEUP_DB]
+                                  [\-\-expander\-threshold\-db EXPANDER_THRESHOLD_DB]
+                                  [\-\-expander\-ratio EXPANDER_RATIO]
+                                  [\-\-expander\-attack\-ms EXPANDER_ATTACK_MS]
+                                  [\-\-expander\-release\-ms EXPANDER_RELEASE_MS]
+                                  [\-\-compander\-threshold\-db COMPANDER_THRESHOLD_DB]
+                                  [\-\-compander\-compress\-ratio COMPANDER_COMPRESS_RATIO]
+                                  [\-\-compander\-expand\-ratio COMPANDER_EXPAND_RATIO]
+                                  [\-\-compander\-attack\-ms COMPANDER_ATTACK_MS]
+                                  [\-\-compander\-release\-ms COMPANDER_RELEASE_MS]
+                                  [\-\-compander\-makeup\-db COMPANDER_MAKEUP_DB]
+                                  [\-\-limiter\-threshold LIMITER_THRESHOLD]
+                                  [\-\-soft\-clip\-level SOFT_CLIP_LEVEL]
+                                  [\-\-soft\-clip\-type {tanh,arctan,cubic}]
+                                  [\-\-soft\-clip\-drive SOFT_CLIP_DRIVE]
+                                  [\-\-hard\-clip\-level HARD_CLIP_LEVEL] [\-\-clip]
+                                  [\-\-manifest\-json MANIFEST_JSON]
+                                  [\-\-manifest\-append] [\-\-subtype SUBTYPE]
+                                  [\-\-bit\-depth {inherit,16,24,32f}]
+                                  [\-\-dither {none,tpdf}]
+                                  [\-\-dither\-seed DITHER_SEED]
+                                  [\-\-true\-peak\-max\-dbtp TRUE_PEAK_MAX_DBTP]
+                                  [\-\-metadata\-policy {none,sidecar,copy}]
+                                  [\-\-explain\-plan]
+                                  [inputs ...]
+
+Phase\-vocoder CLI for multi\-file, multi\-channel time stretching and pitch shifting.
+
+positional arguments:
+  inputs                Input audio files/globs or '\-' for stdin
+
+options:
+  \-h, \-\-help            show this help message and exit
+
+I/O:
+  \-o, \-\-output\-dir OUTPUT_DIR
+                        Directory for output files (default: same directory as each input)
+  \-\-suffix SUFFIX       Suffix appended to output filename stem (default: _pv)
+  \-\-output\-format OUTPUT_FORMAT
+                        Output format/extension (e.g. wav, flac, aiff). Default: keep input extension.
+  \-\-out, \-\-output OUTPUT
+                        Explicit output file path (single\-input mode only). Alias: \-\-out
+  \-\-overwrite           Overwrite existing outputs
+  \-\-dry\-run             Resolve settings without writing files
+  \-\-stdout              Write processed audio to stdout stream (for piping); requires exactly one input
+
+Debug:
+  \-\-verbosity {silent,quiet,normal,verbose,debug}
+                        Console verbosity level
+  \-v, \-\-verbose         Increase verbosity (repeat for extra detail)
+  \-\-quiet               Reduce output and hide status bars
+  \-\-silent              Suppress all console output
+  \-\-explain\-plan        Print resolved processing plan JSON and exit without rendering audio.
+
+Beginner experience:
+  \-\-preset {none,default,vocal,ambient,extreme,vocal_studio,drums_safe,extreme_ambient,stereo_coherent}
+                        High\-level intent preset. Legacy: none/vocal/ambient/extreme. New: default/vocal_studio/drums_safe/extreme_ambient/stereo_coherent.
+  \-\-example {all,basic,vocal,ambient,extreme,drums_safe,stereo_coherent,hybrid,benchmark,gpu,pipeline,csv}
+                        Print copy\-paste example command(s) and exit.
+  \-\-guided              Interactive guided mode for first\-time users.
+  \-\-stretch STRETCH     Alias for \-\-time\-stretch. Accepts scalar or control file (.csv/.json).
+  \-\-gpu                 Alias for \-\-device cuda.
+  \-\-cpu                 Alias for \-\-device cpu.
+
+Performance:
+  \-\-quality\-profile {neutral,speech,music,percussion,ambient,extreme}
+                        Named tuning profile for vocoder defaults (default: neutral)
+  \-\-auto\-profile        Analyze input and choose a profile automatically (speech/music/percussion/ambient/extreme).
+  \-\-auto\-profile\-lookahead\-seconds AUTO_PROFILE_LOOKAHEAD_SECONDS
+                        Seconds of audio used when estimating \-\-auto\-profile (default: 6.0).
+  \-\-auto\-transform      Allow automatic transform selection when \-\-transform is not explicitly set.
+
+Quality/Phase:
+  \-\-n\-fft N_FFT         FFT size (default: 2048). Accepts scalar or control file (.csv/.json).
+  \-\-win\-length WIN_LENGTH
+                        Window length in samples (default: 2048). Accepts scalar or control file (.csv/.json).
+  \-\-hop\-size HOP_SIZE   Hop size in samples (default: 512). Accepts scalar or control file (.csv/.json).
+  \-\-window {hann,hamming,blackman,blackmanharris,nuttall,flattop,blackman_nuttall,exact_blackman,sine,bartlett,boxcar,triangular,bartlett_hann,tukey,tukey_0p1,tukey_0p25,tukey_0p75,tukey_0p9,parzen,lanczos,welch,gaussian_0p25,gaussian_0p35,gaussian_0p45,gaussian_0p55,gaussian_0p65,general_gaussian_1p5_0p35,general_gaussian_2p0_0p35,general_gaussian_3p0_0p35,general_gaussian_4p0_0p35,exponential_0p25,exponential_0p5,exponential_1p0,cauchy_0p5,cauchy_1p0,cauchy_2p0,cosine_power_2,cosine_power_3,cosine_power_4,hann_poisson_0p5,hann_poisson_1p0,hann_poisson_2p0,general_hamming_0p50,general_hamming_0p60,general_hamming_0p70,general_hamming_0p80,bohman,cosine,kaiser,rect}
+                        Window type (default: hann)
+  \-\-kaiser\-beta KAISER_BETA
+                        Kaiser window beta parameter used when \-\-window kaiser (default: 14.0). Accepts scalar or control file (.csv/.json).
+  \-\-transform {fft,dft,czt,dct,dst,hartley}
+                        Per\-frame transform backend for STFT/ISTFT paths (default: fft; options: fft, dft, czt, dct, dst, hartley)
+  \-\-no\-center           Disable center padding in STFT/ISTFT
+  \-\-phase\-locking {off,identity}
+                        Inter\-bin phase locking mode for transient fidelity (default: identity)
+  \-\-phase\-engine {propagate,hybrid,random}
+                        Phase synthesis engine: propagate (classic phase vocoder), hybrid (propagated + stochastic blend), random (ambient stochastic phase).
+  \-\-ambient\-phase\-mix AMBIENT_PHASE_MIX
+                        Random\-phase blend when \-\-phase\-engine hybrid (0.0=propagated only, 1.0=random only; default: 0.5). Accepts scalar or control file (.csv/.json).
+  \-\-phase\-random\-seed PHASE_RANDOM_SEED
+                        Optional deterministic seed for random/hybrid phase generation.
+  \-\-transient\-preserve  Enable transient phase resets based on spectral flux
+  \-\-transient\-threshold TRANSIENT_THRESHOLD
+                        Spectral\-flux multiplier for transient detection (default: 2.0). Accepts scalar or control file (.csv/.json).
+  \-\-fourier\-sync        Enable fundamental frame locking. Uses generic short\-time Fourier transforms with per\-frame FFT sizes locked to detected F0.
+  \-\-fourier\-sync\-min\-fft FOURIER_SYNC_MIN_FFT
+                        Minimum frame FFT size for \-\-fourier\-sync (default: 256). Accepts scalar or control file (.csv/.json).
+  \-\-fourier\-sync\-max\-fft FOURIER_SYNC_MAX_FFT
+                        Maximum frame FFT size for \-\-fourier\-sync (default: 8192). Accepts scalar or control file (.csv/.json).
+  \-\-fourier\-sync\-smooth FOURIER_SYNC_SMOOTH
+                        Smoothing span (frames) for prescanned F0 track in \-\-fourier\-sync (default: 5). Accepts scalar or control file (.csv/.json).
+  \-\-multires\-fusion     Blend multiple FFT resolutions for each channel before pitch resampling.
+  \-\-multires\-ffts MULTIRES_FFTS
+                        Comma\-separated FFT sizes for \-\-multires\-fusion (default: 1024,2048,4096)
+  \-\-multires\-weights MULTIRES_WEIGHTS
+                        Comma\-separated fusion weights for \-\-multires\-fusion (defaults to equal weights).
+  \-\-device {auto,cpu,cuda}
+                        Compute device: auto (prefer CUDA), cpu, or cuda
+  \-\-cuda\-device CUDA_DEVICE
+                        CUDA device index used when \-\-device is auto/cuda (default: 0)
+
+Time/Pitch:
+  \-\-time\-stretch, \-\-time\-stretch\-factor TIME_STRETCH
+                        Final duration multiplier (1.0=unchanged, 2.0=2x longer). Accepts scalar or control file (.csv/.json).
+  \-\-target\-duration TARGET_DURATION
+                        Absolute target duration in seconds (overrides \-\-time\-stretch)
+  \-\-stretch\-mode {auto,standard,multistage}
+                        Stretch strategy: standard (single pass), multistage (chained moderate passes), or auto (multistage only for extreme ratios; default: auto).
+  \-\-extreme\-time\-stretch
+                        Force multistage strategy even when ratio is moderate.
+  \-\-extreme\-stretch\-threshold EXTREME_STRETCH_THRESHOLD
+                        Auto\-mode threshold for multistage activation (default: 2.0). Accepts scalar or control file (.csv/.json).
+  \-\-max\-stage\-stretch MAX_STAGE_STRETCH
+                        Maximum per\-stage ratio used in multistage mode (default: 1.8). Accepts scalar or control file (.csv/.json).
+  \-\-onset\-time\-credit   Enable onset\-triggered time\-credit scheduling to reduce transient smear during extreme stretching.
+  \-\-onset\-credit\-pull ONSET_CREDIT_PULL
+                        Fraction of per\-frame read advance removable while onset credit exists (0.0..1.0, default: 0.5). Accepts scalar or control file (.csv/.json).
+  \-\-onset\-credit\-max ONSET_CREDIT_MAX
+                        Maximum accumulated onset time credit in analysis\-frame units (default: 8.0). Accepts scalar or control file (.csv/.json).
+  \-\-no\-onset\-realign    Disable fractional read\-position realignment on onsets when \-\-onset\-time\-credit is enabled.
+  \-\-ambient\-preset      Convenience preset for ambient extreme stretch (random phase engine, onset\-time\-credit, transient preserve, conservative staging).
+  \-\-auto\-segment\-seconds AUTO_SEGMENT_SECONDS
+                        Optional segment size in seconds for long jobs. When >0, processing runs per segment with crossfade assembly.
+  \-\-checkpoint\-dir CHECKPOINT_DIR
+                        Directory used to cache per\-segment checkpoint chunks for resume workflows.
+  \-\-checkpoint\-id CHECKPOINT_ID
+                        Optional checkpoint run identifier (default: hash of input/settings).
+  \-\-resume              Reuse existing checkpoint chunks from \-\-checkpoint\-dir when available.
+  \-\-interp {none,linear,nearest,cubic,polynomial}
+                        Interpolation mode for time\-varying control signals loaded from CSV/JSON (default: linear).
+  \-\-order ORDER         Polynomial order for \-\-interp polynomial (default: 3). Accepts any integer >= 1; effective fit degree is min(order, control_points\-1).
+  \-\-pitch\-shift\-semitones, \-\-target\-pitch\-shift\-semitones, \-\-pitch, \-\-semitones PITCH_SHIFT_SEMITONES
+                        Pitch shift in semitones (+12 is one octave up). Accepts scalar or control file (.csv/.json).
+  \-\-pitch\-shift\-cents, \-\-cents PITCH_SHIFT_CENTS
+                        Pitch shift in cents (+1200 is one octave up). Accepts scalar or control file (.csv/.json).
+  \-\-pitch\-shift\-ratio, \-\-ratio PITCH_SHIFT_RATIO
+                        Pitch ratio (>1 up, <1 down). Accepts decimals (1.5), integer ratios (3/2), expressions (2^(1/12)), or a control file (.csv/.json).
+  \-\-target\-f0 TARGET_F0
+                        Target fundamental frequency in Hz. Auto\-estimates source F0 per file.
+  \-\-analysis\-channel {first,mix}
+                        Channel strategy for F0 estimation with \-\-target\-f0 (default: mix)
+  \-\-f0\-min F0_MIN       Minimum F0 search bound in Hz (default: 50)
+  \-\-f0\-max F0_MAX       Maximum F0 search bound in Hz (default: 1000)
+  \-\-pitch\-mode {standard,formant\-preserving}
+                        Pitch mode: standard shift or formant\-preserving correction (default: standard)
+  \-\-formant\-lifter FORMANT_LIFTER
+                        Cepstral lifter cutoff for formant envelope extraction (default: 32). Accepts scalar or control file (.csv/.json).
+  \-\-formant\-strength FORMANT_STRENGTH
+                        Formant correction blend 0..1 when pitch mode is formant\-preserving (default: 1.0). Accepts scalar or control file (.csv/.json).
+  \-\-formant\-max\-gain\-db FORMANT_MAX_GAIN_DB
+                        Max per\-bin formant correction gain in dB (default: 12). Accepts scalar or control file (.csv/.json).
+  \-\-pitch\-map PITCH_MAP
+                        CSV control map for time\-varying stretch/pitch. Columns: start_sec,end_sec plus optional stretch,pitch_ratio/pitch_cents/pitch_semitones,confidence. Use '\-' to read from stdin.
+  \-\-pitch\-map\-stdin     Read control\-map CSV from stdin.
+  \-\-control\-stdin       Alias for \-\-pitch\-map\-stdin (canonical control\-bus CSV stdin path).
+  \-\-route EXPR          Control\-bus routing expression for map rows. Repeat flag to chain routes. Syntax: target=source, target=const(v), target=inv(source), target=pow(source,exp), target=mul(source,factor), target=add(source,offset), target=affine(source,scale,bias), target=clip(source,lo,hi). Targets: stretch,pitch_ratio. Sources: any numeric column present in the control\-map CSV.
+  \-\-pitch\-follow\-stdin  Shortcut for \-\-pitch\-map\-stdin (sidechain pitch\-follow workflows).
+  \-\-pitch\-conf\-min PITCH_CONF_MIN
+                        Minimum accepted map confidence (default: 0 disables gating).
+  \-\-pitch\-lowconf\-mode {hold,unity,interp}
+                        Low\-confidence map handling mode (default: hold).
+  \-\-pitch\-map\-smooth\-ms PITCH_MAP_SMOOTH_MS
+                        Moving\-average smoothing over map pitch ratios in milliseconds.
+  \-\-pitch\-map\-crossfade\-ms PITCH_MAP_CROSSFADE_MS
+                        Crossfade between processed map segments in milliseconds (default: 8.0).
+
+Transients:
+  \-\-transient\-mode {off,reset,hybrid,wsola}
+                        Transient handling mode: off (none), reset (phase reset), hybrid (PV steady + WSOLA transients), or wsola (time\-domain transient\-safe path).
+  \-\-transient\-sensitivity TRANSIENT_SENSITIVITY
+                        Transient detector sensitivity in [0,1] (higher catches more onsets). Accepts scalar or control file (.csv/.json).
+  \-\-transient\-protect\-ms TRANSIENT_PROTECT_MS
+                        Transient protection width in milliseconds (default: 30). Accepts scalar or control file (.csv/.json).
+  \-\-transient\-crossfade\-ms TRANSIENT_CROSSFADE_MS
+                        Crossfade duration for transient/steady stitching (default: 10 ms). Accepts scalar or control file (.csv/.json).
+
+Stereo:
+  \-\-stereo\-mode {independent,mid_side_lock,ref_channel_lock}
+                        Channel coherence strategy: independent (legacy), mid_side_lock (M/S\-coupled), ref_channel_lock (phase\-lock to reference channel).
+  \-\-ref\-channel REF_CHANNEL
+                        Reference channel index used by \-\-stereo\-mode ref_channel_lock (default: 0).
+  \-\-coherence\-strength COHERENCE_STRENGTH
+                        Coherence lock strength in [0,1] (0=off, 1=full lock). Accepts scalar or control file (.csv/.json).
+
+Output/Mastering:
+  \-\-target\-sample\-rate TARGET_SAMPLE_RATE
+                        Output sample rate in Hz (default: keep input rate)
+  \-\-resample\-mode {auto,fft,linear}
+                        Resampling engine (auto=fft if scipy available, else linear)
+  \-\-normalize {none,peak,rms}
+                        Output normalization mode
+  \-\-peak\-dbfs PEAK_DBFS
+                        Target peak dBFS when \-\-normalize peak
+  \-\-rms\-dbfs RMS_DBFS   Target RMS dBFS when \-\-normalize rms
+  \-\-target\-lufs TARGET_LUFS
+                        Integrated loudness target in LUFS
+  \-\-compressor\-threshold\-db COMPRESSOR_THRESHOLD_DB
+                        Enable compressor above threshold dBFS
+  \-\-compressor\-ratio COMPRESSOR_RATIO
+                        Compressor ratio (>=1)
+  \-\-compressor\-attack\-ms COMPRESSOR_ATTACK_MS
+                        Compressor attack time in ms
+  \-\-compressor\-release\-ms COMPRESSOR_RELEASE_MS
+                        Compressor release time in ms
+  \-\-compressor\-makeup\-db COMPRESSOR_MAKEUP_DB
+                        Compressor makeup gain in dB
+  \-\-expander\-threshold\-db EXPANDER_THRESHOLD_DB
+                        Enable downward expander below threshold dBFS
+  \-\-expander\-ratio EXPANDER_RATIO
+                        Expander ratio (>=1)
+  \-\-expander\-attack\-ms EXPANDER_ATTACK_MS
+                        Expander attack time in ms
+  \-\-expander\-release\-ms EXPANDER_RELEASE_MS
+                        Expander release time in ms
+  \-\-compander\-threshold\-db COMPANDER_THRESHOLD_DB
+                        Enable compander threshold in dBFS
+  \-\-compander\-compress\-ratio COMPANDER_COMPRESS_RATIO
+                        Compander compression ratio (>=1)
+  \-\-compander\-expand\-ratio COMPANDER_EXPAND_RATIO
+                        Compander expansion ratio (>=1)
+  \-\-compander\-attack\-ms COMPANDER_ATTACK_MS
+                        Compander attack time in ms
+  \-\-compander\-release\-ms COMPANDER_RELEASE_MS
+                        Compander release time in ms
+  \-\-compander\-makeup\-db COMPANDER_MAKEUP_DB
+                        Compander makeup gain in dB
+  \-\-limiter\-threshold LIMITER_THRESHOLD
+                        Peak limiter threshold in linear full\-scale
+  \-\-soft\-clip\-level SOFT_CLIP_LEVEL
+                        Soft clip output ceiling in linear full\-scale
+  \-\-soft\-clip\-type {tanh,arctan,cubic}
+                        Soft clip transfer type
+  \-\-soft\-clip\-drive SOFT_CLIP_DRIVE
+                        Soft clip drive amount (>0)
+  \-\-hard\-clip\-level HARD_CLIP_LEVEL
+                        Hard clip level in linear full\-scale
+  \-\-clip                Legacy alias: hard clip at +/\-1.0 when set
+  \-\-manifest\-json MANIFEST_JSON
+                        Write processing manifest JSON with per\-file settings and outcomes.
+  \-\-manifest\-append     Append entries to an existing \-\-manifest\-json file instead of replacing it.
+  \-\-subtype SUBTYPE     Explicit libsndfile output subtype override (e.g., PCM_16, PCM_24, FLOAT)
+  \-\-bit\-depth {inherit,16,24,32f}
+                        Output bit\-depth policy (default: inherit). Ignored when \-\-subtype is set.
+  \-\-dither {none,tpdf}  Dither policy before quantized writes (default: none)
+  \-\-dither\-seed DITHER_SEED
+                        Deterministic RNG seed for dithering (default: random seed)
+  \-\-true\-peak\-max\-dbtp TRUE_PEAK_MAX_DBTP
+                        Apply output gain trim to enforce max true\-peak in dBTP
+  \-\-metadata\-policy {none,sidecar,copy}
+                        Output metadata policy: none, sidecar, or copy (sidecar implementation)
+
+Beginner examples:
+  pvx voc input.wav \-\-stretch 1.2 \-\-output output.wav
+  pvx voc vocal.wav \-\-preset vocal \-\-pitch \-2 \-\-output vocal_tuned.wav
+  pvx voc speech.wav \-\-transient\-mode hybrid \-\-stretch 1.25 \-\-output speech_hybrid.wav
+  pvx voc stereo.wav \-\-stereo\-mode mid_side_lock \-\-coherence\-strength 0.9 \-\-stretch 1.2 \-\-output stereo_lock.wav
+  pvx pitch\-track A.wav \-\-emit pitch_to_stretch \-\-output \- | pvx voc B.wav \-\-control\-stdin \-\-output B_follow.wav
+  pvx voc input.wav \-\-stretch controls/stretch.csv \-\-interp linear \-\-output output.wav
+  pvx voc input.wav \-\-example all
+.fi
+.SH ATTRIBUTION
+Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.

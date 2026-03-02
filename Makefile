@@ -3,11 +3,13 @@
 install:
 	python3 -m pip install -r requirements.txt
 	python3 -m pip install -e .
+	python3 scripts/scripts_install_man_pages.py
 
 install-dev:
 	python3 -m pip install -r requirements.txt
 	python3 -m pip install -e ".[dev]"
 	python3 -m pip install pre-commit
+	python3 scripts/scripts_install_man_pages.py
 
 lint:
 	ruff check src/pvx src/pvxalgorithms scripts tests

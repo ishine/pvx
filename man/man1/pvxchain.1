@@ -1,0 +1,32 @@
+.TH "PVXCHAIN" "1" "2026-03-01" "pvx" "User Commands"
+.SH NAME
+pvxchain \- Managed serial chain runner
+.SH SYNOPSIS
+.B pvxchain
+.SH DESCRIPTION
+Auto-generated from built-in --help output.
+.SH OPTIONS
+.nf
+usage: pvx chain [\-h] \-\-pipeline PIPELINE \-\-output OUTPUT
+                 [\-\-work\-dir WORK_DIR] [\-\-keep\-intermediate] [\-\-example]
+                 input
+
+Managed one\-line chain runner for serial pvx audio tools. Each stage receives
+the previous stage output as input.
+
+positional arguments:
+  input                 Initial input audio path or '\-' for stdin
+
+options:
+  \-h, \-\-help            show this help message and exit
+  \-\-pipeline PIPELINE   Pipeline string with stages separated by '|'. Example:
+                        "voc \-\-stretch 1.2 | formant \-\-mode preserve"
+  \-\-output, \-\-out OUTPUT
+                        Final output path (or '\-')
+  \-\-work\-dir WORK_DIR   Optional directory for intermediate stage files
+  \-\-keep\-intermediate   Keep intermediate stage files after successful
+                        completion
+  \-\-example             Print a copy\-paste chain example and exit
+.fi
+.SH ATTRIBUTION
+Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.

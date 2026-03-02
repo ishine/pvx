@@ -11,6 +11,7 @@ import difflib
 import importlib
 import io
 import json
+import random
 import re
 import shlex
 import shutil
@@ -202,6 +203,12 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
         summary="Inharmonic spectral warping",
         aliases=("pvxinharmonator",),
     ),
+    ToolSpec(
+        name="trajectory-reverb",
+        entrypoint="pvx.cli.pvxtrajectoryreverb:main",
+        summary="Mono-to-multichannel trajectory convolution reverb",
+        aliases=("pvxtrajectoryreverb", "trajreverb", "spatial-reverb"),
+    ),
 )
 
 
@@ -300,6 +307,10 @@ EXAMPLE_COMMANDS: dict[str, tuple[str, str]] = {
         "Inharmonic spectral warping",
         "pvx inharmonator input.wav --inharmonic-f0-hz 220 --inharmonicity 0.0002 --inharmonic-mix 1.0 --output inharm.wav",
     ),
+    "trajectory-reverb": (
+        "Mono through multichannel room IR with A->B movement",
+        "pvx trajectory-reverb source.wav --ir room_4ch.wav --coord-system cartesian --start -1,0,1 --end 1,0,1 --output flythrough.wav",
+    ),
     "chain": (
         "Managed multi-stage chain",
         "pvx chain input.wav --pipeline \"voc --stretch 1.2 | formant --mode preserve\" --output output_chain.wav",
@@ -377,6 +388,7 @@ _CHAIN_TOOL_ALLOWLIST: set[str] = {
     "ringtvfilter",
     "chordmapper",
     "inharmonator",
+    "trajectory-reverb",
 }
 _CHAIN_STAGE_FORBIDDEN_FLAGS: set[str] = {
     "-o",
@@ -385,6 +397,10 @@ _CHAIN_STAGE_FORBIDDEN_FLAGS: set[str] = {
     "--output-dir",
     "--stdout",
 }
+
+_LUCKY_SUPPORTED_TOOLS: set[str] = set(_CHAIN_TOOL_ALLOWLIST) | {"morph"}
+_LUCKY_PRESETS: tuple[str, ...] = ("default", "vocal_studio", "drums_safe", "extreme_ambient", "stereo_coherent")
+_LUCKY_WINDOWS: tuple[str, ...] = ("hann", "hamming", "blackmanharris", "kaiser", "tukey")
 
 
 def _tool_index() -> dict[str, ToolSpec]:
@@ -440,6 +456,9 @@ def print_tools() -> None:
     print("  stream       Chunked stream wrapper around `pvx voc`")
     print("  stretch-budget  Estimate max safe stretch from file size/budget assumptions")
     print("  help <tool>  Show subcommand help")
+    print("")
+    print("Global randomizer:")
+    print("  --lucky N [--lucky-seed S]  Run selected workflow N times with randomized DSP settings")
     print("")
     print("Use installed commands (`pvx`, `pvxvoc`, `pvxfreeze`, ...) or `python -m pvx...` module entry points.")
 
@@ -617,6 +636,497 @@ def _split_pipeline_stages(pipeline: str) -> list[str]:
 
 def _token_flag(token: str) -> str:
     return token.split("=", 1)[0]
+
+
+def _extract_flag_value(args: list[str], flags: tuple[str, ...]) -> str | None:
+    value: str | None = None
+    i = 0
+    while i < len(args):
+        token = str(args[i])
+        flag = _token_flag(token)
+        if flag in flags:
+            if "=" in token:
+                value = token.split("=", 1)[1]
+                i += 1
+                continue
+            if i + 1 < len(args):
+                value = str(args[i + 1])
+                i += 2
+                continue
+            value = ""
+            i += 1
+            continue
+        i += 1
+    return value
+
+
+def _strip_flags(args: list[str], flag_has_value: dict[str, bool]) -> list[str]:
+    out: list[str] = []
+    i = 0
+    while i < len(args):
+        token = str(args[i])
+        flag = _token_flag(token)
+        has_value = flag_has_value.get(flag)
+        if has_value is None:
+            out.append(token)
+            i += 1
+            continue
+        if "=" in token:
+            i += 1
+            continue
+        if has_value:
+            i += 2
+            continue
+        i += 1
+    return out
+
+
+def _replace_flag_value(args: list[str], flag: str, value: str) -> list[str]:
+    out: list[str] = []
+    replaced = False
+    i = 0
+    while i < len(args):
+        token = str(args[i])
+        tok_flag = _token_flag(token)
+        if tok_flag == flag:
+            if not replaced:
+                out.extend([flag, value])
+                replaced = True
+            if "=" in token:
+                i += 1
+            else:
+                i += 2
+            continue
+        out.append(token)
+        i += 1
+    if not replaced:
+        out.extend([flag, value])
+    return out
+
+
+def _consume_lucky_options(args: list[str]) -> tuple[list[str], int | None, int | None]:
+    clean: list[str] = []
+    lucky_count: int | None = None
+    lucky_seed: int | None = None
+    i = 0
+    while i < len(args):
+        token = str(args[i])
+        if token == "--lucky":
+            if i + 1 >= len(args):
+                raise ValueError("--lucky requires an integer value")
+            lucky_count = int(str(args[i + 1]))
+            i += 2
+            continue
+        if token.startswith("--lucky="):
+            lucky_count = int(token.split("=", 1)[1])
+            i += 1
+            continue
+        if token == "--lucky-seed":
+            if i + 1 >= len(args):
+                raise ValueError("--lucky-seed requires an integer value")
+            lucky_seed = int(str(args[i + 1]))
+            i += 2
+            continue
+        if token.startswith("--lucky-seed="):
+            lucky_seed = int(token.split("=", 1)[1])
+            i += 1
+            continue
+        clean.append(token)
+        i += 1
+
+    if lucky_count is not None and lucky_count <= 0:
+        raise ValueError("--lucky must be a positive integer")
+    return clean, lucky_count, lucky_seed
+
+
+def _lucky_output_variant(base: Path, idx: int) -> Path:
+    stem = base.stem if base.stem else "output"
+    suffix = base.suffix if base.suffix else ".wav"
+    return base.with_name(f"{stem}_lucky_{idx:03d}{suffix}")
+
+
+def _lucky_mastering_overrides(rng: random.Random) -> list[str]:
+    out: list[str] = []
+    if rng.random() < 0.85:
+        out.extend(["--target-lufs", f"{rng.uniform(-18.0, -11.0):.3f}"])
+    if rng.random() < 0.70:
+        out.extend(
+            [
+                "--compressor-threshold-db",
+                f"{rng.uniform(-30.0, -12.0):.3f}",
+                "--compressor-ratio",
+                f"{rng.uniform(1.5, 4.8):.3f}",
+                "--compressor-attack-ms",
+                f"{rng.uniform(2.0, 40.0):.3f}",
+                "--compressor-release-ms",
+                f"{rng.uniform(60.0, 280.0):.3f}",
+                "--compressor-makeup-db",
+                f"{rng.uniform(0.0, 6.0):.3f}",
+            ]
+        )
+    if rng.random() < 0.90:
+        out.extend(["--limiter-threshold", f"{rng.uniform(0.88, 0.995):.4f}"])
+    if rng.random() < 0.65:
+        out.extend(
+            [
+                "--soft-clip-level",
+                f"{rng.uniform(0.90, 0.995):.4f}",
+                "--soft-clip-type",
+                rng.choice(["tanh", "arctan", "cubic"]),
+                "--soft-clip-drive",
+                f"{rng.uniform(0.8, 2.4):.4f}",
+            ]
+        )
+    if rng.random() < 0.30:
+        out.extend(["--hard-clip-level", f"{rng.uniform(0.95, 0.999):.4f}"])
+    return out
+
+
+def _lucky_tool_overrides(tool: str, rng: random.Random) -> list[str]:
+    if tool == "voc":
+        window = rng.choice(_LUCKY_WINDOWS)
+        out = [
+            "--preset",
+            rng.choice(_LUCKY_PRESETS),
+            "--stretch",
+            f"{rng.uniform(0.4, 3.4):.4f}",
+            "--pitch",
+            f"{rng.uniform(-12.0, 12.0):.4f}",
+            "--window",
+            window,
+        ]
+        if window == "kaiser":
+            out.extend(["--kaiser-beta", f"{rng.uniform(7.0, 22.0):.4f}"])
+        return out
+    if tool == "freeze":
+        out = [
+            "--freeze-time",
+            f"{rng.uniform(0.02, 0.92):.4f}",
+            "--duration",
+            f"{rng.uniform(5.0, 90.0):.4f}",
+            "--phase-mode",
+            rng.choice(["instantaneous", "bin", "hold"]),
+        ]
+        if rng.random() < 0.55:
+            out.append("--random-phase")
+        return out
+    if tool == "harmonize":
+        return [
+            "--intervals",
+            rng.choice(["0,7,12", "0,4,7,11", "0,3,7,10", "0,7,14,19"]),
+            "--force-stereo",
+        ]
+    if tool in {"conform", "warp"}:
+        return ["--crossfade-ms", f"{rng.uniform(2.0, 35.0):.4f}"]
+    if tool == "formant":
+        return [
+            "--mode",
+            rng.choice(["shift", "preserve"]),
+            "--formant-shift-ratio",
+            f"{rng.uniform(0.72, 1.42):.4f}",
+            "--pitch-shift-semitones",
+            f"{rng.uniform(-5.0, 5.0):.4f}",
+        ]
+    if tool == "transient":
+        return [
+            "--time-stretch",
+            f"{rng.uniform(0.55, 2.4):.4f}",
+            "--pitch-shift-semitones",
+            f"{rng.uniform(-8.0, 8.0):.4f}",
+            "--transient-threshold",
+            f"{rng.uniform(1.1, 2.4):.4f}",
+        ]
+    if tool == "unison":
+        return [
+            "--voices",
+            str(rng.randint(3, 9)),
+            "--detune-cents",
+            f"{rng.uniform(4.0, 32.0):.4f}",
+            "--width",
+            f"{rng.uniform(0.2, 1.0):.4f}",
+            "--dry-mix",
+            f"{rng.uniform(0.05, 0.45):.4f}",
+        ]
+    if tool == "denoise":
+        return [
+            "--reduction-db",
+            f"{rng.uniform(4.0, 18.0):.4f}",
+            "--floor",
+            f"{rng.uniform(0.05, 0.25):.4f}",
+            "--smooth",
+            str(rng.randint(3, 12)),
+        ]
+    if tool == "deverb":
+        return [
+            "--strength",
+            f"{rng.uniform(0.15, 0.75):.4f}",
+            "--decay",
+            f"{rng.uniform(0.75, 0.97):.4f}",
+            "--floor",
+            f"{rng.uniform(0.05, 0.30):.4f}",
+        ]
+    if tool == "retune":
+        return [
+            "--root",
+            rng.choice(["C", "D", "E", "F", "G", "A", "B"]),
+            "--scale",
+            rng.choice(["major", "minor", "pentatonic", "chromatic"]),
+            "--strength",
+            f"{rng.uniform(0.45, 1.0):.4f}",
+        ]
+    if tool == "layer":
+        return [
+            "--harmonic-stretch",
+            f"{rng.uniform(0.6, 2.2):.4f}",
+            "--percussive-stretch",
+            f"{rng.uniform(0.7, 1.8):.4f}",
+            "--harmonic-pitch-semitones",
+            f"{rng.uniform(-6.0, 6.0):.4f}",
+            "--percussive-pitch-semitones",
+            f"{rng.uniform(-2.0, 2.0):.4f}",
+            "--harmonic-gain",
+            f"{rng.uniform(0.6, 1.4):.4f}",
+            "--percussive-gain",
+            f"{rng.uniform(0.6, 1.4):.4f}",
+        ]
+    if tool in {"filter", "tvfilter", "noisefilter", "bandamp", "spec-compander"}:
+        return [
+            "--response-mix",
+            f"{rng.uniform(0.3, 1.0):.4f}",
+            "--dry-mix",
+            f"{rng.uniform(0.0, 0.35):.4f}",
+            "--response-gain-db",
+            f"{rng.uniform(-6.0, 8.0):.4f}",
+            "--noise-floor",
+            f"{rng.uniform(0.6, 2.0):.4f}",
+            "--band-gain-db",
+            f"{rng.uniform(2.0, 14.0):.4f}",
+            "--peak-count",
+            str(rng.randint(4, 16)),
+            "--comp-ratio",
+            f"{rng.uniform(1.1, 3.6):.4f}",
+            "--expand-ratio",
+            f"{rng.uniform(1.0, 2.5):.4f}",
+        ]
+    if tool in {"ring", "ringfilter", "ringtvfilter"}:
+        return [
+            "--frequency-hz",
+            f"{rng.uniform(12.0, 1800.0):.4f}",
+            "--depth",
+            f"{rng.uniform(0.2, 1.0):.4f}",
+            "--mix",
+            f"{rng.uniform(0.25, 1.0):.4f}",
+            "--feedback",
+            f"{rng.uniform(0.0, 0.45):.4f}",
+            "--resonance-hz",
+            f"{rng.uniform(120.0, 4800.0):.4f}",
+            "--resonance-q",
+            f"{rng.uniform(1.0, 18.0):.4f}",
+            "--resonance-mix",
+            f"{rng.uniform(0.15, 0.95):.4f}",
+        ]
+    if tool == "chordmapper":
+        return [
+            "--root-hz",
+            f"{rng.uniform(80.0, 440.0):.4f}",
+            "--chord",
+            rng.choice(["major", "minor", "sus4"]),
+            "--strength",
+            f"{rng.uniform(0.3, 1.0):.4f}",
+            "--boost-db",
+            f"{rng.uniform(2.0, 12.0):.4f}",
+            "--attenuation",
+            f"{rng.uniform(0.15, 0.85):.4f}",
+        ]
+    if tool == "inharmonator":
+        return [
+            "--inharmonic-f0-hz",
+            f"{rng.uniform(60.0, 440.0):.4f}",
+            "--inharmonicity",
+            f"{rng.uniform(1e-6, 6e-4):.8f}",
+            "--inharmonic-mix",
+            f"{rng.uniform(0.25, 1.0):.4f}",
+            "--dry-mix",
+            f"{rng.uniform(0.0, 0.35):.4f}",
+        ]
+    if tool == "morph":
+        return [
+            "--alpha",
+            f"{rng.uniform(0.15, 0.92):.4f}",
+            "--blend-mode",
+            rng.choice(["linear", "geometric", "carrier_a_envelope_b", "carrier_a_mask_b"]),
+            "--phase-mix",
+            f"{rng.uniform(0.0, 1.0):.4f}",
+            "--mask-exponent",
+            f"{rng.uniform(0.7, 2.2):.4f}",
+            "--envelope-lifter",
+            str(rng.randint(16, 72)),
+        ]
+    return []
+
+
+def _run_lucky_tool_mode(tool: str, forwarded_args: list[str], lucky_count: int, lucky_seed: int | None) -> int:
+    if tool not in _LUCKY_SUPPORTED_TOOLS:
+        raise ValueError(
+            f"`--lucky` is not supported for `{tool}`. "
+            f"Supported tools: {', '.join(sorted(_LUCKY_SUPPORTED_TOOLS))}"
+        )
+    if lucky_count <= 0:
+        raise ValueError("--lucky must be > 0")
+    seed = int(lucky_seed) if lucky_seed is not None else random.SystemRandom().randint(0, 2**31 - 1)
+    rng = random.Random(seed)
+    print(f"[lucky] seed={seed} tool={tool} runs={lucky_count}")
+
+    if tool == "morph":
+        output_value = _extract_flag_value(forwarded_args, ("--output", "--out", "-o"))
+        output_base = Path(output_value if output_value not in {None, "", "-"} else "morph_lucky.wav")
+        if output_base.suffix == "":
+            output_base = output_base.with_suffix(".wav")
+        output_dir = output_base.parent if str(output_base.parent) else Path(".")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        base = _strip_flags(
+            forwarded_args,
+            {
+                "--output": True,
+                "--out": True,
+                "-o": True,
+                "--stdout": False,
+            },
+        )
+        for run_idx in range(1, lucky_count + 1):
+            out_path = _lucky_output_variant(output_dir / output_base.name, run_idx)
+            run_args = list(base)
+            run_args.extend(_lucky_tool_overrides(tool, rng))
+            run_args.extend(_lucky_mastering_overrides(rng))
+            run_args.extend(["--output", str(out_path), "--overwrite"])
+            print(f"[lucky] {tool} run {run_idx}/{lucky_count} -> {out_path}")
+            code = dispatch_tool(tool, run_args)
+            if code != 0:
+                return int(code)
+        return 0
+
+    output_dir_value = _extract_flag_value(forwarded_args, ("--output-dir", "-o"))
+    if output_dir_value in {None, ""}:
+        explicit_out = _extract_flag_value(forwarded_args, ("--output", "--out"))
+        if explicit_out not in {None, "", "-"}:
+            output_dir = Path(str(explicit_out)).parent
+        else:
+            output_dir = Path("lucky_out")
+    else:
+        output_dir = Path(str(output_dir_value))
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    base = _strip_flags(
+        forwarded_args,
+        {
+            "--output": True,
+            "--out": True,
+            "--output-dir": True,
+            "-o": True,
+            "--stdout": False,
+            "--suffix": True,
+        },
+    )
+    for run_idx in range(1, lucky_count + 1):
+        run_args = list(base)
+        run_args.extend(_lucky_tool_overrides(tool, rng))
+        run_args.extend(_lucky_mastering_overrides(rng))
+        run_args.extend(
+            [
+                "--output-dir",
+                str(output_dir),
+                "--suffix",
+                f"_lucky_{run_idx:03d}",
+                "--overwrite",
+            ]
+        )
+        print(f"[lucky] {tool} run {run_idx}/{lucky_count} -> {output_dir}/*_lucky_{run_idx:03d}.*")
+        code = dispatch_tool(tool, run_args)
+        if code != 0:
+            return int(code)
+    return 0
+
+
+def _run_lucky_helper_mode(
+    helper: str,
+    forwarded_args: list[str],
+    lucky_count: int,
+    lucky_seed: int | None,
+) -> int:
+    seed = int(lucky_seed) if lucky_seed is not None else random.SystemRandom().randint(0, 2**31 - 1)
+    rng = random.Random(seed)
+    print(f"[lucky] seed={seed} helper={helper} runs={lucky_count}")
+
+    output_value = _extract_flag_value(forwarded_args, ("--output", "--out"))
+    output_base = Path(output_value if output_value not in {None, "", "-"} else f"{helper}_lucky.wav")
+    if output_base.suffix == "":
+        output_base = output_base.with_suffix(".wav")
+    output_dir = output_base.parent if str(output_base.parent) else Path(".")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    base = _strip_flags(
+        forwarded_args,
+        {
+            "--output": True,
+            "--out": True,
+        },
+    )
+
+    for run_idx in range(1, lucky_count + 1):
+        out_path = _lucky_output_variant(output_dir / output_base.name, run_idx)
+        run_args = list(base)
+        if helper == "chain":
+            current_pipeline = _extract_flag_value(run_args, ("--pipeline",))
+            if current_pipeline not in {None, ""}:
+                random_stage = (
+                    "voc "
+                    f"--stretch {rng.uniform(0.55, 2.4):.4f} "
+                    f"--pitch {rng.uniform(-7.0, 7.0):.4f} "
+                    f"--preset {rng.choice(_LUCKY_PRESETS)}"
+                )
+                run_args = _replace_flag_value(run_args, "--pipeline", f"{current_pipeline} | {random_stage}")
+            run_args.extend(["--output", str(out_path)])
+            print(f"[lucky] chain run {run_idx}/{lucky_count} -> {out_path}")
+            code = run_chain_mode(run_args)
+        elif helper == "follow":
+            run_args.extend(
+                [
+                    "--stretch",
+                    f"{rng.uniform(0.7, 1.5):.4f}",
+                    "--pitch-conf-min",
+                    f"{rng.uniform(0.45, 0.9):.4f}",
+                    "--pitch-map-smooth-ms",
+                    f"{rng.uniform(0.0, 40.0):.4f}",
+                    "--pitch-map-crossfade-ms",
+                    f"{rng.uniform(8.0, 40.0):.4f}",
+                    "--output",
+                    str(out_path),
+                    "--overwrite",
+                ]
+            )
+            print(f"[lucky] follow run {run_idx}/{lucky_count} -> {out_path}")
+            code = run_follow_mode(run_args)
+        elif helper == "stream":
+            run_args.extend(
+                [
+                    "--output",
+                    str(out_path),
+                    "--chunk-seconds",
+                    f"{rng.uniform(0.06, 0.35):.4f}",
+                    "--time-stretch",
+                    f"{rng.uniform(0.6, 3.0):.4f}",
+                    "--pitch",
+                    f"{rng.uniform(-9.0, 9.0):.4f}",
+                    "--preset",
+                    rng.choice(_LUCKY_PRESETS),
+                ]
+            )
+            print(f"[lucky] stream run {run_idx}/{lucky_count} -> {out_path}")
+            code = run_stream_mode(run_args)
+        else:
+            raise ValueError(f"Unsupported helper for --lucky: {helper}")
+        if code != 0:
+            return int(code)
+    return 0
 
 
 def _run_stage_command(stage_name: str, stage_args: list[str]) -> int:
@@ -942,6 +1452,31 @@ def run_chain_mode(forwarded_args: list[str]) -> int:
                 "Managed chain mode controls stage outputs automatically."
             )
         stages.append((stage_tool, tokens[1:]))
+
+    stretch_product = 1.0
+    stretch_terms = 0
+    for stage_tool, stage_args in stages:
+        if stage_tool not in {"voc", "transient"}:
+            continue
+        stretch_text = _extract_flag_value(stage_args, ("--stretch", "--time-stretch", "--time-stretch-factor"))
+        if stretch_text in {None, ""}:
+            continue
+        try:
+            stretch_val = float(str(stretch_text))
+        except ValueError:
+            continue
+        if stretch_val <= 0.0:
+            continue
+        stretch_product *= stretch_val
+        stretch_terms += 1
+    if stretch_terms >= 2 and abs(stretch_product - 1.0) <= 0.06:
+        print(
+            (
+                "[chain] note: cumulative stretch across pipeline is near unity "
+                f"({stretch_product:.6f}x). Perceptual change may be subtle."
+            ),
+            file=sys.stderr,
+        )
 
     temp_ctx: tempfile.TemporaryDirectory[str] | None = None
     if args.work_dir is None:
@@ -1389,6 +1924,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  pvx chain input.wav --pipeline \"voc --stretch 1.2 | formant --mode preserve\" --output out.wav\n"
             "  pvx stream input.wav --output out.wav --chunk-seconds 0.2 --time-stretch 2.0\n"
             "  pvx stretch-budget input.wav --disk-budget 20GB --bit-depth 16 --requested-stretch 1000000\n"
+            "  pvx voc input.wav --output-dir out --lucky 8\n"
             "  pvx list\n"
             "  pvx examples basic\n"
             "  pvx help voc\n"
@@ -1414,13 +1950,18 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(sys.argv[1:] if argv is None else argv)
 
     command_raw = args.command
-    forwarded = list(args.args or [])
+    forwarded_raw = list(args.args or [])
 
     if command_raw is None:
         parser.print_help()
         print("")
         print("Tip: run `pvx list` for tool descriptions.")
         return 0
+
+    try:
+        forwarded, lucky_count, lucky_seed = _consume_lucky_options(forwarded_raw)
+    except ValueError as exc:
+        parser.error(str(exc))
 
     command = str(command_raw).strip().lower()
     helper_commands = {
@@ -1451,26 +1992,45 @@ def main(argv: list[str] | None = None) -> int:
             parser.error(str(exc))
         return 0
     if command in {"guided", "guide"}:
+        if lucky_count is not None:
+            parser.error("--lucky is not supported with `pvx guided`")
         try:
             return run_guided_mode()
         except ValueError as exc:
             parser.error(str(exc))
     if command == "follow":
+        if lucky_count is not None:
+            try:
+                return _run_lucky_helper_mode("follow", forwarded, lucky_count, lucky_seed)
+            except ValueError as exc:
+                parser.error(str(exc))
         try:
             return run_follow_mode(forwarded)
         except ValueError as exc:
             parser.error(str(exc))
     if command == "chain":
+        if lucky_count is not None:
+            try:
+                return _run_lucky_helper_mode("chain", forwarded, lucky_count, lucky_seed)
+            except ValueError as exc:
+                parser.error(str(exc))
         try:
             return run_chain_mode(forwarded)
         except ValueError as exc:
             parser.error(str(exc))
     if command == "stream":
+        if lucky_count is not None:
+            try:
+                return _run_lucky_helper_mode("stream", forwarded, lucky_count, lucky_seed)
+            except ValueError as exc:
+                parser.error(str(exc))
         try:
             return run_stream_mode(forwarded)
         except ValueError as exc:
             parser.error(str(exc))
     if command in {"stretch-budget", "stretchbudget", "budget"}:
+        if lucky_count is not None:
+            parser.error("--lucky is not supported with `pvx stretch-budget`")
         try:
             return run_stretch_budget_mode(forwarded)
         except ValueError as exc:
@@ -1509,11 +2069,23 @@ def main(argv: list[str] | None = None) -> int:
         parser.error(f"Unknown help target '{forwarded[0]}'. Use `pvx list`.")
 
     if command in TOOL_INDEX:
+        spec = TOOL_INDEX[command]
+        if lucky_count is not None:
+            try:
+                return _run_lucky_tool_mode(spec.name, forwarded, lucky_count, lucky_seed)
+            except ValueError as exc:
+                parser.error(str(exc))
         return dispatch_tool(command, forwarded)
 
     # Beginner shortcut: if first token looks like an input path or glob, treat as `pvx voc ...`.
     if _looks_like_audio_input(command_raw):
-        return dispatch_tool("voc", [command_raw] + forwarded)
+        shortcut_args = [command_raw] + forwarded
+        if lucky_count is not None:
+            try:
+                return _run_lucky_tool_mode("voc", shortcut_args, lucky_count, lucky_seed)
+            except ValueError as exc:
+                parser.error(str(exc))
+        return dispatch_tool("voc", shortcut_args)
 
     candidates = sorted(
         set(

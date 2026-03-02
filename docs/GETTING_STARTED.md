@@ -36,13 +36,22 @@ pvx --help
 No-`PATH` fallback:
 
 ```bash
-pvx voc input.wav --stretch 1.2 --output output.wav
+.venv/bin/pvx voc input.wav --stretch 1.2 --output output.wav
+# or
+python3 -m pvx.cli.pvx voc input.wav --stretch 1.2 --output output.wav
 ```
 
 No-`PATH` fallback with `uv`:
 
 ```bash
 uv run pvx voc input.wav --stretch 1.2 --output output.wav
+```
+
+Man-page generation:
+
+```bash
+python3 scripts/scripts_install_man_pages.py
+MANPATH="$(pwd)/man:$MANPATH" man pvx
 ```
 
 ## 0.2 Running Any Command with uv

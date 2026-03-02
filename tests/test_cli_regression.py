@@ -69,6 +69,22 @@ def write_mono_complex(path: Path, sr: int = 24000, duration: float = 0.5) -> tu
     return audio.astype(np.float64), sr
 
 
+def write_multichannel_ir(path: Path, sr: int = 24000, channels: int = 4, duration: float = 0.12) -> tuple[np.ndarray, int]:
+    n = max(8, int(round(sr * duration)))
+    ir = np.zeros((n, channels), dtype=np.float64)
+    taps = [0, int(0.006 * sr), int(0.012 * sr), int(0.021 * sr)]
+    for ch in range(channels):
+        for idx, tap in enumerate(taps):
+            if tap < n:
+                ir[tap, ch] += float((0.75 / (idx + 1)) * (1.0 - (0.08 * ch)))
+    # Tiny diffuse tail to avoid perfectly sparse impulse artifacts in tests.
+    tail = np.linspace(0.15, 0.0, num=n, dtype=np.float64)
+    for ch in range(channels):
+        ir[:, ch] += 0.002 * tail
+    sf.write(path, ir, sr)
+    return ir, sr
+
+
 class TestCLIRegression(unittest.TestCase):
     def test_unified_cli_lists_tools(self) -> None:
         cmd = [*UNIFIED_CLI, "list"]
@@ -207,6 +223,33 @@ class TestCLIRegression(unittest.TestCase):
             self.assertEqual(out_sr, 24000)
             self.assertEqual(out_audio.shape[1], 2)
             self.assertGreater(out_audio.shape[0], 0)
+
+    def test_unified_cli_chain_lucky_runs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            in_path = tmp_path / "chain_lucky.wav"
+            write_stereo_tone(in_path, duration=0.18)
+            out_path = tmp_path / "chain_out.wav"
+
+            cmd = [
+                *UNIFIED_CLI,
+                "chain",
+                str(in_path),
+                "--pipeline",
+                "voc --time-stretch 1.03",
+                "--output",
+                str(out_path),
+                "--lucky",
+                "2",
+                "--lucky-seed",
+                "7",
+            ]
+            proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+            lucky_1 = tmp_path / "chain_out_lucky_001.wav"
+            lucky_2 = tmp_path / "chain_out_lucky_002.wav"
+            self.assertTrue(lucky_1.exists())
+            self.assertTrue(lucky_2.exists())
 
     def test_unified_cli_stream_runs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -402,6 +445,94 @@ class TestCLIRegression(unittest.TestCase):
             proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
             self.assertEqual(proc.returncode, 0, msg=proc.stderr)
             self.assertTrue(out_path.exists())
+
+    def test_freeze_phase_mode_instantaneous(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            in_path = tmp_path / "freeze_phase_in.wav"
+            write_mono_tone(in_path, duration=0.22, freq_hz=210.0)
+            out_path = tmp_path / "freeze_phase_out.wav"
+
+            cmd = [
+                *UNIFIED_CLI,
+                "freeze",
+                str(in_path),
+                "--freeze-time",
+                "0.11",
+                "--duration",
+                "1.1",
+                "--phase-mode",
+                "instantaneous",
+                "--output",
+                str(out_path),
+                "--overwrite",
+                "--quiet",
+            ]
+            proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+            self.assertTrue(out_path.exists())
+            out_audio, _ = sf.read(out_path, always_2d=True)
+            self.assertGreater(float(np.sqrt(np.mean(out_audio[:, 0] * out_audio[:, 0]))), 1e-4)
+
+    def test_unified_cli_lucky_voc_generates_multiple_outputs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            in_path = tmp_path / "lucky_voc_in.wav"
+            write_stereo_tone(in_path, duration=0.22)
+            out_dir = tmp_path / "out"
+
+            cmd = [
+                *UNIFIED_CLI,
+                "voc",
+                str(in_path),
+                "--output-dir",
+                str(out_dir),
+                "--lucky",
+                "2",
+                "--lucky-seed",
+                "17",
+                "--quiet",
+            ]
+            proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+            lucky_outputs = sorted(out_dir.glob("*_lucky_*.wav"))
+            self.assertGreaterEqual(len(lucky_outputs), 2)
+
+    def test_unified_cli_trajectory_reverb_runs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            src_path = tmp_path / "traj_src.wav"
+            ir_path = tmp_path / "traj_ir_4ch.wav"
+            out_path = tmp_path / "traj_out.wav"
+            write_mono_tone(src_path, duration=0.24, freq_hz=180.0)
+            write_multichannel_ir(ir_path, channels=4)
+
+            cmd = [
+                *UNIFIED_CLI,
+                "trajectory-reverb",
+                str(src_path),
+                "--ir",
+                str(ir_path),
+                "--coord-system",
+                "cartesian",
+                "--start",
+                "-1,0,1",
+                "--end",
+                "1,0,1",
+                "--trajectory-shape",
+                "ease-in-out",
+                "--output",
+                str(out_path),
+                "--overwrite",
+                "--quiet",
+            ]
+            proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+            self.assertTrue(out_path.exists())
+            out_audio, out_sr = sf.read(out_path, always_2d=True)
+            self.assertEqual(out_sr, 24000)
+            self.assertEqual(out_audio.shape[1], 4)
+            self.assertGreater(out_audio.shape[0], 0)
 
     def test_pvxmorph_carrier_envelope_mode_runs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

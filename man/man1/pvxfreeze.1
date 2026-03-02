@@ -1,0 +1,190 @@
+.TH "PVXFREEZE" "1" "2026-03-01" "pvx" "User Commands"
+.SH NAME
+pvxfreeze \- Spectral freeze renderer
+.SH SYNOPSIS
+.B pvxfreeze
+.SH DESCRIPTION
+Auto-generated from built-in --help output.
+.SH OPTIONS
+.nf
+usage: python3.14 \-m pvx.cli.pvxfreeze [\-h] [\-o OUTPUT_DIR] [\-\-output OUTPUT]
+                                       [\-\-suffix SUFFIX]
+                                       [\-\-output\-format OUTPUT_FORMAT]
+                                       [\-\-stdout] [\-\-overwrite] [\-\-dry\-run]
+                                       [\-\-verbosity {silent,quiet,normal,verbose,debug}]
+                                       [\-v] [\-\-quiet] [\-\-silent]
+                                       [\-\-normalize {none,peak,rms}]
+                                       [\-\-peak\-dbfs PEAK_DBFS]
+                                       [\-\-rms\-dbfs RMS_DBFS]
+                                       [\-\-target\-lufs TARGET_LUFS]
+                                       [\-\-compressor\-threshold\-db COMPRESSOR_THRESHOLD_DB]
+                                       [\-\-compressor\-ratio COMPRESSOR_RATIO]
+                                       [\-\-compressor\-attack\-ms COMPRESSOR_ATTACK_MS]
+                                       [\-\-compressor\-release\-ms COMPRESSOR_RELEASE_MS]
+                                       [\-\-compressor\-makeup\-db COMPRESSOR_MAKEUP_DB]
+                                       [\-\-expander\-threshold\-db EXPANDER_THRESHOLD_DB]
+                                       [\-\-expander\-ratio EXPANDER_RATIO]
+                                       [\-\-expander\-attack\-ms EXPANDER_ATTACK_MS]
+                                       [\-\-expander\-release\-ms EXPANDER_RELEASE_MS]
+                                       [\-\-compander\-threshold\-db COMPANDER_THRESHOLD_DB]
+                                       [\-\-compander\-compress\-ratio COMPANDER_COMPRESS_RATIO]
+                                       [\-\-compander\-expand\-ratio COMPANDER_EXPAND_RATIO]
+                                       [\-\-compander\-attack\-ms COMPANDER_ATTACK_MS]
+                                       [\-\-compander\-release\-ms COMPANDER_RELEASE_MS]
+                                       [\-\-compander\-makeup\-db COMPANDER_MAKEUP_DB]
+                                       [\-\-limiter\-threshold LIMITER_THRESHOLD]
+                                       [\-\-soft\-clip\-level SOFT_CLIP_LEVEL]
+                                       [\-\-soft\-clip\-type {tanh,arctan,cubic}]
+                                       [\-\-soft\-clip\-drive SOFT_CLIP_DRIVE]
+                                       [\-\-hard\-clip\-level HARD_CLIP_LEVEL]
+                                       [\-\-clip] [\-\-subtype SUBTYPE]
+                                       [\-\-bit\-depth {inherit,16,24,32f}]
+                                       [\-\-dither {none,tpdf}]
+                                       [\-\-dither\-seed DITHER_SEED]
+                                       [\-\-true\-peak\-max\-dbtp TRUE_PEAK_MAX_DBTP]
+                                       [\-\-metadata\-policy {none,sidecar,copy}]
+                                       [\-\-n\-fft N_FFT]
+                                       [\-\-win\-length WIN_LENGTH]
+                                       [\-\-hop\-size HOP_SIZE]
+                                       [\-\-window {hann,hamming,blackman,blackmanharris,nuttall,flattop,blackman_nuttall,exact_blackman,sine,bartlett,boxcar,triangular,bartlett_hann,tukey,tukey_0p1,tukey_0p25,tukey_0p75,tukey_0p9,parzen,lanczos,welch,gaussian_0p25,gaussian_0p35,gaussian_0p45,gaussian_0p55,gaussian_0p65,general_gaussian_1p5_0p35,general_gaussian_2p0_0p35,general_gaussian_3p0_0p35,general_gaussian_4p0_0p35,exponential_0p25,exponential_0p5,exponential_1p0,cauchy_0p5,cauchy_1p0,cauchy_2p0,cosine_power_2,cosine_power_3,cosine_power_4,hann_poisson_0p5,hann_poisson_1p0,hann_poisson_2p0,general_hamming_0p50,general_hamming_0p60,general_hamming_0p70,general_hamming_0p80,bohman,cosine,kaiser,rect}]
+                                       [\-\-kaiser\-beta KAISER_BETA]
+                                       [\-\-transform {fft,dft,czt,dct,dst,hartley}]
+                                       [\-\-phase\-engine {propagate,hybrid,random}]
+                                       [\-\-ambient\-phase\-mix AMBIENT_PHASE_MIX]
+                                       [\-\-phase\-random\-seed PHASE_RANDOM_SEED]
+                                       [\-\-onset\-time\-credit]
+                                       [\-\-onset\-credit\-pull ONSET_CREDIT_PULL]
+                                       [\-\-onset\-credit\-max ONSET_CREDIT_MAX]
+                                       [\-\-no\-onset\-realign] [\-\-no\-center]
+                                       [\-\-device {auto,cpu,cuda}]
+                                       [\-\-cuda\-device CUDA_DEVICE]
+                                       [\-\-freeze\-time FREEZE_TIME]
+                                       [\-\-duration DURATION] [\-\-random\-phase]
+                                       [\-\-phase\-mode {instantaneous,bin,hold}]
+                                       inputs [inputs ...]
+
+Freeze a spectral slice into a sustained output
+
+positional arguments:
+  inputs                Input files/globs or '\-' for stdin
+
+options:
+  \-h, \-\-help            show this help message and exit
+  \-o, \-\-output\-dir OUTPUT_DIR
+                        Output directory
+  \-\-output, \-\-out OUTPUT
+                        Explicit output file path (single\-input mode only). Alias: \-\-out
+  \-\-suffix SUFFIX       Output filename suffix (default: _freeze)
+  \-\-output\-format OUTPUT_FORMAT
+                        Output extension/format
+  \-\-stdout              Write processed audio to stdout stream (for piping); requires exactly one input
+  \-\-overwrite           Overwrite existing outputs
+  \-\-dry\-run             Resolve and print, but do not write files
+  \-\-verbosity {silent,quiet,normal,verbose,debug}
+                        Console verbosity level
+  \-v, \-\-verbose         Increase verbosity (repeat for extra detail)
+  \-\-quiet               Reduce output and hide status bars
+  \-\-silent              Suppress all console output
+  \-\-normalize {none,peak,rms}
+                        Output normalization mode
+  \-\-peak\-dbfs PEAK_DBFS
+                        Target peak dBFS when \-\-normalize peak
+  \-\-rms\-dbfs RMS_DBFS   Target RMS dBFS when \-\-normalize rms
+  \-\-target\-lufs TARGET_LUFS
+                        Integrated loudness target in LUFS
+  \-\-compressor\-threshold\-db COMPRESSOR_THRESHOLD_DB
+                        Enable compressor above threshold dBFS
+  \-\-compressor\-ratio COMPRESSOR_RATIO
+                        Compressor ratio (>=1)
+  \-\-compressor\-attack\-ms COMPRESSOR_ATTACK_MS
+                        Compressor attack time in ms
+  \-\-compressor\-release\-ms COMPRESSOR_RELEASE_MS
+                        Compressor release time in ms
+  \-\-compressor\-makeup\-db COMPRESSOR_MAKEUP_DB
+                        Compressor makeup gain in dB
+  \-\-expander\-threshold\-db EXPANDER_THRESHOLD_DB
+                        Enable downward expander below threshold dBFS
+  \-\-expander\-ratio EXPANDER_RATIO
+                        Expander ratio (>=1)
+  \-\-expander\-attack\-ms EXPANDER_ATTACK_MS
+                        Expander attack time in ms
+  \-\-expander\-release\-ms EXPANDER_RELEASE_MS
+                        Expander release time in ms
+  \-\-compander\-threshold\-db COMPANDER_THRESHOLD_DB
+                        Enable compander threshold in dBFS
+  \-\-compander\-compress\-ratio COMPANDER_COMPRESS_RATIO
+                        Compander compression ratio (>=1)
+  \-\-compander\-expand\-ratio COMPANDER_EXPAND_RATIO
+                        Compander expansion ratio (>=1)
+  \-\-compander\-attack\-ms COMPANDER_ATTACK_MS
+                        Compander attack time in ms
+  \-\-compander\-release\-ms COMPANDER_RELEASE_MS
+                        Compander release time in ms
+  \-\-compander\-makeup\-db COMPANDER_MAKEUP_DB
+                        Compander makeup gain in dB
+  \-\-limiter\-threshold LIMITER_THRESHOLD
+                        Peak limiter threshold in linear full\-scale
+  \-\-soft\-clip\-level SOFT_CLIP_LEVEL
+                        Soft clip output ceiling in linear full\-scale
+  \-\-soft\-clip\-type {tanh,arctan,cubic}
+                        Soft clip transfer type
+  \-\-soft\-clip\-drive SOFT_CLIP_DRIVE
+                        Soft clip drive amount (>0)
+  \-\-hard\-clip\-level HARD_CLIP_LEVEL
+                        Hard clip level in linear full\-scale
+  \-\-clip                Legacy alias: hard clip at +/\-1.0 when set
+  \-\-subtype SUBTYPE     Explicit libsndfile output subtype override (e.g., PCM_16, PCM_24, FLOAT)
+  \-\-bit\-depth {inherit,16,24,32f}
+                        Output bit\-depth policy (default: inherit). Ignored when \-\-subtype is set.
+  \-\-dither {none,tpdf}  Dither policy before quantized writes (default: none)
+  \-\-dither\-seed DITHER_SEED
+                        Deterministic RNG seed for dithering (default: random seed)
+  \-\-true\-peak\-max\-dbtp TRUE_PEAK_MAX_DBTP
+                        Apply output gain trim to enforce max true\-peak in dBTP
+  \-\-metadata\-policy {none,sidecar,copy}
+                        Output metadata policy: none, sidecar, or copy (sidecar implementation)
+  \-\-n\-fft N_FFT         FFT size (default: 2048)
+  \-\-win\-length WIN_LENGTH
+                        Window length in samples (default: 2048)
+  \-\-hop\-size HOP_SIZE   Hop size in samples (default: 256)
+  \-\-window {hann,hamming,blackman,blackmanharris,nuttall,flattop,blackman_nuttall,exact_blackman,sine,bartlett,boxcar,triangular,bartlett_hann,tukey,tukey_0p1,tukey_0p25,tukey_0p75,tukey_0p9,parzen,lanczos,welch,gaussian_0p25,gaussian_0p35,gaussian_0p45,gaussian_0p55,gaussian_0p65,general_gaussian_1p5_0p35,general_gaussian_2p0_0p35,general_gaussian_3p0_0p35,general_gaussian_4p0_0p35,exponential_0p25,exponential_0p5,exponential_1p0,cauchy_0p5,cauchy_1p0,cauchy_2p0,cosine_power_2,cosine_power_3,cosine_power_4,hann_poisson_0p5,hann_poisson_1p0,hann_poisson_2p0,general_hamming_0p50,general_hamming_0p60,general_hamming_0p70,general_hamming_0p80,bohman,cosine,kaiser,rect}
+                        Window type
+  \-\-kaiser\-beta KAISER_BETA
+                        Kaiser window beta parameter used when \-\-window kaiser (default: 14.0)
+  \-\-transform {fft,dft,czt,dct,dst,hartley}
+                        Per\-frame transform backend for STFT/ISTFT paths (default: fft; options: fft, dft, czt, dct, dst, hartley)
+  \-\-phase\-engine {propagate,hybrid,random}
+                        Phase synthesis engine: propagate (classic), hybrid (propagated + stochastic blend), random (ambient stochastic phase)
+  \-\-ambient\-phase\-mix AMBIENT_PHASE_MIX
+                        Random\-phase blend for \-\-phase\-engine hybrid (0..1, default: 0.5)
+  \-\-phase\-random\-seed PHASE_RANDOM_SEED
+                        Deterministic random seed for random/hybrid phase engines
+  \-\-onset\-time\-credit   Enable onset\-triggered time\-credit scheduling for extreme stretch
+  \-\-onset\-credit\-pull ONSET_CREDIT_PULL
+                        Fraction of per\-frame read advance removable by onset credit (0..1)
+  \-\-onset\-credit\-max ONSET_CREDIT_MAX
+                        Maximum accumulated onset credit in analysis\-frame units
+  \-\-no\-onset\-realign    Disable onset read\-position realignment when onset credit is active
+  \-\-no\-center           Disable centered framing
+  \-\-device {auto,cpu,cuda}
+                        Compute device: auto (prefer CUDA), cpu, or cuda
+  \-\-cuda\-device CUDA_DEVICE
+                        CUDA device index used when \-\-device is auto/cuda (default: 0)
+  \-\-freeze\-time FREEZE_TIME
+                        Freeze anchor time in seconds
+  \-\-duration DURATION   Output freeze duration in seconds
+  \-\-random\-phase        Add subtle phase randomization per frame
+  \-\-phase\-mode {instantaneous,bin,hold}
+                        Phase progression mode inside the frozen segment: instantaneous (default, least flutter), bin (bin\-center), hold (no advance).
+
+Examples:
+  pvx freeze input.wav \-\-freeze\-time 0.25 \-\-duration 8 \-\-output output_freeze.wav
+  pvx freeze pad.wav \-\-freeze\-time 0.9 \-\-duration 30 \-\-random\-phase \-\-output pad_air.wav
+  pvx freeze input.wav \-\-freeze\-time 0.4 \-\-duration 6 \-\-stdout | pvx deverb \- \-\-strength 0.35 \-\-output cleaned.wav
+
+Notes:
+  \- Use \-\-freeze\-time to choose the spectral moment to sustain.
+  \- Enable \-\-random\-phase for more animated ambient textures.
+.fi
+.SH ATTRIBUTION
+Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.

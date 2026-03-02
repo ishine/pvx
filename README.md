@@ -23,6 +23,15 @@ At a glance, `pvx` provides:
 - shared mastering/output controls (target loudness units relative to full scale (LUFS), limiting, clipping, dithering, and output policy options)
 - comprehensive generated documentation (Markdown, HyperText Markup Language (HTML), and Portable Document Format (PDF))
 
+## Value Proposition
+
+`pvx` is designed for users who care more about artifact control than raw throughput. In practical terms:
+
+- higher control density than typical one-knob stretch tools (phase, transient, stereo coherence, formant, and mastering layers in one command surface)
+- explicit reproducibility for research and production (deterministic central processing unit (CPU) mode, manifests, benchmark gates, and stable command syntax)
+- first-class automation for time-varying control-rate signals (comma-separated values (CSV)/JavaScript Object Notation (JSON) interpolation, routing, `follow`, and `chain`)
+- one unified command-line interface (CLI) (`pvx`) with backwards-compatible direct entry points (`pvxvoc`, `pvxfreeze`, etc.)
+
 ## Install
 
 ```bash
@@ -61,6 +70,13 @@ python3 -m pip install cupy-cuda12x
 uv pip install cupy-cuda12x
 ```
 
+Man pages are generated during `make install` / `make install-dev`:
+
+```bash
+python3 scripts/scripts_install_man_pages.py
+MANPATH="$(pwd)/man:$MANPATH" man pvx
+```
+
 ### Installation and Runtime Matrix
 
 | Platform / Runtime | CPU mode | GPU/CUDA mode | Notes |
@@ -79,7 +95,9 @@ pvx voc input.wav --stretch 1.2 --output output.wav
 Fallback without `PATH` updates:
 
 ```bash
-pvx voc input.wav --stretch 1.2 --output output.wav
+.venv/bin/pvx voc input.wav --stretch 1.2 --output output.wav
+# or
+python3 -m pvx.cli.pvx voc input.wav --stretch 1.2 --output output.wav
 ```
 
 Fallback with `uv`:
@@ -130,7 +148,9 @@ If that does not work, it is usually a `PATH` issue, which is both common and mi
 No `PATH` fallback:
 
 ```bash
-pvx voc input.wav --stretch 1.20 --output output.wav
+.venv/bin/pvx voc input.wav --stretch 1.20 --output output.wav
+# or
+python3 -m pvx.cli.pvx voc input.wav --stretch 1.20 --output output.wav
 ```
 
 `uv` fallback (no `PATH` changes):
@@ -191,6 +211,9 @@ pvx morph a.wav b.wav --blend-mode carrier_a_envelope_b --alpha 0.75 --envelope-
 
 # True A->B trajectory morph over time (single command)
 pvx morph A.wav B.wav --alpha controls/alpha_curve.csv --interp linear --output morph_traj.wav
+
+# Mono source flying through a captured 4-channel space (A->B trajectory)
+pvx trajectory-reverb source.wav --ir room_4ch.wav --coord-system cartesian --start -1,0,1 --end 1,0,1 --output flythrough.wav
 
 # Retune to a major scale
 pvx retune vocal.wav --root C --scale major --strength 0.85 --output vocal_retuned.wav
@@ -379,7 +402,9 @@ pvx --help
 If you do not want to modify the path environment variable (`PATH`), run the same command through the repository wrapper:
 
 ```bash
-pvx voc input.wav --stretch 1.20 --output output.wav
+.venv/bin/pvx voc input.wav --stretch 1.20 --output output.wav
+# or
+python3 -m pvx.cli.pvx voc input.wav --stretch 1.20 --output output.wav
 ```
 
 Equivalent with `uv`:
@@ -768,6 +793,11 @@ See [docs/DIAGRAMS.md](docs/DIAGRAMS.md) for:
 - enable `--transient-preserve`
 - reduce stretch ratio, or use `--stretch-mode multistage`
 
+### Freeze output flutters instead of sounding stationary
+- use `pvx freeze ... --phase-mode instantaneous` (default; best for stable holds)
+- if you want explicit bin-center stepping, use `--phase-mode bin`
+- use `--phase-mode hold` only for deliberately static/experimental phase behavior
+
 ### Speech sounds robotic after pitch shift
 - use `--pitch-mode formant-preserving`
 - reduce semitone magnitude
@@ -799,6 +829,29 @@ Yes. `--stretch > 1` lengthens, `--stretch < 1` shortens.
 ### Can I shift pitch without changing duration?
 Yes. Use pitch flags with `--stretch 1.0`, e.g. `--pitch`, `--cents`, or `--ratio`.
 
+### I installed pvx but get `zsh: command not found: pvx`. What now?
+Use one of these immediately:
+
+```bash
+.venv/bin/pvx --help
+# or
+python3 -m pvx.cli.pvx --help
+```
+
+Then either keep using one of those forms or add `.venv/bin` to your path environment variable (`PATH`):
+
+```bash
+printf 'export PATH="%s/.venv/bin:$PATH"\n' "$(pwd)" >> ~/.zshrc
+source ~/.zshrc
+```
+
+### What is an `.npz` file in pvx?
+`.npz` is NumPy's compressed container format. In `pvx` it stores reusable analysis/response artifacts:
+- `.pvxan.npz`: short-time Fourier transform (STFT) analysis payloads
+- `.pvxrf.npz`: derived frequency-response payloads
+
+These files are binary, compact, and intended for machine reuse in repeatable pipelines.
+
 ### Can I chain tools in one shell line?
 Yes. Use `--stdout` and `-` input on downstream tools.
 
@@ -818,6 +871,38 @@ Compatibility fallback (legacy segmented-wrapper behavior):
 
 ```bash
 pvx stream input.wav --mode wrapper --output output_stream.wav --chunk-seconds 0.2 --time-stretch 3.0
+```
+
+### Can I generate many random variants in one command?
+Yes. Use `--lucky N` on processing workflows:
+
+```bash
+pvx voc input.wav --output-dir out --lucky 12
+pvx freeze input.wav --output-dir out --lucky 8 --lucky-seed 42
+pvx chain input.wav --pipeline "voc --stretch 1.5 | deverb --strength 0.4" --output out/chain.wav --lucky 5
+```
+
+### Can I reverberate a mono file with a 4-channel impulse response and move source position from A to B?
+Yes. Use `pvx trajectory-reverb` with cartesian or spherical coordinates:
+
+```bash
+# Cartesian trajectory
+pvx trajectory-reverb source.wav --ir room_4ch.wav \
+  --coord-system cartesian --start -1,0,1 --end 1,0,1 \
+  --trajectory-shape ease-in-out --output flythrough_cart.wav
+
+# Spherical trajectory (azimuth,elevation,radius)
+pvx trajectory-reverb source.wav --ir room_4ch.wav \
+  --coord-system spherical --start -90,0,1.2 --end 90,0,1.2 \
+  --output flythrough_sph.wav
+```
+
+Optional explicit speaker layout (azimuth,elevation per channel):
+
+```bash
+pvx trajectory-reverb source.wav --ir room_4ch.wav \
+  --speaker-angles "-45,0;45,0;135,0;-135,0" \
+  --start -1,0,1 --end 1,0,1 --output flythrough_layout.wav
 ```
 
 ```bash

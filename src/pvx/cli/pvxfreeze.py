@@ -29,6 +29,10 @@ from pvx.core.common import (
 from pvx.core.voc import istft, stft
 
 
+def _principal_angle(values: np.ndarray) -> np.ndarray:
+    return (values + np.pi) % (2.0 * np.pi) - np.pi
+
+
 def freeze_channel(
     signal: np.ndarray,
     sr: int,
@@ -36,6 +40,7 @@ def freeze_channel(
     duration_s: float,
     config,
     random_phase: bool,
+    phase_mode: str,
 ) -> np.ndarray:
     spectrum = stft(signal, config)
     bins, frames = spectrum.shape
@@ -49,14 +54,29 @@ def freeze_channel(
     mag = np.abs(spectrum[:, frame_idx])
     phase = np.angle(spectrum[:, frame_idx]).copy()
     omega = 2.0 * np.pi * config.hop_size * np.arange(bins, dtype=np.float64) / config.n_fft
+    if phase_mode == "hold":
+        phase_step = np.zeros_like(omega)
+    elif phase_mode == "bin":
+        phase_step = omega
+    else:
+        if frames <= 1:
+            phase_step = omega
+        elif frame_idx > 0:
+            phase_prev = np.angle(spectrum[:, frame_idx - 1])
+            delta = _principal_angle(np.angle(spectrum[:, frame_idx]) - phase_prev - omega)
+            phase_step = omega + delta
+        else:
+            phase_next = np.angle(spectrum[:, frame_idx + 1])
+            delta = _principal_angle(phase_next - np.angle(spectrum[:, frame_idx]) - omega)
+            phase_step = omega + delta
     out = np.zeros((bins, out_frames), dtype=np.complex128)
 
     rng = np.random.default_rng(12345)
     for idx in range(out_frames):
         if random_phase:
-            phase = phase + omega + rng.uniform(-0.03, 0.03, size=bins)
+            phase = phase + phase_step + rng.uniform(-0.03, 0.03, size=bins)
         else:
-            phase = phase + omega
+            phase = phase + phase_step
         out[:, idx] = mag * np.exp(1j * phase)
 
     expected_len = max(1, int(round(duration_s * sr)))
@@ -84,6 +104,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--freeze-time", type=float, default=0.2, help="Freeze anchor time in seconds")
     parser.add_argument("--duration", type=float, default=3.0, help="Output freeze duration in seconds")
     parser.add_argument("--random-phase", action="store_true", help="Add subtle phase randomization per frame")
+    parser.add_argument(
+        "--phase-mode",
+        choices=["instantaneous", "bin", "hold"],
+        default="instantaneous",
+        help=(
+            "Phase progression mode inside the frozen segment: "
+            "instantaneous (default, least flutter), bin (bin-center), hold (no advance)."
+        ),
+    )
     return parser
 
 
@@ -116,6 +145,7 @@ def main(argv: list[str] | None = None) -> int:
                         args.duration,
                         config,
                         random_phase=args.random_phase,
+                        phase_mode=str(args.phase_mode),
                     )
                 )
             out_len = max(ch.size for ch in out_channels)

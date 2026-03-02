@@ -1,0 +1,102 @@
+.TH "PVXFOLLOW" "1" "2026-03-01" "pvx" "User Commands"
+.SH NAME
+pvxfollow \- Single-command sidechain helper
+.SH SYNOPSIS
+.B pvxfollow
+.SH DESCRIPTION
+Auto-generated from built-in --help output.
+.SH OPTIONS
+.nf
+usage: pvx follow [\-h] \-\-output OUTPUT
+                  [\-\-emit {pitch_map,stretch_map,pitch_to_stretch}]
+                  [\-\-backend {auto,pyin,acf}] [\-\-fmin FMIN] [\-\-fmax FMAX]
+                  [\-\-frame\-length FRAME_LENGTH] [\-\-hop\-size HOP_SIZE]
+                  [\-\-ratio\-reference {median,mean,first,hz}]
+                  [\-\-reference\-hz REFERENCE_HZ] [\-\-ratio\-min RATIO_MIN]
+                  [\-\-ratio\-max RATIO_MAX] [\-\-smooth\-frames SMOOTH_FRAMES]
+                  [\-\-confidence\-floor CONFIDENCE_FLOOR]
+                  [\-\-feature\-set {none,basic,advanced,all}]
+                  [\-\-mfcc\-count MFCC_COUNT]
+                  [\-\-stretch\-from {pitch_ratio,inv_pitch_ratio,f0_hz}]
+                  [\-\-stretch\-scale STRETCH_SCALE] [\-\-stretch\-min STRETCH_MIN]
+                  [\-\-stretch\-max STRETCH_MAX] [\-\-stretch STRETCH]
+                  [\-\-pitch\-conf\-min PITCH_CONF_MIN]
+                  [\-\-pitch\-lowconf\-mode {hold,unity,interp}]
+                  [\-\-pitch\-map\-smooth\-ms PITCH_MAP_SMOOTH_MS]
+                  [\-\-pitch\-map\-crossfade\-ms PITCH_MAP_CROSSFADE_MS]
+                  [\-\-route EXPR] [\-\-overwrite] [\-\-quiet] [\-\-silent]
+                  [\-\-example [NAME]]
+                  guide target
+
+Single\-command sidechain helper: track guide pitch/f0 and apply the resulting
+control map to a target via `pvx voc \-\-control\-stdin`.
+
+positional arguments:
+  guide                 Guide/input A used for pitch tracking
+  target                Target/input B to be processed by pvx voc
+
+options:
+  \-h, \-\-help            show this help message and exit
+  \-\-output, \-\-out OUTPUT
+                        Output audio path
+  \-\-emit {pitch_map,stretch_map,pitch_to_stretch}
+                        Control map emit mode for the guide track (default:
+                        pitch_to_stretch)
+  \-\-backend {auto,pyin,acf}
+                        Pitch tracker backend
+  \-\-fmin FMIN           Minimum tracked f0 in Hz
+  \-\-fmax FMAX           Maximum tracked f0 in Hz
+  \-\-frame\-length FRAME_LENGTH
+                        Tracker frame length in samples
+  \-\-hop\-size HOP_SIZE   Tracker hop size in samples
+  \-\-ratio\-reference {median,mean,first,hz}
+                        Reference mode for pitch_ratio derivation in tracking
+  \-\-reference\-hz REFERENCE_HZ
+                        Reference Hz when \-\-ratio\-reference hz
+  \-\-ratio\-min RATIO_MIN
+                        Minimum pitch_ratio clamp
+  \-\-ratio\-max RATIO_MAX
+                        Maximum pitch_ratio clamp
+  \-\-smooth\-frames SMOOTH_FRAMES
+                        Smoothing window in frames
+  \-\-confidence\-floor CONFIDENCE_FLOOR
+                        Minimum tracker confidence
+  \-\-feature\-set {none,basic,advanced,all}
+                        Feature columns emitted by pitch tracker (default:
+                        all)
+  \-\-mfcc\-count MFCC_COUNT
+                        MFCC column count emitted by pitch tracker (default:
+                        13)
+  \-\-stretch\-from {pitch_ratio,inv_pitch_ratio,f0_hz}
+                        Source for deriving stretch in stretch\-oriented emit
+                        modes
+  \-\-stretch\-scale STRETCH_SCALE
+                        Scale factor for derived stretch track
+  \-\-stretch\-min STRETCH_MIN
+                        Lower clamp for derived stretch
+  \-\-stretch\-max STRETCH_MAX
+                        Upper clamp for derived stretch
+  \-\-stretch STRETCH     Constant stretch value when \-\-emit pitch_map
+  \-\-pitch\-conf\-min PITCH_CONF_MIN
+                        Minimum accepted map confidence for pvx voc (default:
+                        0.75)
+  \-\-pitch\-lowconf\-mode {hold,unity,interp}
+                        Low\-confidence handling mode in pvx voc (default:
+                        hold)
+  \-\-pitch\-map\-smooth\-ms PITCH_MAP_SMOOTH_MS
+                        Additional map smoothing in pvx voc (milliseconds)
+  \-\-pitch\-map\-crossfade\-ms PITCH_MAP_CROSSFADE_MS
+                        Map segment crossfade in pvx voc (milliseconds,
+                        default: 20)
+  \-\-route EXPR          Optional pvx voc control route expression. Repeat to
+                        chain. Example: \-\-route stretch=pitch_ratio \-\-route
+                        pitch_ratio=const(1.0)
+  \-\-overwrite           Overwrite existing output
+  \-\-quiet               Reduce helper logs and hide progress bars
+  \-\-silent              Suppress helper logs
+  \-\-example [NAME]      Print follow example command(s) and exit. Use
+                        `\-\-example` for basic or `\-\-example all` for the full
+                        set.
+.fi
+.SH ATTRIBUTION
+Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.

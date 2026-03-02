@@ -1,0 +1,37 @@
+.TH "PVX" "1" "2026-03-01" "pvx" "User Commands"
+.SH NAME
+pvx \- Unified command-line interface for pvx
+.SH SYNOPSIS
+.B pvx
+.SH DESCRIPTION
+Auto-generated from built-in --help output.
+.SH OPTIONS
+.nf
+usage: pvx [\-h] [command] ...
+
+Unified CLI for pvx (audio quality first, speed second).
+Use subcommands to access all existing pvx tools from one entrypoint.
+
+positional arguments:
+  command     Subcommand name, helper command, or input path (defaults to `voc` when an input path is provided)
+  args        Arguments forwarded directly to the selected subcommand
+
+options:
+  \-h, \-\-help  show this help message and exit
+
+Quick start:
+  pvx voc input.wav \-\-stretch 1.2 \-\-output output.wav
+  pvx input.wav \-\-stretch 1.2 \-\-output output.wav   # defaults to `voc`
+  pvx follow guide.wav target.wav \-\-output followed.wav \-\-emit pitch_to_stretch
+  pvx chain input.wav \-\-pipeline "voc \-\-stretch 1.2 | formant \-\-mode preserve" \-\-output out.wav
+  pvx stream input.wav \-\-output out.wav \-\-chunk\-seconds 0.2 \-\-time\-stretch 2.0
+  pvx stretch\-budget input.wav \-\-disk\-budget 20GB \-\-bit\-depth 16 \-\-requested\-stretch 1000000
+  pvx voc input.wav \-\-output\-dir out \-\-lucky 8
+  pvx list
+  pvx examples basic
+  pvx help voc
+
+Available tool commands: voc, freeze, harmonize, conform, morph, warp, formant, transient, unison, denoise, deverb, retune, layer, pitch\-track, analysis, response, envelope, reshape, filter, tvfilter, noisefilter, bandamp, spec\-compander, ring, ringfilter, ringtvfilter, chordmapper, inharmonator
+.fi
+.SH ATTRIBUTION
+Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
