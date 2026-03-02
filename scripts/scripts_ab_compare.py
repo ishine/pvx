@@ -89,8 +89,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--input", type=Path, required=True, help="Input audio file")
     parser.add_argument(
         "--tool",
-        default="python3 pvxvoc.py",
-        help="Base command used for both renders (default: 'python3 pvxvoc.py')",
+        default="python3 -m pvx.core.voc",
+        help="Base command used for both renders (default: 'python3 -m pvx.core.voc')",
     )
     parser.add_argument("--a-args", required=True, help="Additional argument string for render A")
     parser.add_argument("--b-args", required=True, help="Additional argument string for render B")

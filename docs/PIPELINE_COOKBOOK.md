@@ -47,7 +47,7 @@ Why: Compares current renders against baseline objective metrics with configurab
 ### Batch stretch over folder
 
 ```bash
-python3 pvxvoc.py stems/*.wav --time-stretch 1.08 --output-dir out/stems --overwrite
+pvx voc stems/*.wav --time-stretch 1.08 --output-dir out/stems --overwrite
 ```
 
 Why: Applies consistent transform to many files with one command.
@@ -55,7 +55,7 @@ Why: Applies consistent transform to many files with one command.
 ### Dry-run output validation
 
 ```bash
-python3 pvxdenoise.py takes/*.wav --reduction-db 8 --dry-run --output-dir out/preview
+pvx denoise takes/*.wav --reduction-db 8 --dry-run --output-dir out/preview
 ```
 
 Why: Checks filename resolution and collisions without writing audio.
@@ -65,7 +65,7 @@ Why: Checks filename resolution and collisions without writing audio.
 ### Integrated loudness targeting with limiter
 
 ```bash
-python3 pvxvoc.py mix.wav --time-stretch 1.0 --target-lufs -14 --compressor-threshold-db -20 --compressor-ratio 3 --limiter-threshold 0.98 --output-dir out --suffix _master
+pvx voc mix.wav --time-stretch 1.0 --target-lufs -14 --compressor-threshold-db -20 --compressor-ratio 3 --limiter-threshold 0.98 --output-dir out --suffix _master
 ```
 
 Why: Combines dynamics and loudness controls in shared mastering chain.
@@ -73,7 +73,7 @@ Why: Combines dynamics and loudness controls in shared mastering chain.
 ### Soft clip and hard safety ceiling
 
 ```bash
-python3 pvxharmonize.py bus.wav --intervals 0,7,12 --mix 0.35 --soft-clip-level 0.92 --soft-clip-type tanh --hard-clip-level 0.99 --output-dir out
+pvx harmonize bus.wav --intervals 0,7,12 --mix 0.35 --soft-clip-level 0.92 --soft-clip-type tanh --hard-clip-level 0.99 --output-dir out
 ```
 
 Why: Adds saturation while enforcing a strict final peak ceiling.
@@ -83,7 +83,7 @@ Why: Adds saturation while enforcing a strict final peak ceiling.
 ### Custom cents map retune
 
 ```bash
-python3 pvxretune.py vox.wav --root 60 --scale-cents 0,90,204,294,408,498,612,702,816,906,1020,1110 --strength 0.8 --output-dir out
+pvx retune vox.wav --root 60 --scale-cents 0,90,204,294,408,498,612,702,816,906,1020,1110 --strength 0.8 --output-dir out
 ```
 
 Why: Maps incoming notes to a custom 12-degree microtonal scale.
@@ -91,7 +91,7 @@ Why: Maps incoming notes to a custom 12-degree microtonal scale.
 ### Conform CSV with per-segment ratios
 
 ```bash
-python3 pvxconform.py solo.wav map_conform.csv --pitch-mode ratio --output-dir out --suffix _conform
+pvx conform solo.wav map_conform.csv --pitch-mode ratio --output-dir out --suffix _conform
 ```
 
 Why: Applies timeline-specific time and pitch trajectories from CSV.
@@ -101,7 +101,7 @@ Why: Applies timeline-specific time and pitch trajectories from CSV.
 ### Moderate vocal stretch with formant preservation
 
 ```bash
-python3 pvxvoc.py vocal.wav --time-stretch 1.15 --pitch-mode formant-preserving --output-dir out --suffix _pv
+pvx voc vocal.wav --time-stretch 1.15 --pitch-mode formant-preserving --output-dir out --suffix _pv
 ```
 
 Why: Retains speech-like vowel envelope while stretching timing.
@@ -109,7 +109,7 @@ Why: Retains speech-like vowel envelope while stretching timing.
 ### Independent cents retune
 
 ```bash
-python3 pvxvoc.py lead.wav --pitch-shift-cents -23 --time-stretch 1.0 --output-dir out --suffix _cents
+pvx voc lead.wav --pitch-shift-cents -23 --time-stretch 1.0 --output-dir out --suffix _cents
 ```
 
 Why: Applies precise microtonal offset without tempo change.
@@ -117,7 +117,7 @@ Why: Applies precise microtonal offset without tempo change.
 ### Extreme stretch with multistage strategy
 
 ```bash
-python3 pvxvoc.py ambience.wav --target-duration 600 --ambient-preset --n-fft 16384 --win-length 16384 --hop-size 2048 --window kaiser --kaiser-beta 18 --output-dir out --suffix _ambient600x
+pvx voc ambience.wav --target-duration 600 --ambient-preset --n-fft 16384 --win-length 16384 --hop-size 2048 --window kaiser --kaiser-beta 18 --output-dir out --suffix _ambient600x
 ```
 
 Why: PaulStretch-style ambient profile for very large ratios using stochastic phase and onset time-credit controls.
@@ -125,7 +125,7 @@ Why: PaulStretch-style ambient profile for very large ratios using stochastic ph
 ### Ultra-smooth speech stretch (600x)
 
 ```bash
-python3 pvxvoc.py speech.wav --target-duration 600 --stretch-mode standard --phase-engine propagate --phase-locking identity --n-fft 8192 --win-length 8192 --hop-size 256 --window hann --normalize peak --peak-dbfs -1 --compressor-threshold-db -30 --compressor-ratio 2.0 --compressor-attack-ms 25 --compressor-release-ms 250 --compressor-makeup-db 4 --limiter-threshold 0.95 --output-dir out --suffix _speech600x
+pvx voc speech.wav --target-duration 600 --stretch-mode standard --phase-engine propagate --phase-locking identity --n-fft 8192 --win-length 8192 --hop-size 256 --window hann --normalize peak --peak-dbfs -1 --compressor-threshold-db -30 --compressor-ratio 2.0 --compressor-attack-ms 25 --compressor-release-ms 250 --compressor-makeup-db 4 --limiter-threshold 0.95 --output-dir out --suffix _speech600x
 ```
 
 Why: Prefers continuity and intelligibility over texture animation; avoids choppy stochastic artifacts on speech sources.
@@ -133,7 +133,7 @@ Why: Prefers continuity and intelligibility over texture animation; avoids chopp
 ### Auto-profile plan preview
 
 ```bash
-python3 pvxvoc.py input.wav --auto-profile --auto-transform --explain-plan
+pvx voc input.wav --auto-profile --auto-transform --explain-plan
 ```
 
 Why: Prints the resolved profile/config plan before long renders.
@@ -141,7 +141,7 @@ Why: Prints the resolved profile/config plan before long renders.
 ### Multi-resolution fusion stretch
 
 ```bash
-python3 pvxvoc.py input.wav --multires-fusion --multires-ffts 1024,2048,4096 --multires-weights 0.2,0.35,0.45 --time-stretch 1.4 --output-dir out --suffix _multires
+pvx voc input.wav --multires-fusion --multires-ffts 1024,2048,4096 --multires-weights 0.2,0.35,0.45 --time-stretch 1.4 --output-dir out --suffix _multires
 ```
 
 Why: Blends several FFT scales to reduce single-resolution bias on complex program material.
@@ -149,7 +149,7 @@ Why: Blends several FFT scales to reduce single-resolution bias on complex progr
 ### Checkpointed long render with manifest
 
 ```bash
-python3 pvxvoc.py long.wav --time-stretch 12 --auto-segment-seconds 0.5 --checkpoint-dir checkpoints --manifest-json reports/run_manifest.json --output-dir out --suffix _long
+pvx voc long.wav --time-stretch 12 --auto-segment-seconds 0.5 --checkpoint-dir checkpoints --manifest-json reports/run_manifest.json --output-dir out --suffix _long
 ```
 
 Why: Caches segment renders for resume workflows and writes run metadata for reproducibility.
@@ -159,7 +159,7 @@ Why: Caches segment renders for resume workflows and writes run metadata for rep
 ### Time-stretch -> denoise -> dereverb in one pipe
 
 ```bash
-python3 pvxvoc.py input.wav --time-stretch 1.25 --stdout | python3 pvxdenoise.py - --reduction-db 10 --stdout | python3 pvxdeverb.py - --strength 0.45 --output-dir out --suffix _clean
+pvx voc input.wav --time-stretch 1.25 --stdout | pvx denoise - --reduction-db 10 --stdout | pvx deverb - --strength 0.45 --output-dir out --suffix _clean
 ```
 
 Why: Single-pass CLI chain for serial DSP in Unix pipes.
@@ -167,7 +167,7 @@ Why: Single-pass CLI chain for serial DSP in Unix pipes.
 ### Morph -> formant -> unison
 
 ```bash
-python3 pvxmorph.py a.wav b.wav -o - | python3 pvxformant.py - --mode preserve --stdout | python3 pvxunison.py - --voices 5 --detune-cents 8 --output-dir out --suffix _morph_stack
+pvx morph a.wav b.wav -o - | pvx formant - --mode preserve --stdout | pvx unison - --voices 5 --detune-cents 8 --output-dir out --suffix _morph_stack
 ```
 
 Why: Builds a richer timbre chain with no intermediate files.
@@ -175,7 +175,7 @@ Why: Builds a richer timbre chain with no intermediate files.
 ### Pitch-follow sidechain map (A controls B)
 
 ```bash
-python3 HPS-pitch-track.py A.wav | python3 pvxvoc.py B.wav --pitch-follow-stdin --pitch-conf-min 0.75 --pitch-lowconf-mode hold --time-stretch-factor 1.0 --output output.wav
+pvx pitch-track A.wav | pvx voc B.wav --pitch-follow-stdin --pitch-conf-min 0.75 --pitch-lowconf-mode hold --time-stretch-factor 1.0 --output output.wav
 ```
 
 Why: Tracks F0 contour from source A and applies it as a dynamic pitch-ratio control map on source B.
@@ -195,7 +195,7 @@ Why: Demonstrates algorithm-level spatial module invocation.
 ### Default production backend (FFT + transient protection)
 
 ```bash
-python3 pvxvoc.py mix.wav --transform fft --time-stretch 1.07 --transient-preserve --phase-locking identity --output-dir out --suffix _fft
+pvx voc mix.wav --transform fft --time-stretch 1.07 --transient-preserve --phase-locking identity --output-dir out --suffix _fft
 ```
 
 Why: Use when you need the fastest and most stable general-purpose phase-vocoder path.
@@ -203,7 +203,7 @@ Why: Use when you need the fastest and most stable general-purpose phase-vocoder
 ### Reference Fourier baseline using explicit DFT mode
 
 ```bash
-python3 pvxvoc.py tone_sweep.wav --transform dft --time-stretch 1.00 --pitch-shift-semitones 0 --output-dir out --suffix _dft_ref
+pvx voc tone_sweep.wav --transform dft --time-stretch 1.00 --pitch-shift-semitones 0 --output-dir out --suffix _dft_ref
 ```
 
 Why: Useful for parity checks and controlled transform-comparison experiments.
@@ -211,7 +211,7 @@ Why: Useful for parity checks and controlled transform-comparison experiments.
 ### Prime-size frame experiment with CZT backend
 
 ```bash
-python3 pvxvoc.py archival_take.wav --transform czt --n-fft 1531 --win-length 1531 --hop-size 382 --time-stretch 1.03 --output-dir out --suffix _czt
+pvx voc archival_take.wav --transform czt --n-fft 1531 --win-length 1531 --hop-size 382 --time-stretch 1.03 --output-dir out --suffix _czt
 ```
 
 Why: Alternative numerical path for awkward/prime frame sizes when validating edge cases.
@@ -219,7 +219,7 @@ Why: Alternative numerical path for awkward/prime frame sizes when validating ed
 ### DCT timbral compaction for smooth harmonic material
 
 ```bash
-python3 pvxvoc.py strings.wav --transform dct --pitch-shift-cents -18 --soft-clip-level 0.95 --output-dir out --suffix _dct
+pvx voc strings.wav --transform dct --pitch-shift-cents -18 --soft-clip-level 0.95 --output-dir out --suffix _dct
 ```
 
 Why: Real-basis coefficients can emphasize envelope-like structure for creative reshaping.
@@ -227,7 +227,7 @@ Why: Real-basis coefficients can emphasize envelope-like structure for creative 
 ### DST odd-symmetry color pass
 
 ```bash
-python3 pvxvoc.py snare_loop.wav --transform dst --time-stretch 0.92 --phase-locking off --output-dir out --suffix _dst
+pvx voc snare_loop.wav --transform dst --time-stretch 0.92 --phase-locking off --output-dir out --suffix _dst
 ```
 
 Why: Provides an alternate real-basis artifact profile useful for creative percussive processing.
@@ -235,7 +235,7 @@ Why: Provides an alternate real-basis artifact profile useful for creative percu
 ### Hartley real-basis exploratory render
 
 ```bash
-python3 pvxvoc.py synth_pad.wav --transform hartley --time-stretch 1.30 --pitch-shift-semitones 3 --output-dir out --suffix _hartley
+pvx voc synth_pad.wav --transform hartley --time-stretch 1.30 --pitch-shift-semitones 3 --output-dir out --suffix _hartley
 ```
 
 Why: Compares Hartley-domain behavior against complex FFT phase-vocoder output.
@@ -243,7 +243,7 @@ Why: Compares Hartley-domain behavior against complex FFT phase-vocoder output.
 ### A/B sweep of transform backends from shell loop
 
 ```bash
-for t in fft dft czt dct dst hartley; do python3 pvxvoc.py voice.wav --transform "$t" --time-stretch 1.1 --output-dir out --suffix "_$t"; done
+for t in fft dft czt dct dst hartley; do pvx voc voice.wav --transform "$t" --time-stretch 1.1 --output-dir out --suffix "_$t"; done
 ```
 
 Why: Fast listening workflow for selecting the least-artifact transform on your source.

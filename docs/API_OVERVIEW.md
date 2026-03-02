@@ -27,7 +27,7 @@ pvx --help
 No-`PATH` fallback for CLI validation:
 
 ```bash
-python3 pvx.py help voc
+pvx help voc
 ```
 
 ## 1) Import Paths
@@ -230,9 +230,9 @@ sf.write("segment_output.wav", y, sr)
 
 ## 7) Related CLI Equivalents
 
-- `python3 pvxvoc.py ...` for direct production workflows.
-- `python3 pvxvoc.py --explain-plan` to inspect resolved processing settings.
-- `python3 pvxvoc.py --manifest-json ...` to log run metadata.
+- `pvx voc ...` for direct production workflows.
+- `pvx voc --explain-plan` to inspect resolved processing settings.
+- `pvx voc --manifest-json ...` to log run metadata.
 
 ## Attribution
 

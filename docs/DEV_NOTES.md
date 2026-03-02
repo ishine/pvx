@@ -14,7 +14,7 @@ This note documents the current processing path and exact insertion points for:
 ## 1. Current `pvxvoc` Call Flow
 
 Primary entrypoint:
-- `/Users/cleider/dev/pvx/pvxvoc.py`
+- `pvxvoc (installed entry point)`
   - compatibility wrapper that forwards to `pvx.core.voc:main`
 
 Core runtime flow:

@@ -18,11 +18,6 @@ Command-line interface (CLI) entry points:
 - `/Users/cleider/dev/pvx/src/pvx/cli/pvxenvelope.py`
 - `/Users/cleider/dev/pvx/src/pvx/cli/pvxreshape.py`
 
-Root wrappers:
-
-- `/Users/cleider/dev/pvx/pvxenvelope.py`
-- `/Users/cleider/dev/pvx/pvxreshape.py`
-
 Unified registration:
 
 - `/Users/cleider/dev/pvx/src/pvx/cli/pvx.py`

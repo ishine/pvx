@@ -38,7 +38,7 @@ If you do not use `make`, run the underlying commands directly.
 - Include tests for behavioral changes.
 - Update documentation in the same pull request when behavior, parameters,
   outputs, or defaults change.
-- Preserve existing script entry points (`pvxvoc.py`, `pvxfreeze.py`, etc.).
+- Preserve existing command-line interfaces (`pvx`, `pvxvoc`, `pvxfreeze`, etc.).
 
 ## Commit Messages
 

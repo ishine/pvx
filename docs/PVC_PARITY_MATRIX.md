@@ -76,7 +76,7 @@ Primary references:
 1. Function-stream generators/transforms (`envelope`, `reshape`) interoperable with control-bus workflows:
    - core: `/Users/cleider/dev/pvx/src/pvx/core/pvc_functions.py`
    - CLI: `/Users/cleider/dev/pvx/src/pvx/cli/pvxenvelope.py`, `/Users/cleider/dev/pvx/src/pvx/cli/pvxreshape.py`
-   - wrappers: `/Users/cleider/dev/pvx/pvxenvelope.py`, `/Users/cleider/dev/pvx/pvxreshape.py`
+   - installed entry points: `pvx envelope`, `pvx reshape`
 2. Parity benchmarks and regression gates:
    - benchmark runner: `/Users/cleider/dev/pvx/benchmarks/run_pvc_parity.py`
    - baseline: `/Users/cleider/dev/pvx/benchmarks/baseline_pvc_parity.json`

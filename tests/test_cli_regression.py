@@ -343,6 +343,8 @@ class TestCLIRegression(unittest.TestCase):
         proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, msg=proc.stderr)
         self.assertIn("--a4-reference-hz", proc.stdout)
+        self.assertIn("--root-hz", proc.stdout)
+        self.assertIn("--recommend-root", proc.stdout)
 
     def test_unified_cli_follow_example_basic(self) -> None:
         cmd = [*UNIFIED_CLI, "follow", "--example"]

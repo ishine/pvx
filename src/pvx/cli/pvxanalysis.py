@@ -64,7 +64,7 @@ def build_parser() -> argparse.ArgumentParser:
             [
                 "pvx analysis create input.wav --output input.pvxan.npz --n-fft 4096 --hop-size 256",
                 "pvx analysis inspect input.pvxan.npz",
-                "pvxanalysis.py input.wav --output input.pvxan.npz",
+                "pvxanalysis input.wav --output input.pvxan.npz",
             ],
             notes=[
                 "When command is omitted, create mode is assumed for convenience.",

@@ -1800,7 +1800,7 @@ source ~/.zshrc
 pvx --help</code></pre>
   <p>
     No-PATH fallback:
-    <code>python3 pvx.py voc input.wav --stretch 1.2 --output output.wav</code>
+    <code>pvx voc input.wav --stretch 1.2 --output output.wav</code>
   </p>
 </div>
 """
@@ -2273,12 +2273,12 @@ def render_math_page() -> None:
   </table>
 
   <h3>Sample use cases</h3>
-  <pre><code>python3 pvxvoc.py dialog.wav --transform fft --time-stretch 1.08 --transient-preserve --output-dir out
-python3 pvxvoc.py tone_sweep.wav --transform dft --time-stretch 1.00 --output-dir out
-python3 pvxvoc.py archival_take.wav --transform czt --n-fft 1531 --win-length 1531 --hop-size 382 --output-dir out
-python3 pvxvoc.py strings.wav --transform dct --pitch-shift-cents -17 --output-dir out
-python3 pvxvoc.py percussion.wav --transform dst --time-stretch 0.92 --phase-locking off --output-dir out
-python3 pvxvoc.py synth_pad.wav --transform hartley --time-stretch 1.30 --output-dir out</code></pre>
+  <pre><code>pvx voc dialog.wav --transform fft --time-stretch 1.08 --transient-preserve --output-dir out
+pvx voc tone_sweep.wav --transform dft --time-stretch 1.00 --output-dir out
+pvx voc archival_take.wav --transform czt --n-fft 1531 --win-length 1531 --hop-size 382 --output-dir out
+pvx voc strings.wav --transform dct --pitch-shift-cents -17 --output-dir out
+pvx voc percussion.wav --transform dst --time-stretch 0.92 --phase-locking off --output-dir out
+pvx voc synth_pad.wav --transform hartley --time-stretch 1.30 --output-dir out</code></pre>
 </div>
 """
     )

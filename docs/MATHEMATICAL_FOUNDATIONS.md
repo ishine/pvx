@@ -89,12 +89,12 @@ Plain English: choose `fft` first, then move to other transforms when you specif
 ### Sample Transform Use Cases
 
 ```bash
-python3 pvxvoc.py dialog.wav --transform fft --time-stretch 1.08 --transient-preserve --output-dir out
-python3 pvxvoc.py test_tones.wav --transform dft --time-stretch 1.00 --output-dir out
-python3 pvxvoc.py archival_take.wav --transform czt --n-fft 1536 --win-length 1536 --hop-size 384 --output-dir out
-python3 pvxvoc.py strings.wav --transform dct --pitch-shift-cents -17 --soft-clip-level 0.94 --output-dir out
-python3 pvxvoc.py percussion.wav --transform dst --time-stretch 0.92 --output-dir out
-python3 pvxvoc.py synth.wav --transform hartley --phase-locking off --time-stretch 1.30 --output-dir out
+pvx voc dialog.wav --transform fft --time-stretch 1.08 --transient-preserve --output-dir out
+pvx voc test_tones.wav --transform dft --time-stretch 1.00 --output-dir out
+pvx voc archival_take.wav --transform czt --n-fft 1536 --win-length 1536 --hop-size 384 --output-dir out
+pvx voc strings.wav --transform dct --pitch-shift-cents -17 --soft-clip-level 0.94 --output-dir out
+pvx voc percussion.wav --transform dst --time-stretch 0.92 --output-dir out
+pvx voc synth.wav --transform hartley --phase-locking off --time-stretch 1.30 --output-dir out
 ```
 
 ## 3. Phase-Vocoder Frequency and Phase Update

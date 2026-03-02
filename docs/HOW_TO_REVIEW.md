@@ -39,12 +39,12 @@ Check:
 Run:
 
 ```bash
-python3 pvxvoc.py --help
-python3 pvx.py help voc
+pvx voc --help
+pvx help voc
 ```
 
 Check:
-- legacy wrappers still work.
+- If shell path setup is unavailable, use module entry points with `PYTHONPATH=src`.
 - unified CLI forwarding still resolves `voc` help and options.
 
 ## 3. Managed Follow/Chain/Stream Workflows

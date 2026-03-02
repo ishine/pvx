@@ -26,9 +26,9 @@ def _iter_cli_sources() -> list[Path]:
 
 def _tool_name_for_path(path: Path) -> str:
     if path.name == "voc.py":
-        return "pvxvoc.py"
+        return "pvxvoc"
     if path.parent.name == "cli":
-        return f"{path.stem}.py"
+        return "hps-pitch-track" if path.stem == "hps_pitch_track" else path.stem
     return path.name
 
 

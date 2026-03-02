@@ -36,13 +36,13 @@ pvx --help
 No-`PATH` fallback:
 
 ```bash
-python3 pvx.py voc input.wav --stretch 1.2 --output output.wav
+pvx voc input.wav --stretch 1.2 --output output.wav
 ```
 
 No-`PATH` fallback with `uv`:
 
 ```bash
-uv run python3 pvx.py voc input.wav --stretch 1.2 --output output.wav
+uv run pvx voc input.wav --stretch 1.2 --output output.wav
 ```
 
 ## 0.2 Running Any Command with uv
@@ -502,6 +502,12 @@ pvx retune vocal.wav --root C --scale major --strength 0.8 --output vocal_c_majo
 
 # Alternate concert pitch retune (A4 = 432 Hz)
 pvx retune vocal.wav --root A --scale minor --a4-reference-hz 432 --output vocal_a432.wav
+
+# Explicit root fundamental retune (C4 ~= 261.6256 Hz)
+pvx retune vocal.wav --root-hz 261.6256 --scale major --output vocal_c4_root.wav
+
+# Auto-recommend root fundamental from the source
+pvx retune vocal.wav --recommend-root --scale minor --output vocal_auto_root.wav
 
 # Denoise then dereverb
 pvx denoise noisy.wav --reduction-db 8 --stdout | pvx deverb - --strength 0.3 --output noisy_clean.wav

@@ -23,36 +23,8 @@ PY_FILES = sorted(
 )
 
 CLI_HELP_CANDIDATES = {
-    ROOT / "main.py",
-    ROOT / "pvxvoc.py",
-    ROOT / "pvxfreeze.py",
-    ROOT / "pvxharmonize.py",
-    ROOT / "pvxconform.py",
-    ROOT / "pvxmorph.py",
-    ROOT / "pvxwarp.py",
-    ROOT / "pvxformant.py",
-    ROOT / "pvxtransient.py",
-    ROOT / "pvxunison.py",
-    ROOT / "pvxdenoise.py",
-    ROOT / "pvxdeverb.py",
-    ROOT / "pvxretune.py",
-    ROOT / "pvxlayer.py",
-    ROOT / "pvxanalysis.py",
-    ROOT / "pvxresponse.py",
-    ROOT / "pvxenvelope.py",
-    ROOT / "pvxreshape.py",
-    ROOT / "pvxfilter.py",
-    ROOT / "pvxtvfilter.py",
-    ROOT / "pvxnoisefilter.py",
-    ROOT / "pvxbandamp.py",
-    ROOT / "pvxspeccompander.py",
-    ROOT / "pvxring.py",
-    ROOT / "pvxringfilter.py",
-    ROOT / "pvxringtvfilter.py",
-    ROOT / "pvxharmmap.py",
-    ROOT / "pvxchordmapper.py",
-    ROOT / "pvxinharmonator.py",
-    ROOT / "HPS-pitch-track.py",
+    ROOT / "src" / "pvx" / "core" / "voc.py",
+    *{p for p in (ROOT / "src" / "pvx" / "cli").glob("*.py") if p.name != "__init__.py"},
 }
 
 

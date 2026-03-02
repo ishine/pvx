@@ -273,9 +273,9 @@ flowchart TD
 ## 14) Pipe Chaining Pattern
 
 ```text
-python3 pvxvoc.py input.wav --stdout \
-| python3 pvxdenoise.py - --stdout \
-| python3 pvxdeverb.py - --output final.wav
+pvx voc input.wav --stdout \
+| pvx denoise - --stdout \
+| pvx deverb - --output final.wav
 
 rule:
 - producer uses --stdout

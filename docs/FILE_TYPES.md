@@ -18,7 +18,7 @@ This means some format support is runtime/platform dependent.
 | Audio output (stdout, `--stdout`) | Stream/pipeline mode in `pvxvoc` and common CLI helpers | Explicitly supported: `wav`, `flac`, `aiff`/`aif`, `ogg`/`oga`, `caf` |
 | Control maps | `pvxvoc --pitch-map`, `pvxwarp --map`, `pvxconform --map` | `csv` |
 | Time-varying per-parameter control signals | `pvxvoc --stretch stretch.csv`, `pvxvoc --pitch-shift-ratio pitch.json`, `pvxvoc --n-fft nfft.csv`, `pvx stream ... --stretch stretch.csv` | `csv`, `json` |
-| Pitch tracking map output | `HPS-pitch-track.py` | `csv` |
+| Pitch tracking map output | `pvx pitch-track / hps-pitch-track` | `csv` |
 | Render manifest | `pvxvoc --manifest-json` | `json` |
 | Documentation output | docs generators | `html`, `pdf` |
 

@@ -67,7 +67,7 @@ def build_parser() -> argparse.ArgumentParser:
             [
                 "pvx response create input.pvxan.npz --output input.pvxrf.npz --method median --normalize peak",
                 "pvx response inspect input.pvxrf.npz",
-                "pvxresponse.py input.pvxan.npz --phase-mode zero --normalize rms",
+                "pvxresponse input.pvxan.npz --phase-mode zero --normalize rms",
             ],
             notes=[
                 "When command is omitted, create mode is assumed for convenience.",

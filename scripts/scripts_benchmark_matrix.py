@@ -85,8 +85,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--input", type=Path, required=True, help="Input audio file")
     parser.add_argument(
         "--tool",
-        default="python3 pvxvoc.py",
-        help="Command used to invoke pvxvoc (default: 'python3 pvxvoc.py')",
+        default="python3 -m pvx.core.voc",
+        help="Command used to invoke pvxvoc (default: 'python3 -m pvx.core.voc')",
     )
     parser.add_argument("--transforms", default="fft,dft,czt,dct,dst,hartley", help="CSV transform list")
     parser.add_argument("--windows", default="hann,kaiser,blackmanharris", help="CSV window list")

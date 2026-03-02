@@ -37,19 +37,19 @@ pvx --help
 No-`PATH` fallback for every example command:
 
 ```bash
-python3 pvx.py <tool> ...
+pvx <tool> ...
 ```
 
 No-`PATH` fallback with `uv`:
 
 ```bash
-uv run python3 pvx.py <tool> ...
+uv run pvx <tool> ...
 ```
 
 Preferred invocation:
 - use unified subcommands via `pvx` (for example: `pvx voc`, `pvx freeze`, `pvx morph`)
-- legacy wrappers remain valid (`python3 pvxvoc.py`, `python3 pvxfreeze.py`, etc.)
-- quick conversion rule: replace `python3 pvxvoc.py` with `pvx voc`, `python3 pvxharmonize.py` with `pvx harmonize`, and so on
+- use installed commands (`pvx`, `pvxvoc`, `pvxfreeze`) as the stable entry points
+- if needed, use module fallback: `PYTHONPATH=src python3 -m pvx.core.voc ...`
 - `uv` conversion rule: prefix examples with `uv run` (`pvx ...` -> `uv run pvx ...`, `python3 ...` -> `uv run python3 ...`)
 
 Assumptions:
@@ -1310,6 +1310,12 @@ find sessions -name "*.wav" -print0 | xargs -0 -I{} pvx voc "{}" --stretch 1.05 
 **Command**
 ```bash
 pvx retune vocal.wav --scale minor --root A --a4-reference-hz 432 --f0-min 70 --f0-max 1000 --output-dir out --suffix _retune_amin
+
+# Optional: anchor to an explicit root fundamental instead of note class
+pvx retune vocal.wav --scale major --root-hz 261.6256 --output vocal_root_c4.wav
+
+# Optional: ask pvx to estimate and use a root fundamental from the input
+pvx retune vocal.wav --scale minor --recommend-root --output vocal_auto_root.wav
 ```
 
 **Explanation**
@@ -1321,6 +1327,7 @@ pvx retune vocal.wav --scale minor --root A --a4-reference-hz 432 --f0-min 70 --
 
 **Parameters that matter most**
 - `--scale`, `--root`
+- `--root-hz`, `--recommend-root`
 - `--a4-reference-hz`
 - `--f0-min`, `--f0-max`
 

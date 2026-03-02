@@ -66,7 +66,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="pvx quality regression checker.")
     parser.add_argument("--input", type=Path, required=True, help="Input audio file")
     parser.add_argument("--output", type=Path, required=True, help="Rendered output path")
-    parser.add_argument("--tool", default="python3 pvxvoc.py", help="Render command (default: 'python3 pvxvoc.py')")
+    parser.add_argument("--tool", default="python3 -m pvx.core.voc", help="Render command (default: 'python3 -m pvx.core.voc')")
     parser.add_argument("--render-args", required=True, help="Argument string appended after input path")
     parser.add_argument("--report-json", type=Path, default=Path("reports/quality_regression.json"))
     parser.add_argument("--baseline-json", type=Path, default=None, help="Optional baseline metrics JSON")

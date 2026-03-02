@@ -517,7 +517,7 @@ def _run_pvx_cycle(
 
     base_cmd = [
         py_executable,
-        str(ROOT / "pvxvoc.py"),
+        "-m", "pvx.core.voc",
         str(input_path),
         "--device",
         "cpu",
@@ -536,7 +536,7 @@ def _run_pvx_cycle(
         ]
         inverse = [
             py_executable,
-            str(ROOT / "pvxvoc.py"),
+            "-m", "pvx.core.voc",
             str(stage1),
             "--device",
             "cpu",
@@ -562,7 +562,7 @@ def _run_pvx_cycle(
         ]
         inverse = [
             py_executable,
-            str(ROOT / "pvxvoc.py"),
+            "-m", "pvx.core.voc",
             str(stage1),
             "--device",
             "cpu",
@@ -579,6 +579,7 @@ def _run_pvx_cycle(
         ]
 
     env = os.environ.copy()
+    env["PYTHONPATH"] = str(SRC) + os.pathsep + env.get("PYTHONPATH", "")
     if deterministic_cpu:
         env["PYTHONHASHSEED"] = "0"
         env.setdefault("OMP_NUM_THREADS", "1")

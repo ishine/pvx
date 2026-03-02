@@ -112,9 +112,9 @@ def _simple_literal(node: ast.AST) -> Any:
 
 def _tool_name_for_path(path: Path) -> str:
     if path.name == "voc.py":
-        return "pvxvoc.py"
+        return "pvxvoc"
     if path.parent.name == "cli":
-        return f"{path.stem}.py"
+        return "hps-pitch-track" if path.stem == "hps_pitch_track" else path.stem
     return path.name
 
 
@@ -459,139 +459,139 @@ def generate_cookbook() -> None:
         {
             "category": "Phase-vocoder core",
             "title": "Moderate vocal stretch with formant preservation",
-            "command": "python3 pvxvoc.py vocal.wav --time-stretch 1.15 --pitch-mode formant-preserving --output-dir out --suffix _pv",
+            "command": "pvx voc vocal.wav --time-stretch 1.15 --pitch-mode formant-preserving --output-dir out --suffix _pv",
             "why": "Retains speech-like vowel envelope while stretching timing.",
         },
         {
             "category": "Phase-vocoder core",
             "title": "Independent cents retune",
-            "command": "python3 pvxvoc.py lead.wav --pitch-shift-cents -23 --time-stretch 1.0 --output-dir out --suffix _cents",
+            "command": "pvx voc lead.wav --pitch-shift-cents -23 --time-stretch 1.0 --output-dir out --suffix _cents",
             "why": "Applies precise microtonal offset without tempo change.",
         },
         {
             "category": "Phase-vocoder core",
             "title": "Extreme stretch with multistage strategy",
-            "command": "python3 pvxvoc.py ambience.wav --target-duration 600 --ambient-preset --n-fft 16384 --win-length 16384 --hop-size 2048 --window kaiser --kaiser-beta 18 --output-dir out --suffix _ambient600x",
+            "command": "pvx voc ambience.wav --target-duration 600 --ambient-preset --n-fft 16384 --win-length 16384 --hop-size 2048 --window kaiser --kaiser-beta 18 --output-dir out --suffix _ambient600x",
             "why": "PaulStretch-style ambient profile for very large ratios using stochastic phase and onset time-credit controls.",
         },
         {
             "category": "Phase-vocoder core",
             "title": "Ultra-smooth speech stretch (600x)",
-            "command": "python3 pvxvoc.py speech.wav --target-duration 600 --stretch-mode standard --phase-engine propagate --phase-locking identity --n-fft 8192 --win-length 8192 --hop-size 256 --window hann --normalize peak --peak-dbfs -1 --compressor-threshold-db -30 --compressor-ratio 2.0 --compressor-attack-ms 25 --compressor-release-ms 250 --compressor-makeup-db 4 --limiter-threshold 0.95 --output-dir out --suffix _speech600x",
+            "command": "pvx voc speech.wav --target-duration 600 --stretch-mode standard --phase-engine propagate --phase-locking identity --n-fft 8192 --win-length 8192 --hop-size 256 --window hann --normalize peak --peak-dbfs -1 --compressor-threshold-db -30 --compressor-ratio 2.0 --compressor-attack-ms 25 --compressor-release-ms 250 --compressor-makeup-db 4 --limiter-threshold 0.95 --output-dir out --suffix _speech600x",
             "why": "Prefers continuity and intelligibility over texture animation; avoids choppy stochastic artifacts on speech sources.",
         },
         {
             "category": "Phase-vocoder core",
             "title": "Auto-profile plan preview",
-            "command": "python3 pvxvoc.py input.wav --auto-profile --auto-transform --explain-plan",
+            "command": "pvx voc input.wav --auto-profile --auto-transform --explain-plan",
             "why": "Prints the resolved profile/config plan before long renders.",
         },
         {
             "category": "Phase-vocoder core",
             "title": "Multi-resolution fusion stretch",
-            "command": "python3 pvxvoc.py input.wav --multires-fusion --multires-ffts 1024,2048,4096 --multires-weights 0.2,0.35,0.45 --time-stretch 1.4 --output-dir out --suffix _multires",
+            "command": "pvx voc input.wav --multires-fusion --multires-ffts 1024,2048,4096 --multires-weights 0.2,0.35,0.45 --time-stretch 1.4 --output-dir out --suffix _multires",
             "why": "Blends several FFT scales to reduce single-resolution bias on complex program material.",
         },
         {
             "category": "Phase-vocoder core",
             "title": "Checkpointed long render with manifest",
-            "command": "python3 pvxvoc.py long.wav --time-stretch 12 --auto-segment-seconds 0.5 --checkpoint-dir checkpoints --manifest-json reports/run_manifest.json --output-dir out --suffix _long",
+            "command": "pvx voc long.wav --time-stretch 12 --auto-segment-seconds 0.5 --checkpoint-dir checkpoints --manifest-json reports/run_manifest.json --output-dir out --suffix _long",
             "why": "Caches segment renders for resume workflows and writes run metadata for reproducibility.",
         },
         {
             "category": "Transform selection",
             "title": "Default production backend (FFT + transient protection)",
-            "command": "python3 pvxvoc.py mix.wav --transform fft --time-stretch 1.07 --transient-preserve --phase-locking identity --output-dir out --suffix _fft",
+            "command": "pvx voc mix.wav --transform fft --time-stretch 1.07 --transient-preserve --phase-locking identity --output-dir out --suffix _fft",
             "why": "Use when you need the fastest and most stable general-purpose phase-vocoder path.",
         },
         {
             "category": "Transform selection",
             "title": "Reference Fourier baseline using explicit DFT mode",
-            "command": "python3 pvxvoc.py tone_sweep.wav --transform dft --time-stretch 1.00 --pitch-shift-semitones 0 --output-dir out --suffix _dft_ref",
+            "command": "pvx voc tone_sweep.wav --transform dft --time-stretch 1.00 --pitch-shift-semitones 0 --output-dir out --suffix _dft_ref",
             "why": "Useful for parity checks and controlled transform-comparison experiments.",
         },
         {
             "category": "Transform selection",
             "title": "Prime-size frame experiment with CZT backend",
-            "command": "python3 pvxvoc.py archival_take.wav --transform czt --n-fft 1531 --win-length 1531 --hop-size 382 --time-stretch 1.03 --output-dir out --suffix _czt",
+            "command": "pvx voc archival_take.wav --transform czt --n-fft 1531 --win-length 1531 --hop-size 382 --time-stretch 1.03 --output-dir out --suffix _czt",
             "why": "Alternative numerical path for awkward/prime frame sizes when validating edge cases.",
         },
         {
             "category": "Transform selection",
             "title": "DCT timbral compaction for smooth harmonic material",
-            "command": "python3 pvxvoc.py strings.wav --transform dct --pitch-shift-cents -18 --soft-clip-level 0.95 --output-dir out --suffix _dct",
+            "command": "pvx voc strings.wav --transform dct --pitch-shift-cents -18 --soft-clip-level 0.95 --output-dir out --suffix _dct",
             "why": "Real-basis coefficients can emphasize envelope-like structure for creative reshaping.",
         },
         {
             "category": "Transform selection",
             "title": "DST odd-symmetry color pass",
-            "command": "python3 pvxvoc.py snare_loop.wav --transform dst --time-stretch 0.92 --phase-locking off --output-dir out --suffix _dst",
+            "command": "pvx voc snare_loop.wav --transform dst --time-stretch 0.92 --phase-locking off --output-dir out --suffix _dst",
             "why": "Provides an alternate real-basis artifact profile useful for creative percussive processing.",
         },
         {
             "category": "Transform selection",
             "title": "Hartley real-basis exploratory render",
-            "command": "python3 pvxvoc.py synth_pad.wav --transform hartley --time-stretch 1.30 --pitch-shift-semitones 3 --output-dir out --suffix _hartley",
+            "command": "pvx voc synth_pad.wav --transform hartley --time-stretch 1.30 --pitch-shift-semitones 3 --output-dir out --suffix _hartley",
             "why": "Compares Hartley-domain behavior against complex FFT phase-vocoder output.",
         },
         {
             "category": "Transform selection",
             "title": "A/B sweep of transform backends from shell loop",
-            "command": "for t in fft dft czt dct dst hartley; do python3 pvxvoc.py voice.wav --transform \"$t\" --time-stretch 1.1 --output-dir out --suffix \"_$t\"; done",
+            "command": "for t in fft dft czt dct dst hartley; do pvx voc voice.wav --transform \"$t\" --time-stretch 1.1 --output-dir out --suffix \"_$t\"; done",
             "why": "Fast listening workflow for selecting the least-artifact transform on your source.",
         },
         {
             "category": "Microtonal",
             "title": "Custom cents map retune",
-            "command": "python3 pvxretune.py vox.wav --root 60 --scale-cents 0,90,204,294,408,498,612,702,816,906,1020,1110 --strength 0.8 --output-dir out",
+            "command": "pvx retune vox.wav --root 60 --scale-cents 0,90,204,294,408,498,612,702,816,906,1020,1110 --strength 0.8 --output-dir out",
             "why": "Maps incoming notes to a custom 12-degree microtonal scale.",
         },
         {
             "category": "Microtonal",
             "title": "Conform CSV with per-segment ratios",
-            "command": "python3 pvxconform.py solo.wav map_conform.csv --pitch-mode ratio --output-dir out --suffix _conform",
+            "command": "pvx conform solo.wav map_conform.csv --pitch-mode ratio --output-dir out --suffix _conform",
             "why": "Applies timeline-specific time and pitch trajectories from CSV.",
         },
         {
             "category": "Pipelines",
             "title": "Time-stretch -> denoise -> dereverb in one pipe",
-            "command": "python3 pvxvoc.py input.wav --time-stretch 1.25 --stdout | python3 pvxdenoise.py - --reduction-db 10 --stdout | python3 pvxdeverb.py - --strength 0.45 --output-dir out --suffix _clean",
+            "command": "pvx voc input.wav --time-stretch 1.25 --stdout | pvx denoise - --reduction-db 10 --stdout | pvx deverb - --strength 0.45 --output-dir out --suffix _clean",
             "why": "Single-pass CLI chain for serial DSP in Unix pipes.",
         },
         {
             "category": "Pipelines",
             "title": "Morph -> formant -> unison",
-            "command": "python3 pvxmorph.py a.wav b.wav -o - | python3 pvxformant.py - --mode preserve --stdout | python3 pvxunison.py - --voices 5 --detune-cents 8 --output-dir out --suffix _morph_stack",
+            "command": "pvx morph a.wav b.wav -o - | pvx formant - --mode preserve --stdout | pvx unison - --voices 5 --detune-cents 8 --output-dir out --suffix _morph_stack",
             "why": "Builds a richer timbre chain with no intermediate files.",
         },
         {
             "category": "Pipelines",
             "title": "Pitch-follow sidechain map (A controls B)",
-            "command": "python3 HPS-pitch-track.py A.wav | python3 pvxvoc.py B.wav --pitch-follow-stdin --pitch-conf-min 0.75 --pitch-lowconf-mode hold --time-stretch-factor 1.0 --output output.wav",
+            "command": "pvx pitch-track A.wav | pvx voc B.wav --pitch-follow-stdin --pitch-conf-min 0.75 --pitch-lowconf-mode hold --time-stretch-factor 1.0 --output output.wav",
             "why": "Tracks F0 contour from source A and applies it as a dynamic pitch-ratio control map on source B.",
         },
         {
             "category": "Mastering",
             "title": "Integrated loudness targeting with limiter",
-            "command": "python3 pvxvoc.py mix.wav --time-stretch 1.0 --target-lufs -14 --compressor-threshold-db -20 --compressor-ratio 3 --limiter-threshold 0.98 --output-dir out --suffix _master",
+            "command": "pvx voc mix.wav --time-stretch 1.0 --target-lufs -14 --compressor-threshold-db -20 --compressor-ratio 3 --limiter-threshold 0.98 --output-dir out --suffix _master",
             "why": "Combines dynamics and loudness controls in shared mastering chain.",
         },
         {
             "category": "Mastering",
             "title": "Soft clip and hard safety ceiling",
-            "command": "python3 pvxharmonize.py bus.wav --intervals 0,7,12 --mix 0.35 --soft-clip-level 0.92 --soft-clip-type tanh --hard-clip-level 0.99 --output-dir out",
+            "command": "pvx harmonize bus.wav --intervals 0,7,12 --mix 0.35 --soft-clip-level 0.92 --soft-clip-type tanh --hard-clip-level 0.99 --output-dir out",
             "why": "Adds saturation while enforcing a strict final peak ceiling.",
         },
         {
             "category": "Batch",
             "title": "Batch stretch over folder",
-            "command": "python3 pvxvoc.py stems/*.wav --time-stretch 1.08 --output-dir out/stems --overwrite",
+            "command": "pvx voc stems/*.wav --time-stretch 1.08 --output-dir out/stems --overwrite",
             "why": "Applies consistent transform to many files with one command.",
         },
         {
             "category": "Batch",
             "title": "Dry-run output validation",
-            "command": "python3 pvxdenoise.py takes/*.wav --reduction-db 8 --dry-run --output-dir out/preview",
+            "command": "pvx denoise takes/*.wav --reduction-db 8 --dry-run --output-dir out/preview",
             "why": "Checks filename resolution and collisions without writing audio.",
         },
         {

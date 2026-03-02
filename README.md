@@ -14,7 +14,7 @@ Primary project goal and differentiator:
 - speed second (throughput/runtime tuning only after quality targets are met)
 
 At a glance, `pvx` provides:
-- a unified command-line interface (CLI) (`pvx`) plus backward-compatible script entry points (`pvxvoc.py`, `pvxfreeze.py`, and others)
+- a unified command-line interface (CLI) (`pvx`) plus installed tool entry points (`pvxvoc`, `pvxfreeze`, and others)
 - focused tools (`voc`, `freeze`, `harmonize`, `retune`, `morph`, and more) with shared argument conventions
 - deterministic central processing unit (CPU) paths for reproducible runs, plus optional graphics processing unit (GPU)/Compute Unified Device Architecture (CUDA) acceleration where available
 - native Apple Silicon support in the CPU path
@@ -79,13 +79,13 @@ pvx voc input.wav --stretch 1.2 --output output.wav
 Fallback without `PATH` updates:
 
 ```bash
-python3 pvx.py voc input.wav --stretch 1.2 --output output.wav
+pvx voc input.wav --stretch 1.2 --output output.wav
 ```
 
 Fallback with `uv`:
 
 ```bash
-uv run python3 pvx.py voc input.wav --stretch 1.2 --output output.wav
+uv run pvx voc input.wav --stretch 1.2 --output output.wav
 ```
 
 Legacy wrappers remain available for backward compatibility.
@@ -130,13 +130,13 @@ If that does not work, it is usually a `PATH` issue, which is both common and mi
 No `PATH` fallback:
 
 ```bash
-python3 pvx.py voc input.wav --stretch 1.20 --output output.wav
+pvx voc input.wav --stretch 1.20 --output output.wav
 ```
 
 `uv` fallback (no `PATH` changes):
 
 ```bash
-uv run python3 pvx.py voc input.wav --stretch 1.20 --output output.wav
+uv run pvx voc input.wav --stretch 1.20 --output output.wav
 ```
 
 What you should hear:
@@ -197,6 +197,12 @@ pvx retune vocal.wav --root C --scale major --strength 0.85 --output vocal_retun
 
 # Retune with alternate concert pitch (A4 = 432 Hz)
 pvx retune vocal.wav --root A --scale minor --a4-reference-hz 432 --output vocal_a432.wav
+
+# Retune with an explicit root fundamental (C4 ~= 261.6256 Hz)
+pvx retune vocal.wav --root-hz 261.6256 --scale major --output vocal_c4_root.wav
+
+# Ask pvx to recommend and use a root fundamental from the file
+pvx retune vocal.wav --recommend-root --scale minor --output vocal_auto_root.wav
 
 # Denoise then dereverb in one pipe
 pvx denoise noisy.wav --reduction-db 8 --stdout | pvx deverb - --strength 0.3 --output cleaned.wav
@@ -373,13 +379,13 @@ pvx --help
 If you do not want to modify the path environment variable (`PATH`), run the same command through the repository wrapper:
 
 ```bash
-python3 pvx.py voc input.wav --stretch 1.20 --output output.wav
+pvx voc input.wav --stretch 1.20 --output output.wav
 ```
 
 Equivalent with `uv`:
 
 ```bash
-uv run python3 pvx.py voc input.wav --stretch 1.20 --output output.wav
+uv run pvx voc input.wav --stretch 1.20 --output output.wav
 ```
 
 What this does:
@@ -387,13 +393,13 @@ What this does:
 - stretches duration by 20%
 - writes `output.wav`
 
-If you prefer direct script wrappers, legacy commands are still supported (`python3 pvxvoc.py ...`, `python3 pvxfreeze.py ...`, etc.).
+Prefer installed commands (`pvx`, `pvxvoc`, `pvxfreeze`) for stable entry points.
 
 With `uv`, run wrappers the same way:
 
 ```bash
-uv run python3 pvxvoc.py input.wav --stretch 1.2 --output output.wav
-uv run python3 pvxfreeze.py input.wav --freeze-time 0.25 --duration 8 --output freeze.wav
+uv run pvx voc input.wav --stretch 1.2 --output output.wav
+uv run pvx freeze input.wav --freeze-time 0.25 --duration 8 --output freeze.wav
 ```
 
 ## Unified CLI (Primary Entry Point)

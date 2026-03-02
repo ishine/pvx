@@ -52,6 +52,21 @@ NOTE_TO_CLASS = {
     "B": 11,
 }
 
+CLASS_TO_NOTE = [
+    "C",
+    "C#",
+    "D",
+    "D#",
+    "E",
+    "F",
+    "F#",
+    "G",
+    "G#",
+    "A",
+    "A#",
+    "B",
+]
+
 SCALES = {
     "chromatic": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
     "major": [0, 2, 4, 5, 7, 9, 11],
@@ -80,11 +95,15 @@ def nearest_scale_freq(
     *,
     custom_scale_cents: list[float] | None = None,
     a4_reference_hz: float = 440.0,
+    root_hz: float | None = None,
 ) -> float:
-    root_class = NOTE_TO_CLASS[root.upper()]
     midi = freq_to_midi(freq, a4_reference_hz=float(a4_reference_hz))
     cents = midi * 100.0
-    root_cents = float(root_class * 100)
+    if root_hz is None:
+        root_class = NOTE_TO_CLASS[root.upper()]
+        root_cents = float(root_class * 100)
+    else:
+        root_cents = freq_to_midi(float(root_hz), a4_reference_hz=float(a4_reference_hz)) * 100.0
     if custom_scale_cents is None:
         degree_cents = [float(interval * 100.0) for interval in SCALES[scale_name]]
     else:
@@ -124,6 +143,44 @@ def overlap_add(chunks: list[np.ndarray], starts: list[int], total_len: int) -> 
     return out
 
 
+def collect_f0_values(
+    mono: np.ndarray,
+    sr: int,
+    *,
+    chunk: int,
+    step: int,
+    f0_min: float,
+    f0_max: float,
+) -> list[float]:
+    values: list[float] = []
+    for start in range(0, mono.shape[0], step):
+        end = min(mono.shape[0], start + chunk)
+        piece = mono[start:end]
+        if piece.shape[0] < 8:
+            continue
+        try:
+            f0 = float(estimate_f0_autocorrelation(piece, sr, f0_min, f0_max))
+        except Exception:
+            continue
+        if np.isfinite(f0) and f0 > 0.0:
+            values.append(f0)
+    return values
+
+
+def recommend_root_hz(f0_values: list[float], *, a4_reference_hz: float = 440.0) -> tuple[float, str] | None:
+    if not f0_values:
+        return None
+    midi_values = np.array([freq_to_midi(v, a4_reference_hz=float(a4_reference_hz)) for v in f0_values], dtype=np.float64)
+    pitch_classes = np.mod(np.rint(midi_values).astype(np.int64), 12)
+    pitch_class_counts = np.bincount(pitch_classes, minlength=12)
+    root_class = int(np.argmax(pitch_class_counts))
+    median_midi = float(np.median(midi_values))
+    root_octave = int(round((median_midi - float(root_class)) / 12.0))
+    root_midi = float(root_class + (12 * root_octave))
+    root_hz = midi_to_freq(root_midi, a4_reference_hz=float(a4_reference_hz))
+    return float(root_hz), CLASS_TO_NOTE[root_class]
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Monophonic retune toward a musical scale",
@@ -133,11 +190,15 @@ def build_parser() -> argparse.ArgumentParser:
                 "pvx retune vocal.wav --root C --scale major --strength 0.8 --output vocal_major.wav",
                 "pvx retune flute.wav --root D --scale-cents 0,112,204,316,498,702,884,1088 --output flute_microtonal.wav",
                 "pvx retune vocal.wav --root A --scale minor --a4-reference-hz 432 --output vocal_a432.wav",
+                "pvx retune voice.wav --root-hz 261.6256 --scale major --output voice_c4_anchor.wav",
+                "pvx retune vocal.wav --scale minor --recommend-root --output vocal_auto_root.wav",
                 "pvx retune lead.wav --root A --scale minor --stdout | pvx unison - --voices 5 --detune-cents 10 --output lead_retune_unison.wav",
             ],
             notes=[
                 "Use --scale-cents for custom microtonal scales within one octave.",
                 "Use --a4-reference-hz for alternate concert pitch (for example 432 Hz).",
+                "Use --root-hz to anchor tuning to a specific root fundamental frequency.",
+                "Use --recommend-root to estimate a root fundamental from the input file.",
                 "Increase --chunk-ms for steadier pitch decisions, reduce for faster note changes.",
             ],
         ),
@@ -145,6 +206,17 @@ def build_parser() -> argparse.ArgumentParser:
     add_common_io_args(parser, default_suffix="_retune")
     add_vocoder_args(parser, default_n_fft=2048, default_win_length=2048, default_hop_size=512)
     parser.add_argument("--root", default="C", help="Scale root note (C,C#,D,...,B)")
+    parser.add_argument(
+        "--root-hz",
+        type=float,
+        default=None,
+        help="Optional root fundamental in Hz (overrides --root when provided).",
+    )
+    parser.add_argument(
+        "--recommend-root",
+        action="store_true",
+        help="Estimate and use a per-file root fundamental from tracked F0.",
+    )
     parser.add_argument("--scale", choices=sorted(SCALES.keys()), default="chromatic", help="Named scale for 12-TET quantization")
     parser.add_argument(
         "--scale-cents",
@@ -192,6 +264,10 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--overlap-ms must be >= 0")
     if not np.isfinite(float(args.a4_reference_hz)) or float(args.a4_reference_hz) <= 0.0:
         parser.error("--a4-reference-hz must be a finite value > 0")
+    if args.root_hz is not None and (not np.isfinite(float(args.root_hz)) or float(args.root_hz) <= 0.0):
+        parser.error("--root-hz must be a finite value > 0")
+    if args.recommend_root and args.root_hz is not None:
+        parser.error("--recommend-root and --root-hz are mutually exclusive")
     if args.f0_min <= 0 or args.f0_max <= 0 or args.f0_min >= args.f0_max:
         parser.error("0 < --f0-min < --f0-max required")
 
@@ -208,6 +284,32 @@ def main(argv: list[str] | None = None) -> int:
             chunk = max(32, int(round(sr * args.chunk_ms / 1000.0)))
             overlap = int(round(sr * args.overlap_ms / 1000.0))
             step = max(8, chunk - overlap)
+            root_hz = float(args.root_hz) if args.root_hz is not None else None
+            if args.recommend_root:
+                recommended = recommend_root_hz(
+                    collect_f0_values(
+                        mono,
+                        sr,
+                        chunk=chunk,
+                        step=step,
+                        f0_min=float(args.f0_min),
+                        f0_max=float(args.f0_max),
+                    ),
+                    a4_reference_hz=float(args.a4_reference_hz),
+                )
+                if recommended is None:
+                    log_message(
+                        args,
+                        f"[warn] {path.name}: unable to estimate root fundamental; falling back to --root {args.root.upper()}",
+                        min_level="normal",
+                    )
+                else:
+                    root_hz, root_note = recommended
+                    log_message(
+                        args,
+                        f"[info] {path.name}: recommended root={root_note} ({root_hz:.3f} Hz)",
+                        min_level="normal",
+                    )
 
             chunks: list[np.ndarray] = []
             starts: list[int] = []
@@ -227,6 +329,7 @@ def main(argv: list[str] | None = None) -> int:
                         args.scale,
                         custom_scale_cents=custom_scale_cents,
                         a4_reference_hz=float(args.a4_reference_hz),
+                        root_hz=root_hz,
                     )
                     ratio = target / f0
                 except Exception:

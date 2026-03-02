@@ -441,7 +441,7 @@ def print_tools() -> None:
     print("  stretch-budget  Estimate max safe stretch from file size/budget assumptions")
     print("  help <tool>  Show subcommand help")
     print("")
-    print("Backward compatibility: existing wrappers remain supported (pvxvoc.py, pvxfreeze.py, ...).")
+    print("Use installed commands (`pvx`, `pvxvoc`, `pvxfreeze`, ...) or `python -m pvx...` module entry points.")
 
 
 def print_examples(which: str = "all") -> None:
