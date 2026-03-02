@@ -23,6 +23,34 @@ At a glance, `pvx` provides:
 - shared mastering/output controls (target loudness units relative to full scale (LUFS), limiting, clipping, dithering, and output policy options)
 - comprehensive generated documentation (Markdown, HyperText Markup Language (HTML), and Portable Document Format (PDF))
 
+## Table of Contents
+
+- [Value Proposition](#value-proposition)
+- [Install](#install)
+- [Start Here (No Prior DSP Knowledge Needed)](#start-here-no-prior-dsp-knowledge-needed)
+- [What Is a Phase Vocoder? (No Math Version)](#what-is-a-phase-vocoder-no-math-version)
+- [Analog Tape Methods for Pitch/Time Shifting](#analog-tape-methods-for-pitchtime-shifting)
+- [Mental Model (1 Minute)](#mental-model-1-minute)
+- [30-Second Quick Start](#30-second-quick-start)
+- [Unified CLI (Primary Entry Point)](#unified-cli-primary-entry-point)
+- [5-Minute Tutorial (Single-File Workflow)](#5-minute-tutorial-single-file-workflow)
+- [Conceptual Overview: What Is a Phase Vocoder?](#conceptual-overview-what-is-a-phase-vocoder)
+- [When To Use Which Tool (Decision Tree)](#when-to-use-which-tool-decision-tree)
+- [Common Workflows](#common-workflows)
+- [Supported File Types](#supported-file-types)
+- [Performance and GPU (Quality-First)](#performance-and-gpu-quality-first)
+- [CLI Discoverability and UX](#cli-discoverability-and-ux)
+- [Benchmarking (pvx vs Rubber Band vs librosa)](#benchmarking-pvx-vs-rubber-band-vs-librosa)
+- [Visual Documentation](#visual-documentation)
+- [Troubleshooting](#troubleshooting)
+- [FAQ](#faq)
+- [Why This Matters](#why-this-matters)
+- [Lessons from Paul Koonce's PVC Package](#lessons-from-paul-koonces-pvc-package)
+- [Progressive Documentation Map](#progressive-documentation-map)
+- [Community and Governance](#community-and-governance)
+- [License](#license)
+- [Attribution](#attribution)
+
 ## Value Proposition
 
 `pvx` is designed for users who care more about artifact control than raw throughput. In practical terms:
@@ -373,7 +401,23 @@ In practical terms, `pvx` gives you controls for this quality layer:
 
 Before digital signal processing (DSP), classical tape varispeed linked time and pitch: speed tape up and pitch rises; slow it down and pitch falls. The central engineering problem was decoupling those two controls.
 
-The Eltro information rate changer (derived from Anton Springer’s time/pitch regulator work) addressed that with a rotating-head playback mechanism attached to reel-to-reel workflows. Instead of simple fixed-head varispeed, it used short playback segments and controlled repeat/skip logic to change duration and pitch more independently. Historically, this is one direct ancestor of modern time-stretch/pitch-shift thinking.
+### Anton Springer before ELTRO (pre-commercial phase)
+
+Before ELTRO-branded units became widely known, Anton Springer had already developed and demonstrated the core time/pitch regulation idea in the 1950s.
+
+Practical timeline (pre-ELTRO):
+- around 1950: early patent-era work focused on changing information rate while preserving intelligibility
+- 1953: public demonstration of an acoustic speed/pitch regulator at the International Congress on Acoustics (Delft)
+- 1950s to early 1960s: continued engineering/publication work (including German technical press such as *Funkschau*) on segmented rotating-head tape replay methods
+
+Core mechanism:
+- a rotating multi-head replay path processes short tape segments
+- segment repeat/skip behavior controls duration and pitch more independently than fixed-head varispeed
+- transition handling between segments determines perceived smoothness and artifact level
+
+### ELTRO as commercialization phase
+
+The ELTRO information rate changer can be viewed as the commercialization and operational packaging of that earlier Springer regulator lineage. Historically, this analog segmented-playback family is a direct ancestor of modern time-stretch/pitch-shift systems.
 
 Two practical historical points still matter for `pvx`:
 - Segment operations can create discontinuity artifacts if transitions are not handled carefully.
@@ -385,6 +429,7 @@ Sources:
 - [Eltro information rate changer (Wikipedia)](https://en.wikipedia.org/wiki/Eltro_information_rate_changer)
 - [Vintage Technologies: The Eltro and the Voice of HAL (Wendy Carlos)](https://www.wendycarlos.com/other/Eltro-1967/)
 - [Anton Springer and the Time and Pitch Regulator (Sound and Science)](https://soundandscience.net/contributor-essays/anton-springer-and-the-time-and-pitch-regulator/)
+- [Anton Springer, *Zeitraffung und -dehnung bei der Tonbandwiedergabe* (Funkschau archive entry)](https://soundandscience.net/texts/zeitraffung-und-dehnung-bei-der-tonbandwiedergabe/)
 
 ## Mental Model (1 Minute)
 
