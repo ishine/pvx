@@ -2118,6 +2118,289 @@ python3 benchmarks/run_pvc_parity.py --quick --out-dir benchmarks/out_pvc_parity
 - identity-case drift (unexpected coloration when effect depth should be near-neutral)
 - unstable runtime or metric jumps between revisions
 
+---
+
+## 76) Persist STFT Analysis Artifact (PVXAN)
+
+**Command**
+```bash
+pvx analysis create input.wav --output input.pvxan.npz --n-fft 4096 --win-length 4096 --hop-size 256 --window hann
+pvx analysis inspect input.pvxan.npz
+```
+
+**Explanation**
+- Saves a reusable short-time Fourier transform (STFT) analysis artifact so you can inspect or re-use spectral analysis across multiple downstream workflows.
+- Useful when iterating on response design, parity checks, and research traces without re-running the same front-end analysis assumptions manually each time.
+
+**Before/After**
+- Before: analysis lives only in-memory during a single command invocation.
+- After: analysis is persisted as a versionable artifact (`.pvxan.npz`) you can inspect and pass to other tools.
+
+**Parameters that matter most**
+- `--n-fft`
+- `--win-length`
+- `--hop-size`
+- `--window`
+
+**Artifacts to listen for**
+- not an audio render; inspect analysis metadata consistency (sample rate, frame count, transform/window choices)
+- mismatch between analysis resolution and intended downstream response usage
+
+---
+
+## 77) Derive and Inspect a Reusable Response Artifact (PVXRF)
+
+**Command**
+```bash
+pvx response create input.pvxan.npz --output input.pvxrf.npz --method median --phase-mode mean --normalize peak --smoothing-bins 3
+pvx response inspect input.pvxrf.npz
+```
+
+**Explanation**
+- Builds a reusable frequency-response profile from a persisted analysis artifact.
+- This response can drive `pvx filter`, `pvx tvfilter`, `pvx noisefilter`, `pvx bandamp`, and `pvx spec-compander`.
+
+**Before/After**
+- Before: no explicit reusable spectral profile for cross-session reuse.
+- After: deterministic response artifact (`.pvxrf.npz`) with inspectable metadata.
+
+**Parameters that matter most**
+- `--method`
+- `--phase-mode`
+- `--normalize`
+- `--smoothing-bins`
+
+**Artifacts to listen for**
+- not an audio render; watch for overly jagged responses if smoothing is too low
+- flattened response detail if smoothing is too high
+
+---
+
+## 78) Response-Profile Denoising with `pvx noisefilter`
+
+**Command**
+```bash
+pvx analysis create roomtone.wav --output roomtone.pvxan.npz
+pvx response create roomtone.pvxan.npz --output roomtone.pvxrf.npz --method median --normalize peak
+pvx noisefilter dialog.wav --response roomtone.pvxrf.npz --noise-floor 1.2 --response-mix 1.0 --dry-mix 0.05 --output dialog_noisefilter.wav
+```
+
+**Explanation**
+- Uses external room-tone analysis to build a targeted noise profile, then applies response-referenced suppression to the noisy program material.
+- This is often more controlled than blind denoising when consistent environmental noise is present.
+
+**Before/After**
+- Before: broadband hiss/hum/air conditioning texture over dialogue.
+- After: reduced steady-state noise with dialogue content better preserved.
+
+**Parameters that matter most**
+- `--noise-floor`
+- `--response-mix`
+- `--dry-mix`
+- quality of `roomtone.wav`
+
+**Artifacts to listen for**
+- speech dulling from over-suppression
+- tonal holes if the room-tone profile does not match the program noise
+
+---
+
+## 79) Time-Varying Spectral Filtering with `pvx tvfilter`
+
+**Command**
+```bash
+pvx tvfilter pad.wav --response color_profile.pvxrf.npz --tv-map controls/response_mix.csv --tv-key response_mix --tv-interp s_curve --tv-order 3 --output pad_tvfilter.wav
+```
+
+**Example `controls/response_mix.csv`**
+```csv
+time_sec,response_mix
+0.0,0.10
+4.0,0.65
+8.0,1.00
+12.0,0.35
+```
+
+**Explanation**
+- Morphs response influence over time so timbre evolves dynamically instead of staying static for the full render.
+- Useful for long-form pads, scenes, and texture design where one fixed filter shape is too rigid.
+
+**Before/After**
+- Before: static timbre profile.
+- After: time-varying spectral color trajectory controlled by a map.
+
+**Parameters that matter most**
+- `--tv-map`
+- `--tv-key`
+- `--tv-interp`
+- `--response-mix`
+
+**Artifacts to listen for**
+- abrupt tonal jumps if control map points are sparse and interpolation is too sharp
+- over-filtered sections when response mix is pinned near 1.0 for too long
+
+---
+
+## 80) Spectral Peak Emphasis with `pvx bandamp`
+
+**Command**
+```bash
+pvx bandamp source.wav --response profile.pvxrf.npz --band-gain-db 8 --peak-count 10 --band-width-bins 6 --output source_bandamp.wav
+```
+
+**Explanation**
+- Detects high-energy response regions and boosts corresponding bands to emphasize characteristic partial groups.
+- Helpful for presence enhancement and stylized spectral contour exaggeration.
+
+**Before/After**
+- Before: flatter spectral emphasis.
+- After: more pronounced response-defined band structure.
+
+**Parameters that matter most**
+- `--band-gain-db`
+- `--peak-count`
+- `--band-width-bins`
+- response profile content
+
+**Artifacts to listen for**
+- harshness if gain and peak count are too high
+- ringing coloration when boosted bands are too narrow
+
+---
+
+## 81) Response-Shaped Spectral Dynamics with `pvx spec-compander`
+
+**Command**
+```bash
+pvx spec-compander mix.wav --response profile.pvxrf.npz --comp-threshold-db -18 --comp-ratio 2.5 --expand-ratio 1.3 --output mix_speccomp.wav
+```
+
+**Explanation**
+- Applies response-informed compression and expansion behavior in the spectral domain.
+- Useful for reshaping dynamic contrast in specific timbral regions rather than broad full-band dynamics only.
+
+**Before/After**
+- Before: less controlled spectral dynamic contour.
+- After: response-informed dynamic shaping that can clarify or stylize spectral balance.
+
+**Parameters that matter most**
+- `--comp-threshold-db`
+- `--comp-ratio`
+- `--expand-ratio`
+- `--response`
+
+**Artifacts to listen for**
+- pumping/breathing if ratios are aggressive
+- unstable ambience tails if threshold is too low
+
+---
+
+## 82) Ring Modulation Fundamentals with `pvx ring`
+
+**Command**
+```bash
+pvx ring synth.wav --frequency-hz 43 --depth 0.9 --mix 0.8 --feedback 0.15 --output synth_ring.wav
+```
+
+**Explanation**
+- Applies controllable ring modulation with optional feedback memory for sideband-rich timbre design.
+- Works well for metallic, bell-like, and animated tremolo-adjacent transformations.
+
+**Before/After**
+- Before: original oscillator or instrument tone.
+- After: sideband-rich ring-modulated texture with controllable wet/dry blend.
+
+**Parameters that matter most**
+- `--frequency-hz`
+- `--depth`
+- `--mix`
+- `--feedback`
+
+**Artifacts to listen for**
+- harsh alias-like texture when carrier frequency/depth are extreme
+- runaway coloration if feedback is too high
+
+---
+
+## 83) Resonant Ring Filtering with `pvx ringfilter`
+
+**Command**
+```bash
+pvx ringfilter input.wav --frequency-hz 60 --depth 0.8 --mix 0.9 --resonance-hz 1200 --resonance-q 9 --resonance-mix 0.4 --resonance-decay 0.2 --output input_ringfilter.wav
+```
+
+**Explanation**
+- Chains ring modulation with a resonant peak stage for tuned, animated spectral coloration.
+- Useful for vocal/synth character design where simple ring modulation alone is too blunt.
+
+**Before/After**
+- Before: dry source or plain ring modulation.
+- After: ringed tone plus focused resonant emphasis and decay behavior.
+
+**Parameters that matter most**
+- `--resonance-hz`
+- `--resonance-q`
+- `--resonance-mix`
+- `--resonance-decay`
+
+**Artifacts to listen for**
+- whistling resonances if `--resonance-q` is too high
+- tonal masking if resonance center sits on dominant formants/partials unintentionally
+
+---
+
+## 84) Harmonic Chord Mapping with `pvx chordmapper`
+
+**Command**
+```bash
+pvx chordmapper vocal.wav --root-hz 220 --chord min7 --strength 0.75 --tolerance-cents 35 --boost-db 6 --attenuation 0.45 --output vocal_chordmapped.wav
+```
+
+**Explanation**
+- Pulls spectral emphasis toward chord-constrained pitch-class regions relative to a chosen root.
+- Good for harmonic re-coloring and pseudo-harmonization textures without explicit multi-voice synthesis.
+
+**Before/After**
+- Before: unconstrained harmonic emphasis.
+- After: chord-guided spectral emphasis with out-of-chord attenuation.
+
+**Parameters that matter most**
+- `--root-hz`
+- `--chord`
+- `--strength`
+- `--tolerance-cents`
+
+**Artifacts to listen for**
+- unnatural pitch-class bias if tolerance is too narrow
+- muffling when attenuation is too high for non-chord content
+
+---
+
+## 85) Inharmonic Spectral Warping with `pvx inharmonator`
+
+**Command**
+```bash
+pvx inharmonator bell.wav --inharmonic-f0-hz 220 --inharmonicity 0.0002 --inharmonic-mix 1.0 --dry-mix 0.1 --output bell_inharm.wav
+```
+
+**Explanation**
+- Applies controlled inharmonic spectral remapping inspired by stiff-string/inharmonic partial spacing models.
+- Useful for bell, plate, metallic, and abstract hybrid timbres.
+
+**Before/After**
+- Before: harmonic or near-harmonic partial spacing.
+- After: increasingly inharmonic overtone structure with controllable blend.
+
+**Parameters that matter most**
+- `--inharmonic-f0-hz`
+- `--inharmonicity`
+- `--inharmonic-mix`
+- `--dry-mix`
+
+**Artifacts to listen for**
+- excessive dissonance if inharmonicity is too high
+- loss of note center perception at high wet mix on dense sources
+
 ## Attribution
 
 Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).
