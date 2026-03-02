@@ -8,10 +8,17 @@ selection, and support for all registered analysis windows.
 """
 
 import unittest
+import sys
+from pathlib import Path
 
 import numpy as np
 
-from pvxvoc import (
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from pvx.core.voc import (
     QUALITY_PROFILE_CHOICES,
     TRANSFORM_CHOICES,
     WINDOW_CHOICES,

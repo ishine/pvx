@@ -2,7 +2,7 @@
 
 # pvx Command-Line Interface (CLI) Flags Reference
 
-_Generated from commit `b9f5c0e` (commit date: 2026-03-01T19:08:12-05:00)._
+_Generated from commit `cd4e579` (commit date: 2026-03-01T19:15:37-05:00)._
 
 This file enumerates long-form CLI flags discovered from argparse declarations in canonical pvx CLI sources.
 
@@ -11,9 +11,9 @@ Total unique long flags: **265**
 
 ## Unique Long Flags
 
-`--alpha`, `--a4-reference-hz`, `--ambient-phase-mix`, `--ambient-preset`, `--analysis-channel`, `--attack-sec`, `--attenuation`, `--auto-profile`, `--auto-profile-lookahead-seconds`, `--auto-segment-seconds`, `--auto-transform`, `--backend`, `--band-gain-db`, `--band-width-bins`, `--bit-depth`, `--blend-mode`, `--boost-db`, `--budget-path`, `--cents`, `--checkpoint-dir`, `--checkpoint-id`, `--chord`, `--chunk-ms`, `--chunk-seconds`, `--clip`, `--coherence-strength`, `--comp-ratio`, `--comp-threshold-db`, `--compander-attack-ms`, `--compander-compress-ratio`, `--compander-expand-ratio`, `--compander-makeup-db`, `--compander-release-ms`, `--compander-threshold-db`, `--compressor-attack-ms`, `--compressor-makeup-db`, `--compressor-ratio`, `--compressor-release-ms`, `--compressor-threshold-db`, `--confidence-floor`, `--context-ms`, `--control-stdin`, `--cpu`, `--crossfade-ms`, `--cuda-device`, `--decay`, `--decay-sec`, `--depth`, `--detune-cents`, `--device`, `--disk-budget`, `--dither`, `--dither-seed`, `--dry-mix`, `--dry-run`, `--duration`, `--emit`, `--end`, `--envelope-lifter`, `--example`, `--exp-curve`, `--expand-ratio`, `--expander-attack-ms`, `--expander-ratio`, `--expander-release-ms`, `--expander-threshold-db`, `--explain-plan`, `--exponent`, `--extreme-stretch-threshold`, `--extreme-time-stretch`, `--f0-max`, `--f0-min`, `--factor`, `--fail-if-exceeds`, `--feature-set`, `--feedback`, `--floor`, `--fmax`, `--fmin`, `--force-stereo`, `--formant-lifter`, `--formant-max-gain-db`, `--formant-shift-ratio`, `--formant-strength`, `--format`, `--fourier-sync`, `--fourier-sync-max-fft`, `--fourier-sync-min-fft`, `--fourier-sync-smooth`, `--frame-length`, `--freeze-time`, `--frequency-hz`, `--gains`, `--gpu`, `--guided`, `--hard-clip-level`, `--harmonic-gain`, `--harmonic-kernel`, `--harmonic-pitch-cents`, `--harmonic-pitch-semitones`, `--harmonic-stretch`, `--hop-size`, `--inharmonic-f0-hz`, `--inharmonic-mix`, `--inharmonicity`, `--input-format`, `--interp`, `--intervals`, `--intervals-cents`, `--json`, `--kaiser-beta`, `--keep-intermediate`, `--key`, `--limiter-threshold`, `--manifest-append`, `--manifest-json`, `--map`, `--mask-exponent`, `--max`, `--max-stage-stretch`, `--metadata-policy`, `--method`, `--mfcc-count`, `--min`, `--mix`, `--mode`, `--multires-ffts`, `--multires-fusion`, `--multires-weights`, `--n-fft`, `--no-center`, `--no-onset-realign`, `--no-progress`, `--noise-file`, `--noise-floor`, `--noise-seconds`, `--normalize`, `--normalize-energy`, `--offset`, `--onset-credit-max`, `--onset-credit-pull`, `--onset-time-credit`, `--operation`, `--operator`, `--order`, `--out`, `--output`, `--output-dir`, `--output-format`, `--output-key`, `--overlap-ms`, `--overwrite`, `--pans`, `--peak`, `--peak-count`, `--peak-dbfs`, `--percussive-gain`, `--percussive-kernel`, `--percussive-pitch-cents`, `--percussive-pitch-semitones`, `--percussive-stretch`, `--phase-engine`, `--phase-locking`, `--phase-mix`, `--phase-mode`, `--phase-random-seed`, `--pipeline`, `--pitch`, `--pitch-conf-min`, `--pitch-follow-stdin`, `--pitch-lowconf-mode`, `--pitch-map`, `--pitch-map-crossfade-ms`, `--pitch-map-smooth-ms`, `--pitch-map-stdin`, `--pitch-mode`, `--pitch-shift-cents`, `--pitch-shift-ratio`, `--pitch-shift-semitones`, `--preset`, `--quality-profile`, `--quiet`, `--random-phase`, `--rate`, `--ratio`, `--ratio-max`, `--ratio-min`, `--ratio-reference`, `--reduction-db`, `--recommend-root`, `--ref-channel`, `--reference-hz`, `--release-sec`, `--requested-stretch`, `--resample-mode`, `--resonance-decay`, `--resonance-hz`, `--resonance-mix`, `--resonance-q`, `--response`, `--response-gain-db`, `--response-mix`, `--resume`, `--rms-dbfs`, `--root`, `--root-hz`, `--route`, `--safety-margin`, `--scale`, `--scale-cents`, `--semitones`, `--shift-bins`, `--silent`, `--sine-cycles`, `--sine-phase-rad`, `--smooth`, `--smooth-frames`, `--smoothing-bins`, `--soft-clip-drive`, `--soft-clip-level`, `--soft-clip-type`, `--start`, `--stdout`, `--stereo-mode`, `--strength`, `--stretch`, `--stretch-from`, `--stretch-max`, `--stretch-min`, `--stretch-mode`, `--stretch-scale`, `--subtype`, `--suffix`, `--summary-json`, `--sustain`, `--target-duration`, `--target-f0`, `--target-lufs`, `--target-max`, `--target-min`, `--target-pitch-shift-semitones`, `--target-sample-rate`, `--time-stretch`, `--time-stretch-factor`, `--tolerance-cents`, `--transform`, `--transient-crossfade-ms`, `--transient-mode`, `--transient-preserve`, `--transient-protect-ms`, `--transient-sensitivity`, `--transient-threshold`, `--transpose-semitones`, `--true-peak-max-dbtp`, `--tv-interp`, `--tv-key`, `--tv-map`, `--tv-order`, `--verbose`, `--verbosity`, `--voices`, `--width`, `--win-length`, `--window`, `--work-dir`
+`--a4-reference-hz`, `--alpha`, `--ambient-phase-mix`, `--ambient-preset`, `--analysis-channel`, `--attack-sec`, `--attenuation`, `--auto-profile`, `--auto-profile-lookahead-seconds`, `--auto-segment-seconds`, `--auto-transform`, `--backend`, `--band-gain-db`, `--band-width-bins`, `--bit-depth`, `--blend-mode`, `--boost-db`, `--budget-path`, `--cents`, `--checkpoint-dir`, `--checkpoint-id`, `--chord`, `--chunk-ms`, `--chunk-seconds`, `--clip`, `--coherence-strength`, `--comp-ratio`, `--comp-threshold-db`, `--compander-attack-ms`, `--compander-compress-ratio`, `--compander-expand-ratio`, `--compander-makeup-db`, `--compander-release-ms`, `--compander-threshold-db`, `--compressor-attack-ms`, `--compressor-makeup-db`, `--compressor-ratio`, `--compressor-release-ms`, `--compressor-threshold-db`, `--confidence-floor`, `--context-ms`, `--control-stdin`, `--cpu`, `--crossfade-ms`, `--cuda-device`, `--decay`, `--decay-sec`, `--depth`, `--detune-cents`, `--device`, `--disk-budget`, `--dither`, `--dither-seed`, `--dry-mix`, `--dry-run`, `--duration`, `--emit`, `--end`, `--envelope-lifter`, `--example`, `--exp-curve`, `--expand-ratio`, `--expander-attack-ms`, `--expander-ratio`, `--expander-release-ms`, `--expander-threshold-db`, `--explain-plan`, `--exponent`, `--extreme-stretch-threshold`, `--extreme-time-stretch`, `--f0-max`, `--f0-min`, `--factor`, `--fail-if-exceeds`, `--feature-set`, `--feedback`, `--floor`, `--fmax`, `--fmin`, `--force-stereo`, `--formant-lifter`, `--formant-max-gain-db`, `--formant-shift-ratio`, `--formant-strength`, `--format`, `--fourier-sync`, `--fourier-sync-max-fft`, `--fourier-sync-min-fft`, `--fourier-sync-smooth`, `--frame-length`, `--freeze-time`, `--frequency-hz`, `--gains`, `--gpu`, `--guided`, `--hard-clip-level`, `--harmonic-gain`, `--harmonic-kernel`, `--harmonic-pitch-cents`, `--harmonic-pitch-semitones`, `--harmonic-stretch`, `--hop-size`, `--inharmonic-f0-hz`, `--inharmonic-mix`, `--inharmonicity`, `--input-format`, `--interp`, `--intervals`, `--intervals-cents`, `--json`, `--kaiser-beta`, `--keep-intermediate`, `--key`, `--limiter-threshold`, `--manifest-append`, `--manifest-json`, `--map`, `--mask-exponent`, `--max`, `--max-stage-stretch`, `--metadata-policy`, `--method`, `--mfcc-count`, `--min`, `--mix`, `--mode`, `--multires-ffts`, `--multires-fusion`, `--multires-weights`, `--n-fft`, `--no-center`, `--no-onset-realign`, `--no-progress`, `--noise-file`, `--noise-floor`, `--noise-seconds`, `--normalize`, `--normalize-energy`, `--offset`, `--onset-credit-max`, `--onset-credit-pull`, `--onset-time-credit`, `--operation`, `--operator`, `--order`, `--out`, `--output`, `--output-dir`, `--output-format`, `--output-key`, `--overlap-ms`, `--overwrite`, `--pans`, `--peak`, `--peak-count`, `--peak-dbfs`, `--percussive-gain`, `--percussive-kernel`, `--percussive-pitch-cents`, `--percussive-pitch-semitones`, `--percussive-stretch`, `--phase-engine`, `--phase-locking`, `--phase-mix`, `--phase-mode`, `--phase-random-seed`, `--pipeline`, `--pitch`, `--pitch-conf-min`, `--pitch-follow-stdin`, `--pitch-lowconf-mode`, `--pitch-map`, `--pitch-map-crossfade-ms`, `--pitch-map-smooth-ms`, `--pitch-map-stdin`, `--pitch-mode`, `--pitch-shift-cents`, `--pitch-shift-ratio`, `--pitch-shift-semitones`, `--preset`, `--quality-profile`, `--quiet`, `--random-phase`, `--rate`, `--ratio`, `--ratio-max`, `--ratio-min`, `--ratio-reference`, `--recommend-root`, `--reduction-db`, `--ref-channel`, `--reference-hz`, `--release-sec`, `--requested-stretch`, `--resample-mode`, `--resonance-decay`, `--resonance-hz`, `--resonance-mix`, `--resonance-q`, `--response`, `--response-gain-db`, `--response-mix`, `--resume`, `--rms-dbfs`, `--root`, `--root-hz`, `--route`, `--safety-margin`, `--scale`, `--scale-cents`, `--semitones`, `--shift-bins`, `--silent`, `--sine-cycles`, `--sine-phase-rad`, `--smooth`, `--smooth-frames`, `--smoothing-bins`, `--soft-clip-drive`, `--soft-clip-level`, `--soft-clip-type`, `--start`, `--stdout`, `--stereo-mode`, `--strength`, `--stretch`, `--stretch-from`, `--stretch-max`, `--stretch-min`, `--stretch-mode`, `--stretch-scale`, `--subtype`, `--suffix`, `--summary-json`, `--sustain`, `--target-duration`, `--target-f0`, `--target-lufs`, `--target-max`, `--target-min`, `--target-pitch-shift-semitones`, `--target-sample-rate`, `--time-stretch`, `--time-stretch-factor`, `--tolerance-cents`, `--transform`, `--transient-crossfade-ms`, `--transient-mode`, `--transient-preserve`, `--transient-protect-ms`, `--transient-sensitivity`, `--transient-threshold`, `--transpose-semitones`, `--true-peak-max-dbtp`, `--tv-interp`, `--tv-key`, `--tv-map`, `--tv-order`, `--verbose`, `--verbosity`, `--voices`, `--width`, `--win-length`, `--window`, `--work-dir`
 
-## `hps_pitch_track.py`
+## `hps-pitch-track`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -38,7 +38,7 @@ Total unique long flags: **265**
 | `--stretch-min` | False | `0.25` | `` | `` | Lower clamp for emitted stretch in stretch-oriented modes (default: 0.25). | `src/pvx/cli/hps_pitch_track.py` |
 | `--stretch-scale` | False | `1.0` | `` | `` | Scale factor for derived stretch tracks (default: 1.0). | `src/pvx/cli/hps_pitch_track.py` |
 
-## `pvx.py`
+## `pvx`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -89,7 +89,7 @@ Total unique long flags: **265**
 | `--subtype` | False | `` | `` | `` | Explicit libsndfile subtype assumption (e.g., PCM_16, PCM_24, FLOAT). | `src/pvx/cli/pvx.py` |
 | `--work-dir` | False | `` | `` | `` | Optional directory for intermediate stage files | `src/pvx/cli/pvx.py` |
 
-## `pvxanalysis.py`
+## `pvxanalysis`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -107,7 +107,7 @@ Total unique long flags: **265**
 | `--win-length` | False | `2048` | `` | `` | Window length (default: 2048) | `src/pvx/cli/pvxanalysis.py` |
 | `--window` | False | `hann` | `` | `` | Window type | `src/pvx/cli/pvxanalysis.py` |
 
-## `pvxconform.py`
+## `pvxconform`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -115,7 +115,7 @@ Total unique long flags: **265**
 | `--map` | True | `` | `` | `` | CSV map path | `src/pvx/cli/pvxconform.py` |
 | `--resample-mode` | False | `auto` | `auto, fft, linear` | `` |  | `src/pvx/cli/pvxconform.py` |
 
-## `pvxdenoise.py`
+## `pvxdenoise`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -125,7 +125,7 @@ Total unique long flags: **265**
 | `--reduction-db` | False | `12.0` | `` | `` | Reduction strength in dB | `src/pvx/cli/pvxdenoise.py` |
 | `--smooth` | False | `5` | `` | `` | Temporal smoothing frames | `src/pvx/cli/pvxdenoise.py` |
 
-## `pvxdeverb.py`
+## `pvxdeverb`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -133,7 +133,7 @@ Total unique long flags: **265**
 | `--floor` | False | `0.12` | `` | `` | Per-bin floor multiplier | `src/pvx/cli/pvxdeverb.py` |
 | `--strength` | False | `0.45` | `` | `` | Tail suppression strength 0..1 | `src/pvx/cli/pvxdeverb.py` |
 
-## `pvxenvelope.py`
+## `pvxenvelope`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -158,7 +158,7 @@ Total unique long flags: **265**
 | `--stdout` | False | `` | `` | `store_true` | Write map to stdout | `src/pvx/cli/pvxenvelope.py` |
 | `--sustain` | False | `0.7` | `` | `` | Sustain value for ADSR mode | `src/pvx/cli/pvxenvelope.py` |
 
-## `pvxfilter.py`
+## `pvxfilter`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -181,7 +181,7 @@ Total unique long flags: **265**
 | `--tv-map` | False | `` | `` | `` | Optional CSV/JSON map for time-varying response_mix | `src/pvx/cli/pvxfilter.py` |
 | `--tv-order` | False | `3` | `` | `` | Polynomial order for --tv-interp polynomial | `src/pvx/cli/pvxfilter.py` |
 
-## `pvxformant.py`
+## `pvxformant`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -193,7 +193,7 @@ Total unique long flags: **265**
 | `--pitch-shift-semitones` | False | `0.0` | `` | `` | Optional pitch shift before formant stage | `src/pvx/cli/pvxformant.py` |
 | `--resample-mode` | False | `auto` | `auto, fft, linear` | `` |  | `src/pvx/cli/pvxformant.py` |
 
-## `pvxfreeze.py`
+## `pvxfreeze`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -201,7 +201,7 @@ Total unique long flags: **265**
 | `--freeze-time` | False | `0.2` | `` | `` | Freeze anchor time in seconds | `src/pvx/cli/pvxfreeze.py` |
 | `--random-phase` | False | `` | `` | `store_true` | Add subtle phase randomization per frame | `src/pvx/cli/pvxfreeze.py` |
 
-## `pvxharmmap.py`
+## `pvxharmmap`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -217,7 +217,7 @@ Total unique long flags: **265**
 | `--strength` | False | `0.75` | `` | `` | Chordmapper emphasis strength in [0,1] | `src/pvx/cli/pvxharmmap.py` |
 | `--tolerance-cents` | False | `35.0` | `` | `` | Chordmapper tolerance in cents | `src/pvx/cli/pvxharmmap.py` |
 
-## `pvxharmonize.py`
+## `pvxharmonize`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -228,7 +228,7 @@ Total unique long flags: **265**
 | `--pans` | False | `` | `` | `` | Optional comma-separated pan per voice [-1..1] | `src/pvx/cli/pvxharmonize.py` |
 | `--resample-mode` | False | `auto` | `auto, fft, linear` | `` |  | `src/pvx/cli/pvxharmonize.py` |
 
-## `pvxlayer.py`
+## `pvxlayer`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -244,7 +244,7 @@ Total unique long flags: **265**
 | `--percussive-stretch` | False | `1.0` | `` | `` |  | `src/pvx/cli/pvxlayer.py` |
 | `--resample-mode` | False | `auto` | `auto, fft, linear` | `` |  | `src/pvx/cli/pvxlayer.py` |
 
-## `pvxmorph.py`
+## `pvxmorph`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -261,7 +261,7 @@ Total unique long flags: **265**
 | `--phase-mix` | False | `` | `` | `` | Phase blend in [0,1]. If omitted, mode-specific defaults apply (A-phase for *_phase_a/carrier_a_*, B-phase for *_phase_b/carrier_b_*, alpha for symmetric modes). Accepts scalar or control file (.csv/.json). | `src/pvx/cli/pvxmorph.py` |
 | `--stdout` | False | `` | `` | `store_true` | Write processed audio to stdout stream (for piping); equivalent to -o - | `src/pvx/cli/pvxmorph.py` |
 
-## `pvxreshape.py`
+## `pvxreshape`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -285,7 +285,7 @@ Total unique long flags: **265**
 | `--target-min` | False | `0.0` | `` | `` | Target minimum for normalize operation | `src/pvx/cli/pvxreshape.py` |
 | `--window` | False | `5` | `` | `` | Window size for smooth operation | `src/pvx/cli/pvxreshape.py` |
 
-## `pvxresponse.py`
+## `pvxresponse`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -297,7 +297,7 @@ Total unique long flags: **265**
 | `--smoothing-bins` | False | `1` | `` | `` | Moving-average smoothing width in bins (default: 1) | `src/pvx/cli/pvxresponse.py` |
 | `--summary-json` | False | `` | `` | `` | Optional path to write summary JSON | `src/pvx/cli/pvxresponse.py` |
 
-## `pvxretune.py`
+## `pvxretune`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -314,7 +314,7 @@ Total unique long flags: **265**
 | `--scale-cents` | False | `` | `` | `` | Optional comma-separated microtonal scale degrees in cents within one octave, relative to --root (example: 0,90,204,294,408,498,612,702,816,906,1020,1110) | `src/pvx/cli/pvxretune.py` |
 | `--strength` | False | `0.85` | `` | `` | Correction strength 0..1 | `src/pvx/cli/pvxretune.py` |
 
-## `pvxring.py`
+## `pvxring`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -331,7 +331,7 @@ Total unique long flags: **265**
 | `--tv-map` | False | `` | `` | `` | CSV/JSON time-varying map for ringtvfilter | `src/pvx/cli/pvxring.py` |
 | `--tv-order` | False | `3` | `` | `` | Polynomial order for --tv-interp polynomial | `src/pvx/cli/pvxring.py` |
 
-## `pvxtransient.py`
+## `pvxtransient`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -343,7 +343,7 @@ Total unique long flags: **265**
 | `--time-stretch` | False | `1.0` | `` | `` |  | `src/pvx/cli/pvxtransient.py` |
 | `--transient-threshold` | False | `1.6` | `` | `` |  | `src/pvx/cli/pvxtransient.py` |
 
-## `pvxunison.py`
+## `pvxunison`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -353,7 +353,7 @@ Total unique long flags: **265**
 | `--voices` | False | `5` | `` | `` | Number of unison voices | `src/pvx/cli/pvxunison.py` |
 | `--width` | False | `1.0` | `` | `` | Stereo width multiplier 0..2 | `src/pvx/cli/pvxunison.py` |
 
-## `pvxvoc.py`
+## `pvxvoc`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -489,7 +489,7 @@ Total unique long flags: **265**
 | `--win-length` | False | `2048` | `` | `` | Window length in samples (default: 2048). Accepts scalar or control file (.csv/.json). | `src/pvx/core/voc.py` |
 | `--window` | False | `hann` | `` | `` | Window type (default: hann) | `src/pvx/core/voc.py` |
 
-## `pvxwarp.py`
+## `pvxwarp`
 
 | Flag | Required | Default | Choices | Action | Description | Source |
 | --- | --- | --- | --- | --- | --- | --- |

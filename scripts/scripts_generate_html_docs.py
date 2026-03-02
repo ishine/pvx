@@ -13,6 +13,8 @@ import subprocess
 from urllib.parse import quote_plus
 import sys
 
+import numpy as np
+
 ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT / "src"
 DOCS_HTML_DIR = ROOT / "docs" / "html"
@@ -2726,49 +2728,139 @@ def render_limitations_page() -> None:
 
 
 def render_benchmarks_page() -> None:
-    payload = load_json(BENCHMARKS_PATH, {"runs": [], "benchmark_spec": {}, "host": {}})
+    payload = load_json(BENCHMARKS_PATH, {"runs": [], "case_runs": [], "benchmark_spec": {}, "host": {}})
     runs = payload.get("runs", []) if isinstance(payload, dict) else []
+    case_runs = payload.get("case_runs", []) if isinstance(payload, dict) else []
     spec = payload.get("benchmark_spec", {}) if isinstance(payload, dict) else {}
     host = payload.get("host", {}) if isinstance(payload, dict) else {}
 
-    rows: list[str] = []
+    def _fmt(value: object, precision: int = 3) -> str:
+        if value is None:
+            return "n/a"
+        try:
+            f = float(value)  # type: ignore[arg-type]
+        except Exception:
+            text = str(value) if value is not None else ""
+            if not text or text.lower() == "none":
+                return "n/a"
+            return text
+        if not np.isfinite(f):
+            return "n/a"
+        return f"{f:.{precision}f}"
+
+    summary_rows: list[str] = []
     for run in runs:
         if not isinstance(run, dict):
             continue
-        note_parts: list[str] = []
-        if run.get("reason"):
-            note_parts.append(str(run["reason"]))
-        if run.get("runtime_fallback_reason"):
-            note_parts.append(f"fallback={run['runtime_fallback_reason']}")
-        if "gpu_pool_used_mb" in run:
-            note_parts.append(f"gpu_pool_used_mb={run['gpu_pool_used_mb']}")
-        rows.append(
+        notes = str(run.get("notes", "") or run.get("reason", ""))
+        summary_rows.append(
             "<tr>"
             f"<td><code>{escape(str(run.get('backend', 'n/a')))}</code></td>"
             f"<td>{escape(str(run.get('status', 'n/a')))}</td>"
-            f"<td>{escape(str(run.get('elapsed_ms', 'n/a')))}</td>"
-            f"<td>{escape(str(run.get('peak_host_memory_mb', 'n/a')))}</td>"
-            f"<td>{escape(str(run.get('snr_vs_input_db', 'n/a')))}</td>"
-            f"<td>{escape(str(run.get('spectral_distance_vs_input_db', 'n/a')))}</td>"
-            f"<td>{escape(str(run.get('snr_vs_cpu_db', 'n/a')))}</td>"
-            f"<td>{escape(str(run.get('spectral_distance_vs_cpu_db', 'n/a')))}</td>"
-            f"<td>{escape('; '.join(note_parts))}</td>"
+            f"<td>{escape(str(int(run.get('cases_ok', 0) or 0)))} / {escape(str(int(run.get('cases_total', 0) or 0)))}</td>"
+            f"<td>{escape(_fmt(run.get('x_real_time_mean'), 2))}</td>"
+            f"<td>{escape(_fmt(run.get('elapsed_ms_mean'), 2))}</td>"
+            f"<td>{escape(_fmt(run.get('peak_host_memory_mb_max'), 2))}</td>"
+            f"<td>{escape(_fmt(run.get('quality_score_mean'), 2))}</td>"
+            f"<td>{escape(_fmt(run.get('snr_vs_input_db_mean'), 3))}</td>"
+            f"<td>{escape(_fmt(run.get('si_sdr_db_mean'), 3))}</td>"
+            f"<td>{escape(_fmt(run.get('log_spectral_distance_db_mean'), 4))}</td>"
+            f"<td>{escape(_fmt(run.get('modulation_spectrum_distance_mean'), 4))}</td>"
+            f"<td>{escape(_fmt(run.get('transient_smear_score_mean'), 4))}</td>"
+            f"<td>{escape(_fmt(run.get('envelope_correlation_mean'), 4))}</td>"
+            f"<td>{escape(_fmt(run.get('stereo_coherence_drift_mean'), 4))}</td>"
+            f"<td>{escape(_fmt(run.get('phasiness_index_mean'), 4))}</td>"
+            f"<td>{escape(_fmt(run.get('musical_noise_index_mean'), 4))}</td>"
+            f"<td>{escape(_fmt(run.get('snr_vs_cpu_db_mean'), 3))}</td>"
+            f"<td>{escape(_fmt(run.get('spectral_distance_vs_cpu_db_mean'), 4))}</td>"
+            f"<td>{escape(notes)}</td>"
             "</tr>"
+        )
+
+    case_rows_html: list[str] = []
+    for row in sorted(
+        [item for item in case_runs if isinstance(item, dict)],
+        key=lambda item: (str(item.get("backend", "")), str(item.get("signal", ""))),
+    ):
+        note = str(row.get("notes", "") or row.get("reason", ""))
+        case_rows_html.append(
+            "<tr>"
+            f"<td><code>{escape(str(row.get('backend', 'n/a')))}</code></td>"
+            f"<td><code>{escape(str(row.get('signal', 'n/a')))}</code></td>"
+            f"<td>{escape(str(int(row.get('channels', 0) or 0)))}</td>"
+            f"<td>{escape(_fmt(row.get('duration_seconds'), 3))}</td>"
+            f"<td>{escape(str(row.get('status', 'n/a')))}</td>"
+            f"<td>{escape(_fmt(row.get('x_real_time'), 2))}</td>"
+            f"<td>{escape(_fmt(row.get('elapsed_ms'), 2))}</td>"
+            f"<td>{escape(_fmt(row.get('quality_score'), 2))}</td>"
+            f"<td>{escape(_fmt(row.get('snr_vs_input_db'), 3))}</td>"
+            f"<td>{escape(_fmt(row.get('si_sdr_db'), 3))}</td>"
+            f"<td>{escape(_fmt(row.get('log_spectral_distance_db'), 4))}</td>"
+            f"<td>{escape(_fmt(row.get('modulation_spectrum_distance'), 4))}</td>"
+            f"<td>{escape(_fmt(row.get('transient_smear_score'), 4))}</td>"
+            f"<td>{escape(_fmt(row.get('envelope_correlation'), 4))}</td>"
+            f"<td>{escape(_fmt(row.get('stereo_coherence_drift'), 4))}</td>"
+            f"<td>{escape(_fmt(row.get('phasiness_index'), 4))}</td>"
+            f"<td>{escape(_fmt(row.get('musical_noise_index'), 4))}</td>"
+            f"<td>{escape(_fmt(row.get('snr_vs_cpu_db'), 3))}</td>"
+            f"<td>{escape(_fmt(row.get('spectral_distance_vs_cpu_db'), 4))}</td>"
+            f"<td>{escape(note)}</td>"
+            "</tr>"
+        )
+
+    signal_rows = spec.get("signals", []) if isinstance(spec, dict) else []
+    signal_table = ""
+    if isinstance(signal_rows, list) and signal_rows:
+        rows_html: list[str] = []
+        for row in signal_rows:
+            if not isinstance(row, dict):
+                continue
+            rows_html.append(
+                "<tr>"
+                f"<td><code>{escape(str(row.get('name', 'n/a')))}</code></td>"
+                f"<td>{escape(str(int(row.get('channels', 0) or 0)))}</td>"
+                f"<td>{escape(_fmt(row.get('duration_seconds'), 3))}</td>"
+                f"<td>{escape(str(row.get('description', '')))}</td>"
+                "</tr>"
+            )
+        signal_table = (
+            "<h2>Signal Suite</h2>"
+            "<div class=\"table-scroll\">"
+            "<table>"
+            "<thead><tr><th>Signal</th><th>Channels</th><th>Duration (s)</th><th>Description</th></tr></thead>"
+            f"<tbody>{''.join(rows_html)}</tbody>"
+            "</table>"
+            "</div>"
         )
 
     content = (
         "<div class=\"card\">"
-        "<p>Reproducible STFT/ISTFT benchmark summary.</p>"
+        "<p>Reproducible STFT/ISTFT benchmark summary with expanded multi-signal quality metrics.</p>"
         "<p><code>python3 scripts/scripts_generate_docs_extras.py --run-benchmarks</code></p>"
         f"<p class=\"small\">Spec: sample_rate={escape(str(spec.get('sample_rate', 'n/a')))} Hz, "
-        f"duration={escape(str(spec.get('duration_seconds', 'n/a')))} s</p>"
+        f"duration={escape(str(spec.get('duration_seconds', 'n/a')))} s, "
+        f"signals={escape(str(spec.get('signal_suite_count', len(signal_rows) if isinstance(signal_rows, list) else 'n/a')))}</p>"
         f"<p class=\"small\">Host: {escape(str(host.get('platform', 'n/a')))} | machine={escape(str(host.get('machine', 'n/a')))} | python={escape(str(host.get('python', 'n/a')))}</p>"
         "</div>"
+        f"{signal_table}"
+        "<h2>Backend Summary</h2>"
+        "<div class=\"table-scroll\">"
         "<table>"
-        "<thead><tr><th>Backend</th><th>Status</th><th>Elapsed (ms)</th><th>Peak host memory (MB)</th><th>SNR vs input (dB)</th><th>Spectral dist vs input (dB)</th><th>SNR vs CPU (dB)</th><th>Spectral dist vs CPU (dB)</th><th>Notes</th></tr></thead>"
-        f"<tbody>{''.join(rows)}</tbody>"
+        "<thead><tr><th>Backend</th><th>Status</th><th>Cases (ok/total)</th><th>Mean xRT</th><th>Mean elapsed (ms)</th><th>Peak host mem (MB)</th><th>Quality (/100)</th><th>SNR in (dB)</th><th>SI-SDR (dB)</th><th>LSD (dB)</th><th>ModSpec</th><th>Smear</th><th>EnvCorr</th><th>Coherence drift</th><th>Phasiness</th><th>Musical noise</th><th>SNR vs CPU (dB)</th><th>LSD vs CPU (dB)</th><th>Notes</th></tr></thead>"
+        f"<tbody>{''.join(summary_rows)}</tbody>"
         "</table>"
+        "</div>"
     )
+    if case_rows_html:
+        content += (
+            "<h2>Per-Signal Results</h2>"
+            "<div class=\"table-scroll\">"
+            "<table>"
+            "<thead><tr><th>Backend</th><th>Signal</th><th>Ch</th><th>Dur (s)</th><th>Status</th><th>xRT</th><th>Elapsed (ms)</th><th>Quality</th><th>SNR in</th><th>SI-SDR</th><th>LSD</th><th>ModSpec</th><th>Smear</th><th>EnvCorr</th><th>Coh drift</th><th>Phasiness</th><th>Musical noise</th><th>SNR vs CPU</th><th>LSD vs CPU</th><th>Notes</th></tr></thead>"
+            f"<tbody>{''.join(case_rows_html)}</tbody>"
+            "</table>"
+            "</div>"
+        )
     breadcrumbs = (
         "<nav>"
         "<a href=\"index.html\">Home</a> | "
