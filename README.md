@@ -363,6 +363,23 @@ In practical terms, `pvx` gives you controls for this quality layer:
 - stereo coherence modes
 - formant-aware pitch workflows
 
+## Analog Tape Methods for Pitch/Time Shifting
+
+Before digital signal processing (DSP), classical tape varispeed linked time and pitch: speed tape up and pitch rises; slow it down and pitch falls. The central engineering problem was decoupling those two controls.
+
+The Eltro information rate changer (derived from Anton Springer’s time/pitch regulator work) addressed that with a rotating-head playback mechanism attached to reel-to-reel workflows. Instead of simple fixed-head varispeed, it used short playback segments and controlled repeat/skip logic to change duration and pitch more independently. Historically, this is one direct ancestor of modern time-stretch/pitch-shift thinking.
+
+Two practical historical points still matter for `pvx`:
+- Segment operations can create discontinuity artifacts if transitions are not handled carefully.
+- Perceptual quality depends heavily on continuity constraints (in analog systems: segment stitching; in phase-vocoder systems: phase evolution, transient handling, and crossfades).
+
+Wendy Carlos’ account of the Eltro Mark II also documents production use in film post work, including `2001: A Space Odyssey` voice treatment workflows where time and pitch manipulation were applied in controlled passes. That production history is a useful reminder that high-quality results usually come from methodical multi-stage processing, not one aggressive control move.
+
+Sources:
+- [Eltro information rate changer (Wikipedia)](https://en.wikipedia.org/wiki/Eltro_information_rate_changer)
+- [Vintage Technologies: The Eltro and the Voice of HAL (Wendy Carlos)](https://www.wendycarlos.com/other/Eltro-1967/)
+- [Anton Springer and the Time and Pitch Regulator (Sound and Science)](https://soundandscience.net/contributor-essays/anton-springer-and-the-time-and-pitch-regulator/)
+
 ## Mental Model (1 Minute)
 
 Input waveform -> short overlapping frames -> frequency-domain edit -> overlap-add resynthesis -> output waveform

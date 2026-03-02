@@ -106,6 +106,19 @@ Design priority:
 - speed second: optimize runtime after quality targets are achieved
 - translation: we would rather be right than merely fast
 
+## Analog Tape Methods for Pitch/Time Shifting
+
+Historically, reel-to-reel varispeed coupled time and pitch. Analog systems like the Eltro information rate changer and related Anton Springer regulator concepts were early attempts to separate them using segmented rotating-head playback methods instead of simple fixed-speed tape transport.
+
+Why this matters for `pvx`:
+- artifact control is largely a continuity problem (then: segment stitching; now: phase/transient/stereo continuity),
+- high-quality time/pitch work usually benefits from conservative, staged processing.
+
+Sources:
+- [Eltro information rate changer (Wikipedia)](https://en.wikipedia.org/wiki/Eltro_information_rate_changer)
+- [Vintage Technologies: The Eltro and the Voice of HAL (Wendy Carlos)](https://www.wendycarlos.com/other/Eltro-1967/)
+- [Anton Springer and the Time and Pitch Regulator (Sound and Science)](https://soundandscience.net/contributor-essays/anton-springer-and-the-time-and-pitch-regulator/)
+
 ## 2. Basic DSP Terms (Plain Language)
 
 - Sample rate: how many audio samples per second (e.g. 48,000 Hz).
