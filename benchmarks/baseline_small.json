@@ -1,6 +1,6 @@
 {
   "corpus": {
-    "data_dir": "/Users/cleider/dev/pvx/benchmarks/data",
+    "data_dir": "benchmarks/data",
     "entries": [
       {
         "channels": 2,
@@ -20,7 +20,7 @@
       }
     ],
     "manifest_issues": [],
-    "manifest_path": "/Users/cleider/dev/pvx/benchmarks/data/manifest.json",
+    "manifest_path": "benchmarks/data/manifest.json",
     "manifest_valid": true
   },
   "description": "Stage 2 baseline for quick benchmark gate (pvx only).",
