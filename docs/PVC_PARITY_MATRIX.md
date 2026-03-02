@@ -87,6 +87,17 @@ Primary references:
 
 1. Add explicit PVC-style resynthesis family toggles and thresholds where they improve auditability without fragmenting the core `pvx voc` interface.
 2. Add additional parity scenarios that stress the same pipeline family with persisted artifact round-trips (`pvx analysis create` + `pvx response create`) and stricter drift gates.
+3. Add the sorted top-level command roadmap below to stage user-facing workflow expansion in quality-first order.
+
+### Sorted Top-Level Command Roadmap
+
+| Phase | Priority | Proposed commands | Parity and quality rationale |
+| --- | --- | --- | --- |
+| Phase 1 | Highest | `doctor`, `inspect`, `validate`, `schema`, `preset`, `config` | Improves reproducibility and inspectability before introducing more operator complexity. |
+| Phase 2 | High | `render`, `graph`, `queue`, `watch`, `cache` | Supports longer research- and production-oriented runs with less shell friction. |
+| Phase 3 | Medium-High | `mod`, `derive`, `route`, `quantize`, `smooth` | Brings function-stream/control-signal workflows closer to classic PVC flexibility with modern parameter routing. |
+| Phase 4 | Medium | `bench`, `compare`, `regress`, `abx`, `report` | Establishes objective parity and regression tracking as first-class command surfaces. |
+| Phase 5 | Medium-Low | `align`, `match`, `stem`, `spatialize`, `live`, `serve` | Expands into advanced alignment, immersive, and deployment workflows after core parity and QA gates are stable. |
 
 ## Attribution
 

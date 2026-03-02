@@ -1082,6 +1082,21 @@ Practical next steps inspired by PVC tradition:
 - prefer transparent defaults and explicit artifact tradeoffs over black-box presets
 - keep docs and `--help` synchronized so terminal users are not forced into source code
 
+Sorted roadmap for additional top-level `pvx` commands (highest implementation return on investment first):
+
+| Phase | Priority | Proposed commands | Why this phase comes first |
+| --- | --- | --- | --- |
+| Phase 1 | Highest | `doctor`, `inspect`, `validate`, `schema`, `preset`, `config` | Removes onboarding/debug friction and makes workflows self-describing before adding more DSP complexity. |
+| Phase 2 | High | `render`, `graph`, `queue`, `watch`, `cache` | Makes long runs and iterative workflows practical for real projects. |
+| Phase 3 | Medium-High | `mod`, `derive`, `route`, `quantize`, `smooth` | Expands control-rate signal design so dynamic parameter workflows become concise and repeatable. |
+| Phase 4 | Medium | `bench`, `compare`, `regress`, `abx`, `report` | Turns quality claims into measurable quality gates and release criteria. |
+| Phase 5 | Medium-Low | `align`, `match`, `stem`, `spatialize`, `live`, `serve` | Adds advanced production and deployment workflows once foundations are stable. |
+
+Roadmap sort key:
+- primary: user impact on quality-first workflows
+- secondary: implementation complexity and dependency risk
+- tertiary: leverage across multiple existing tools (`voc`, `retune`, `morph`, `freeze`, and wrappers)
+
 ## Progressive Documentation Map
 
 Complete Markdown documentation list (all `.md` documentation files):
