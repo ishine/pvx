@@ -635,7 +635,7 @@ Full table of all currently supported audio container types: [docs/FILE_TYPES.md
 
 ## Performance and GPU (Quality-First)
 
-`pvx` is not tuned as a "fastest possible at any cost" engine. Start from quality-safe defaults, validate artifact levels, then reduce runtime where acceptable.
+`pvx` is not tuned as a "fastest possible at any cost" engine. Duh: it's written in Python. Start from quality-safe defaults, validate artifact levels, then reduce runtime where acceptable.
 
 ### CPU path
 - default path is robust and portable
