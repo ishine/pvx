@@ -9,9 +9,10 @@
 
 It is designed for users who need musically usable results under both normal and extreme processing conditions, including long time stretching, formant-aware pitch movement, transient-sensitive material, and stereo/multichannel coherence preservation.
 
-Primary project goal and differentiator:
+Primary project goala and differentiatora:
 - audio quality first (phase coherence, transient integrity, formant stability, stereo coherence)
 - speed second (throughput/runtime tuning only after quality targets are met)
+- multichannel-native audio processing
 
 At a glance, `pvx` provides:
 - a unified command-line interface (CLI) (`pvx`) plus installed tool entry points (`pvxvoc`, `pvxfreeze`, and others)
