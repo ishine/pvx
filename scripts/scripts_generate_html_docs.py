@@ -9,7 +9,6 @@ from html import escape
 import json
 from pathlib import Path
 import re
-import subprocess
 from urllib.parse import quote_plus
 import sys
 
