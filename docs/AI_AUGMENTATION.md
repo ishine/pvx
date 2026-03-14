@@ -37,6 +37,8 @@ What this does:
 | --- | --- |
 | `--seed` | Global deterministic seed for all sampled parameters |
 | `--split train,val,test` | Deterministic split assignment ratios written into manifest |
+| `--grouping` | Split assignment grouping strategy (`stem-prefix` or `none`) |
+| `--group-separator` | Prefix separator for grouping (default: `__`) |
 | `--dry-run` | Plan outputs and write manifests without rendering audio |
 | `--manifest-jsonl` / `--manifest-csv` | Explicit manifest output paths |
 
@@ -49,6 +51,7 @@ Each JSON Lines (JSONL) row contains:
 - `intent`
 - `seed`
 - `split` (`train`, `val`, `test`)
+- `group_key` (split-group identifier)
 - `status` (`planned`, `rendered`, or `error:<code>`)
 - `params` object, including:
   - `stretch`
@@ -71,6 +74,8 @@ pvx augment corpus/speech/*.wav \
   --output-dir data_aug/speech \
   --variants-per-input 6 \
   --intent asr_robust \
+  --grouping stem-prefix \
+  --group-separator "__" \
   --split 0.8,0.1,0.1 \
   --seed 1337
 ```
@@ -118,7 +123,7 @@ uv run pvx augment data/*.wav --output-dir aug_out --variants-per-input 4 --inte
 ## Research Notes
 
 - Keep original clean file IDs in your training metadata so you can group augmented siblings.
-- Avoid split leakage: assign train/validation/test at source-item level when needed by your protocol.
+- Avoid split leakage: use `--grouping stem-prefix` with a stable naming convention (for example `speaker42__take3.wav`).
 - Prefer fixed seeds for published experiments; change seeds only for explicit variance studies.
 - Use `--dry-run` before large jobs to validate output counts and manifest content.
 

@@ -10,6 +10,7 @@ import contextlib
 import csv
 import difflib
 import glob
+import hashlib
 import importlib
 import io
 import json
@@ -902,6 +903,22 @@ def _pick_split(rng: random.Random, ratios: tuple[float, float, float]) -> str:
     return "test"
 
 
+def _stable_seed_from_text(base_seed: int, text: str) -> int:
+    digest = hashlib.sha256(str(text).encode("utf-8")).digest()
+    value = int.from_bytes(digest[:8], byteorder="big", signed=False)
+    return int((int(base_seed) ^ value) & 0x7FFFFFFF)
+
+
+def _augment_group_key(path: Path, grouping: str, separator: str) -> str:
+    if str(grouping) == "none":
+        return str(path.resolve())
+    stem = str(path.stem)
+    sep = str(separator)
+    if sep:
+        return stem.split(sep)[0]
+    return stem
+
+
 def _sample_augment_params(intent: str, rng: random.Random) -> dict[str, str]:
     key = str(intent).strip().lower()
     if key == "asr_robust":
@@ -973,6 +990,20 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
         help="train,val,test split ratios (default: 0.8,0.1,0.1)",
     )
     parser.add_argument(
+        "--grouping",
+        choices=["none", "stem-prefix"],
+        default="stem-prefix",
+        help=(
+            "Split-grouping strategy (default: stem-prefix). "
+            "`stem-prefix` keeps variants from similarly named sources in one split."
+        ),
+    )
+    parser.add_argument(
+        "--group-separator",
+        default="__",
+        help="Separator used by stem-prefix grouping (default: '__')",
+    )
+    parser.add_argument(
         "--manifest-jsonl",
         type=Path,
         default=None,
@@ -1027,6 +1058,7 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
     total_jobs = len(sources) * int(args.variants_per_input)
     job_idx = 0
     failures = 0
+    group_to_split: dict[str, str] = {}
 
     for src_idx, src in enumerate(sources):
         for variant_idx in range(int(args.variants_per_input)):
@@ -1034,7 +1066,11 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
             sample_seed = base_seed + (src_idx * 10_000) + variant_idx
             rng = random.Random(sample_seed)
             params = _sample_augment_params(str(args.intent), rng)
-            split_name = _pick_split(rng, split_ratios)
+            group_key = _augment_group_key(src, str(args.grouping), str(args.group_separator))
+            if group_key not in group_to_split:
+                group_rng = random.Random(_stable_seed_from_text(base_seed, group_key))
+                group_to_split[group_key] = _pick_split(group_rng, split_ratios)
+            split_name = group_to_split[group_key]
 
             out_name = (
                 f"{src.stem}__aug_{str(args.intent)}_{variant_idx + 1:03d}_{sample_seed}.{str(args.output_format)}"
@@ -1046,6 +1082,7 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
                 "intent": str(args.intent),
                 "seed": sample_seed,
                 "split": split_name,
+                "group_key": group_key,
                 "params": dict(params),
                 "status": "planned" if bool(args.dry_run) else "rendered",
             }
@@ -1110,6 +1147,7 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
         "intent",
         "seed",
         "split",
+        "group_key",
         "status",
         "stretch",
         "pitch",
@@ -1132,6 +1170,7 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
                     "intent": str(record.get("intent", "")),
                     "seed": str(record.get("seed", "")),
                     "split": str(record.get("split", "")),
+                    "group_key": str(record.get("group_key", "")),
                     "status": str(record.get("status", "")),
                     "stretch": str(params.get("stretch", "")),
                     "pitch": str(params.get("pitch", "")),
@@ -1146,10 +1185,19 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
 
     rendered = sum(1 for record in records if str(record.get("status", "")).startswith("rendered"))
     planned_count = sum(1 for record in records if str(record.get("status", "")).startswith("planned"))
+    split_counts: dict[str, int] = {"train": 0, "val": 0, "test": 0}
+    for record in records:
+        split = str(record.get("split", "")).strip().lower()
+        if split in split_counts:
+            split_counts[split] += 1
     if not bool(args.silent):
         print(f"[augment] done inputs={len(sources)} variants={len(records)} failures={failures}")
         print(f"[augment] manifest jsonl -> {manifest_jsonl}")
         print(f"[augment] manifest csv   -> {manifest_csv}")
+        print(
+            "[augment] split counts "
+            f"train={split_counts['train']} val={split_counts['val']} test={split_counts['test']}"
+        )
         if bool(args.dry_run):
             print(f"[augment] dry-run planned variants={planned_count}")
         else:

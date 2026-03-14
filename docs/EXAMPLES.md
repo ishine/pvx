@@ -2548,6 +2548,7 @@ pvx augment data/*.wav --output-dir aug_out --variants-per-input 4 --intent asr_
 - `--intent`
 - `--seed`
 - `--split`
+- `--grouping` / `--group-separator`
 - `--dry-run`
 
 **Artifacts to listen for**

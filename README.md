@@ -803,6 +803,9 @@ pvx smoke --output smoke_out.wav
 Key properties:
 - deterministic generation with `--seed`
 - repeatable train/validation/test assignment with `--split`
+- split-leakage control via grouping:
+  - `--grouping stem-prefix` (default)
+  - `--group-separator "__"`
 - intent profiles tuned for common tasks:
   - `asr_robust` (automatic speech recognition robustness)
   - `mir_music` (music information retrieval)
