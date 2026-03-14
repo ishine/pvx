@@ -2401,6 +2401,131 @@ pvx inharmonator bell.wav --inharmonic-f0-hz 220 --inharmonicity 0.0002 --inharm
 - excessive dissonance if inharmonicity is too high
 - loss of note center perception at high wet mix on dense sources
 
+---
+
+## 86) Diagnose Environment and Install Issues (`pvx doctor`)
+
+**Command**
+```bash
+pvx doctor
+```
+
+**Explanation**
+- Runs launch-readiness diagnostics for virtual environment, path environment variable (`PATH`), and optional dependency visibility.
+- Prints concrete remediation commands when warnings are found.
+
+**Before/After**
+- Before: trial-and-error debugging when `pvx` commands fail or optional features are missing.
+- After: one-command diagnosis with direct fix suggestions.
+
+**Parameters that matter most**
+- `--strict`
+- `--json`
+
+**Artifacts to listen for**
+- not an audio render; inspect warnings list for missing `PATH` entries and dependency gaps
+
+---
+
+## 87) Minimal Public-Demo Sequence (`pvx quickstart`)
+
+**Command**
+```bash
+pvx quickstart input.wav --output output.wav
+```
+
+**Explanation**
+- Prints a concise launch script that chains diagnostics, safe first render, transform guidance, examples, and smoke test.
+- Useful when preparing demos and avoiding ad-hoc command selection.
+
+**Before/After**
+- Before: inconsistent launch flow and missed preflight checks.
+- After: repeatable launch sequence suitable for public demos.
+
+**Parameters that matter most**
+- positional input path
+- `--output`
+- `--material`
+
+**Artifacts to listen for**
+- not an audio render; this is command-sequence generation
+
+---
+
+## 88) Quality-First First Pass (`pvx safe`)
+
+**Command**
+```bash
+pvx safe input.wav --material mix --output input_safe.wav
+```
+
+**Explanation**
+- Wraps `pvx voc` with conservative defaults (`identity` phase locking, hybrid transient handling, stereo coherence defaults) to reduce first-pass artifact risk.
+- Intended for “first render should not embarrass us” scenarios.
+
+**Before/After**
+- Before: first render quality depends heavily on manual flag selection.
+- After: consistent conservative baseline output with one command.
+
+**Parameters that matter most**
+- `--material`
+- passthrough `pvx voc` arguments (for example `--stretch`, `--pitch`)
+- `--overwrite`
+
+**Artifacts to listen for**
+- reduced, but not eliminated, smear/phase artifacts on extreme settings
+- material-specific tuning may still be required for final delivery
+
+---
+
+## 89) Transform Availability and Selection (`pvx transforms`)
+
+**Command**
+```bash
+pvx transforms
+```
+
+**Explanation**
+- Prints transform backend options (`fft`, `dft`, `czt`, `dct`, `dst`, `hartley`) with runtime availability and practical recommendations.
+- Clarifies when optional SciPy-backed transforms are unavailable.
+
+**Before/After**
+- Before: uncertainty about whether non-FFT transforms are supported in the active runtime.
+- After: explicit transform availability and usage guidance in one place.
+
+**Parameters that matter most**
+- `--json`
+
+**Artifacts to listen for**
+- not an audio render; review backend availability and recommendation text
+
+---
+
+## 90) Fast End-to-End Health Check (`pvx smoke`)
+
+**Command**
+```bash
+pvx smoke --output smoke_out.wav
+```
+
+**Explanation**
+- Generates a short synthetic input, runs a conservative `pvx voc` render, verifies output creation, and reports output metadata.
+- Useful for pre-demo confidence checks and basic continuous integration (CI) sanity gates.
+
+**Before/After**
+- Before: no quick integrated health check for “does this build actually render audio.”
+- After: one-command smoke render with pass/fail signal.
+
+**Parameters that matter most**
+- `--output`
+- `--duration`
+- `--sample-rate`
+- `--stretch`
+- `--pitch`
+
+**Artifacts to listen for**
+- simple synthetic tone render; severe distortion/silence indicates environment/runtime problems
+
 ## Attribution
 
 Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).

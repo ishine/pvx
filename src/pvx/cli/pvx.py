@@ -11,6 +11,7 @@ import difflib
 import importlib
 import io
 import json
+import os
 import random
 import re
 import shlex
@@ -21,6 +22,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
 
+import numpy as np
 import soundfile as sf
 
 from pvx.core.streaming import run_stateful_stream
@@ -213,6 +215,23 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
 
 
 EXAMPLE_COMMANDS: dict[str, tuple[str, str]] = {
+    "doctor": ("Environment diagnostics", "pvx doctor"),
+    "quickstart": (
+        "Minimal launch/demo sequence",
+        "pvx quickstart input.wav --output output.wav",
+    ),
+    "safe": (
+        "Quality-first conservative voc wrapper",
+        "pvx safe input.wav --material mix --output output_safe.wav",
+    ),
+    "transforms": (
+        "Transform availability and recommendation guide",
+        "pvx transforms",
+    ),
+    "smoke": (
+        "Synthetic end-to-end smoke render",
+        "pvx smoke --output smoke_out.wav",
+    ),
     "basic": ("Basic stretch", "pvx voc input.wav --stretch 1.20 --output output.wav"),
     "speech": ("Slow speech for review", "pvx voc speech.wav --preset vocal_studio --stretch 1.30 --output speech_slow.wav"),
     "vocal": (
@@ -450,6 +469,11 @@ def print_tools() -> None:
     print("Helper commands:")
     print("  list         Show this command table")
     print("  examples     Show copy-paste examples (use `pvx examples <name>`)")
+    print("  quickstart   Print a minimal launch sequence")
+    print("  doctor       Run environment diagnostics and suggested fixes")
+    print("  transforms   Show transform choices and recommendations")
+    print("  safe         Run `pvx voc` with conservative quality-first defaults")
+    print("  smoke        Fast synthetic end-to-end smoke render")
     print("  guided       Interactive command builder")
     print("  follow       Track one file and control another in one command")
     print("  chain        Run a managed multi-stage one-line tool chain")
@@ -519,6 +543,304 @@ def print_follow_examples(which: str = "basic") -> None:
     title, command = FOLLOW_EXAMPLE_COMMANDS[key]
     print(f"[{key}] {title}")
     print(command)
+
+
+def run_doctor_mode(forwarded_args: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        prog="pvx doctor",
+        description="Environment and launch-readiness diagnostics for pvx.",
+    )
+    parser.add_argument("--json", action="store_true", help="Emit machine-readable JSON report")
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Return non-zero exit code if warnings are found",
+    )
+    args = parser.parse_args(forwarded_args)
+
+    cwd = Path.cwd().resolve()
+    venv_active = bool(getattr(sys, "base_prefix", sys.prefix) != sys.prefix)
+    python_exe = str(Path(sys.executable).resolve())
+    pvx_on_path = shutil.which("pvx")
+    path_entries = [entry for entry in os.environ.get("PATH", "").split(os.pathsep) if entry]
+    venv_bin = str((cwd / ".venv" / "bin").resolve())
+
+    try:
+        importlib.import_module("scipy")
+        scipy_ok = True
+    except Exception:
+        scipy_ok = False
+    try:
+        importlib.import_module("cupy")
+        cupy_ok = True
+    except Exception:
+        cupy_ok = False
+
+    warnings: list[str] = []
+    if not venv_active:
+        warnings.append("Python virtual environment is not active.")
+    if pvx_on_path is None:
+        warnings.append("`pvx` executable is not on PATH.")
+    if (cwd / ".venv").exists() and venv_bin not in path_entries:
+        warnings.append("Project virtualenv bin directory is not on PATH.")
+    if not scipy_ok:
+        warnings.append("SciPy not installed: czt/dct/dst/hartley transforms may be unavailable.")
+
+    report = {
+        "python_executable": python_exe,
+        "python_version": sys.version.split()[0],
+        "cwd": str(cwd),
+        "venv_active": venv_active,
+        "pvx_on_path": pvx_on_path,
+        "venv_bin_expected": venv_bin,
+        "venv_bin_on_path": venv_bin in path_entries,
+        "scipy_installed": scipy_ok,
+        "cupy_installed": cupy_ok,
+        "warnings": list(warnings),
+    }
+
+    if args.json:
+        print(json.dumps(report, indent=2, sort_keys=True))
+    else:
+        print("pvx doctor")
+        print(f"- python: {report['python_executable']} (v{report['python_version']})")
+        print(f"- working directory: {report['cwd']}")
+        print(f"- virtual environment active: {'yes' if venv_active else 'no'}")
+        print(f"- pvx on PATH: {pvx_on_path if pvx_on_path is not None else 'no'}")
+        print(f"- scipy installed: {'yes' if scipy_ok else 'no'}")
+        print(f"- cupy installed: {'yes' if cupy_ok else 'no'}")
+        if warnings:
+            print("")
+            print("Warnings:")
+            for item in warnings:
+                print(f"- {item}")
+            print("")
+            print("Suggested fixes:")
+            print("- Activate virtual environment: source .venv/bin/activate")
+            print("- Add pvx to PATH (zsh):")
+            print('  printf \'export PATH="%s/.venv/bin:$PATH"\\n\' "$(pwd)" >> ~/.zshrc && source ~/.zshrc')
+            print("- Install optional transforms/GPU dependencies:")
+            print("  python3 -m pip install scipy")
+            print("  python3 -m pip install cupy-cuda12x  # optional, NVIDIA CUDA only")
+        else:
+            print("")
+            print("No launch-blocking warnings found.")
+
+    if args.strict and warnings:
+        return 1
+    return 0
+
+
+def run_quickstart_mode(forwarded_args: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        prog="pvx quickstart",
+        description="Print a minimal copy-paste launch sequence for announcement demos.",
+    )
+    parser.add_argument("input", nargs="?", default="input.wav", help="Input audio path (default: input.wav)")
+    parser.add_argument("--output", default="output.wav", help="Output audio path (default: output.wav)")
+    parser.add_argument(
+        "--material",
+        choices=["mix", "speech", "vocal", "drums", "ambient"],
+        default="mix",
+        help="Material profile for `pvx safe` command generation",
+    )
+    args = parser.parse_args(forwarded_args)
+
+    print("pvx quickstart")
+    print("")
+    print("1) Diagnose environment")
+    print("pvx doctor")
+    print("")
+    print("2) Run quality-safe first render")
+    print(
+        f"pvx safe {shlex.quote(str(args.input))} --material {args.material} "
+        f"--output {shlex.quote(str(args.output))}"
+    )
+    print("")
+    print("3) Inspect transform options")
+    print("pvx transforms")
+    print("")
+    print("4) Print curated examples")
+    print("pvx examples basic")
+    print("")
+    print("5) Run a synthetic smoke test")
+    print("pvx smoke --output smoke_out.wav")
+    return 0
+
+
+def run_safe_mode(forwarded_args: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        prog="pvx safe",
+        description="Run `pvx voc` with conservative, quality-first defaults for first-pass renders.",
+    )
+    parser.add_argument("input", help="Input audio path")
+    parser.add_argument("--output", "--out", dest="output", required=True, help="Output audio path")
+    parser.add_argument(
+        "--material",
+        choices=["mix", "speech", "vocal", "drums", "ambient"],
+        default="mix",
+        help="Material profile (default: mix)",
+    )
+    parser.add_argument("--overwrite", action="store_true", help="Overwrite output if it exists")
+    parser.add_argument("--quiet", action="store_true", help="Reduce logs")
+    parser.add_argument("--silent", action="store_true", help="Suppress logs")
+    args, passthrough = parser.parse_known_args(forwarded_args)
+
+    passthrough_flags = {_token_flag(token) for token in passthrough if token.startswith("-")}
+    forbidden_passthrough = {"--output", "--out", "-o", "--stdout"}
+    bad_flags = sorted(passthrough_flags & forbidden_passthrough)
+    if bad_flags:
+        parser.error(
+            f"Do not pass {bad_flags} via passthrough in `pvx safe`; safe mode manages output routing."
+        )
+
+    preset_by_material = {
+        "mix": "stereo_coherent",
+        "speech": "vocal_studio",
+        "vocal": "vocal_studio",
+        "drums": "drums_safe",
+        "ambient": "extreme_ambient",
+    }
+
+    voc_args: list[str] = [
+        str(args.input),
+        "--preset",
+        preset_by_material[str(args.material)],
+    ]
+
+    if "--phase-locking" not in passthrough_flags:
+        voc_args.extend(["--phase-locking", "identity"])
+    if "--transient-mode" not in passthrough_flags:
+        voc_args.extend(["--transient-mode", "hybrid"])
+    if "--transient-sensitivity" not in passthrough_flags:
+        voc_args.extend(["--transient-sensitivity", "0.60"])
+    if "--stereo-mode" not in passthrough_flags:
+        voc_args.extend(["--stereo-mode", "mid_side_lock"])
+    if "--coherence-strength" not in passthrough_flags:
+        voc_args.extend(["--coherence-strength", "0.85"])
+
+    voc_args.extend(["--output", str(args.output)])
+    if args.overwrite:
+        voc_args.append("--overwrite")
+    if args.quiet:
+        voc_args.append("--quiet")
+    if args.silent:
+        voc_args.append("--silent")
+    voc_args.extend(passthrough)
+    return dispatch_tool("voc", voc_args)
+
+
+def run_transforms_mode(forwarded_args: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        prog="pvx transforms",
+        description="Show available per-frame transform backends and practical recommendations.",
+    )
+    parser.add_argument("--json", action="store_true", help="Emit machine-readable JSON")
+    args = parser.parse_args(forwarded_args)
+
+    try:
+        importlib.import_module("scipy.fft")
+        scipy_fft_ok = True
+    except Exception:
+        scipy_fft_ok = False
+    try:
+        from scipy.signal import czt as _scipy_czt  # noqa: F401
+        scipy_czt_ok = True
+    except Exception:
+        scipy_czt_ok = False
+
+    transforms = [
+        {"name": "fft", "available": True, "recommended_for": "default production use", "notes": "Best overall speed/quality baseline"},
+        {"name": "dft", "available": True, "recommended_for": "reference and non-power-of-two research", "notes": "Slowest but direct reference path"},
+        {"name": "czt", "available": scipy_czt_ok, "recommended_for": "zoomed/custom spectral focus", "notes": "Requires scipy.signal.czt"},
+        {"name": "dct", "available": scipy_fft_ok, "recommended_for": "real-transform experiments", "notes": "Requires scipy.fft"},
+        {"name": "dst", "available": scipy_fft_ok, "recommended_for": "real-transform experiments", "notes": "Requires scipy.fft"},
+        {"name": "hartley", "available": scipy_fft_ok, "recommended_for": "real-transform experiments", "notes": "Requires scipy.fft"},
+    ]
+
+    if args.json:
+        print(json.dumps({"transforms": transforms}, indent=2, sort_keys=True))
+        return 0
+
+    print("pvx transform guide")
+    print("")
+    for item in transforms:
+        state = "yes" if bool(item["available"]) else "no"
+        print(f"- {item['name']}: available={state}")
+        print(f"  use: {item['recommended_for']}")
+        print(f"  note: {item['notes']}")
+    print("")
+    print("Rule of thumb: start with --transform fft, then A/B against alternatives only if you need a specific behavior.")
+    return 0
+
+
+def _build_smoke_signal(sample_rate: int, duration: float) -> np.ndarray:
+    frames = max(1024, int(round(float(sample_rate) * float(duration))))
+    t = np.arange(frames, dtype=np.float64) / float(sample_rate)
+    tone = 0.18 * np.sin(2.0 * np.pi * 220.0 * t) + 0.08 * np.sin(2.0 * np.pi * 440.0 * t)
+    fade = min(256, max(8, frames // 20))
+    ramp = np.linspace(0.0, 1.0, num=fade, endpoint=True, dtype=np.float64)
+    tone[:fade] *= ramp
+    tone[-fade:] *= ramp[::-1]
+    return np.stack([tone, tone], axis=1)
+
+
+def run_smoke_mode(forwarded_args: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        prog="pvx smoke",
+        description="Run a fast synthetic end-to-end smoke render for launch confidence.",
+    )
+    parser.add_argument("--output", default="smoke_out.wav", help="Output path for smoke render")
+    parser.add_argument("--duration", type=float, default=0.30, help="Synthetic input duration seconds (default: 0.30)")
+    parser.add_argument("--sample-rate", type=int, default=24000, help="Synthetic input sample rate (default: 24000)")
+    parser.add_argument("--stretch", type=float, default=1.25, help="Smoke render stretch factor (default: 1.25)")
+    parser.add_argument("--pitch", type=float, default=0.0, help="Smoke render pitch semitones (default: 0.0)")
+    args = parser.parse_args(forwarded_args)
+
+    if float(args.duration) <= 0.0:
+        parser.error("--duration must be > 0")
+    if int(args.sample_rate) <= 1000:
+        parser.error("--sample-rate must be > 1000")
+    if float(args.stretch) <= 0.0:
+        parser.error("--stretch must be > 0")
+
+    with tempfile.TemporaryDirectory(prefix="pvx-smoke-") as tmp:
+        tmp_dir = Path(tmp)
+        in_path = tmp_dir / "smoke_in.wav"
+        out_path = Path(args.output).expanduser().resolve()
+        signal = _build_smoke_signal(int(args.sample_rate), float(args.duration))
+        sf.write(str(in_path), signal, int(args.sample_rate))
+        code = dispatch_tool(
+            "voc",
+            [
+                str(in_path),
+                "--stretch",
+                f"{float(args.stretch):.8g}",
+                "--pitch",
+                f"{float(args.pitch):.8g}",
+                "--preset",
+                "stereo_coherent",
+                "--phase-locking",
+                "identity",
+                "--transient-mode",
+                "hybrid",
+                "--output",
+                str(out_path),
+                "--overwrite",
+                "--silent",
+            ],
+        )
+        if int(code) != 0:
+            print(f"[smoke] failed: voc exited with code {code}", file=sys.stderr)
+            return int(code)
+        if not out_path.exists():
+            print("[smoke] failed: output file was not created", file=sys.stderr)
+            return 1
+        info = sf.info(str(out_path))
+        print(
+            f"[smoke] ok -> {out_path} | frames={int(info.frames)} sr={int(info.samplerate)} channels={int(info.channels)}"
+        )
+    return 0
 
 
 def _extract_follow_example_request(args: list[str]) -> str | None:
@@ -1924,6 +2246,11 @@ def build_parser() -> argparse.ArgumentParser:
             "  pvx chain input.wav --pipeline \"voc --stretch 1.2 | formant --mode preserve\" --output out.wav\n"
             "  pvx stream input.wav --output out.wav --chunk-seconds 0.2 --time-stretch 2.0\n"
             "  pvx stretch-budget input.wav --disk-budget 20GB --bit-depth 16 --requested-stretch 1000000\n"
+            "  pvx doctor\n"
+            "  pvx quickstart input.wav --output output.wav\n"
+            "  pvx safe input.wav --material mix --output output.wav\n"
+            "  pvx transforms\n"
+            "  pvx smoke --output smoke_out.wav\n"
             "  pvx voc input.wav --output-dir out --lucky 8\n"
             "  pvx list\n"
             "  pvx examples basic\n"
@@ -1970,6 +2297,11 @@ def main(argv: list[str] | None = None) -> int:
         "tools",
         "examples",
         "example",
+        "quickstart",
+        "doctor",
+        "transforms",
+        "safe",
+        "smoke",
         "guided",
         "guide",
         "follow",
@@ -1991,6 +2323,26 @@ def main(argv: list[str] | None = None) -> int:
         except ValueError as exc:
             parser.error(str(exc))
         return 0
+    if command == "quickstart":
+        if lucky_count is not None:
+            parser.error("--lucky is not supported with `pvx quickstart`")
+        return run_quickstart_mode(forwarded)
+    if command == "doctor":
+        if lucky_count is not None:
+            parser.error("--lucky is not supported with `pvx doctor`")
+        return run_doctor_mode(forwarded)
+    if command == "transforms":
+        if lucky_count is not None:
+            parser.error("--lucky is not supported with `pvx transforms`")
+        return run_transforms_mode(forwarded)
+    if command == "safe":
+        if lucky_count is not None:
+            parser.error("--lucky is not supported with `pvx safe`")
+        return run_safe_mode(forwarded)
+    if command == "smoke":
+        if lucky_count is not None:
+            parser.error("--lucky is not supported with `pvx smoke`")
+        return run_smoke_mode(forwarded)
     if command in {"guided", "guide"}:
         if lucky_count is not None:
             parser.error("--lucky is not supported with `pvx guided`")
@@ -2043,6 +2395,21 @@ def main(argv: list[str] | None = None) -> int:
         if target in helper_commands:
             if target in {"examples", "example"}:
                 print_examples("all")
+                return 0
+            if target == "quickstart":
+                print("Run `pvx quickstart` for a minimal launch/demo sequence.")
+                return 0
+            if target == "doctor":
+                print("Run `pvx doctor` for environment diagnostics and actionable fixes.")
+                return 0
+            if target == "transforms":
+                print("Run `pvx transforms` for transform choices and backend availability.")
+                return 0
+            if target == "safe":
+                print("Run `pvx safe --help` for conservative quality-first voc defaults.")
+                return 0
+            if target == "smoke":
+                print("Run `pvx smoke --help` for a fast synthetic end-to-end verification render.")
                 return 0
             if target in {"list", "ls", "tools"}:
                 print_tools()

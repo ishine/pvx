@@ -41,6 +41,7 @@ At a glance, `pvx` provides:
 - [Supported File Types](#supported-file-types)
 - [Performance and GPU (Quality-First)](#performance-and-gpu-quality-first)
 - [CLI Discoverability and UX](#cli-discoverability-and-ux)
+- [Announcement Readiness: Top 5 Complaints (and Fixes)](#announcement-readiness-top-5-complaints-and-fixes)
 - [Benchmarking (pvx vs Rubber Band vs librosa)](#benchmarking-pvx-vs-rubber-band-vs-librosa)
 - [Visual Documentation](#visual-documentation)
 - [Troubleshooting](#troubleshooting)
@@ -769,6 +770,28 @@ Output policy controls (shared across audio-output tools):
 - `--true-peak-max-dbtp`
 - `--metadata-policy {none,sidecar,copy}`
 - `--subtype` remains available as explicit low-level override
+
+## Announcement Readiness: Top 5 Complaints (and Fixes)
+
+If you announce `pvx`, these are the most likely first-wave complaints and the built-in responses.
+
+| Likely complaint | Code-level response | Documentation response |
+| --- | --- | --- |
+| “I installed it, but `pvx` is not found.” | `pvx doctor` checks virtual environment activity, `PATH`, and dependency status with concrete fix commands. | Install and troubleshooting sections now point to `pvx doctor` as first triage. |
+| “There are too many flags; I don’t know where to start.” | `pvx quickstart` prints a minimal five-step launch sequence. | Quick-start sections and examples now include the same sequence. |
+| “My first render sounds phasey/choppy.” | `pvx safe` wraps `pvx voc` with conservative quality-first defaults (`identity` phase locking, hybrid transient mode, stereo coherence controls). | Quality guidance and cookbook examples now include `pvx safe` first-pass usage. |
+| “Do I have to use FFT/STFT only?” | `pvx transforms` prints transform options (`fft`, `dft`, `czt`, `dct`, `dst`, `hartley`) plus availability and recommendation guidance. | Transform guidance is now explicit and linked from command help and examples. |
+| “How do I know this build is healthy before a demo?” | `pvx smoke` runs a fast synthetic end-to-end render and verifies output creation/readback. | Launch checklist now includes `pvx smoke` before public demos/releases. |
+
+Launch checklist (copy/paste):
+
+```bash
+pvx doctor
+pvx quickstart input.wav --output output.wav
+pvx safe input.wav --material mix --output output_safe.wav
+pvx transforms
+pvx smoke --output smoke_out.wav
+```
 
 ## Benchmarking (pvx vs Rubber Band vs librosa)
 

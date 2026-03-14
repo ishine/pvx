@@ -54,6 +54,25 @@ python3 scripts/scripts_install_man_pages.py
 MANPATH="$(pwd)/man:$MANPATH" man pvx
 ```
 
+## 0.3 Launch-Ready Helper Commands
+
+Before announcing or demoing, run these:
+
+```bash
+pvx doctor
+pvx quickstart input.wav --output output.wav
+pvx safe input.wav --material mix --output output_safe.wav
+pvx transforms
+pvx smoke --output smoke_out.wav
+```
+
+What each does:
+- `pvx doctor`: checks environment, path environment variable (`PATH`), and optional dependencies.
+- `pvx quickstart`: prints the minimal launch command sequence.
+- `pvx safe`: runs `pvx voc` with conservative quality-first defaults.
+- `pvx transforms`: explains transform options and runtime availability.
+- `pvx smoke`: executes a fast synthetic end-to-end sanity render.
+
 ## 0.2 Running Any Command with uv
 
 `uv` can run every command in this guide without changing the DSP arguments.
