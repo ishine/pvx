@@ -64,6 +64,7 @@ pvx quickstart input.wav --output output.wav
 pvx safe input.wav --material mix --output output_safe.wav
 pvx transforms
 pvx smoke --output smoke_out.wav
+pvx augment data/*.wav --output-dir aug_out --variants-per-input 4 --intent asr_robust --seed 1337
 ```
 
 What each does:
@@ -72,6 +73,7 @@ What each does:
 - `pvx safe`: runs `pvx voc` with conservative quality-first defaults.
 - `pvx transforms`: explains transform options and runtime availability.
 - `pvx smoke`: executes a fast synthetic end-to-end sanity render.
+- `pvx augment`: builds deterministic augmentation datasets and writes manifests for machine-learning pipelines.
 
 ## 0.2 Running Any Command with uv
 

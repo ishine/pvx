@@ -2526,6 +2526,34 @@ pvx smoke --output smoke_out.wav
 **Artifacts to listen for**
 - simple synthetic tone render; severe distortion/silence indicates environment/runtime problems
 
+---
+
+## 91) Deterministic AI Dataset Augmentation (`pvx augment`)
+
+**Command**
+```bash
+pvx augment data/*.wav --output-dir aug_out --variants-per-input 4 --intent asr_robust --split 0.8,0.1,0.1 --seed 1337
+```
+
+**Explanation**
+- Generates reproducible augmentation variants per source file and writes machine-readable manifests for training pipelines.
+- Intended for automatic speech recognition (ASR), music information retrieval (MIR), and self-supervised learning (SSL) experiments.
+
+**Before/After**
+- Before: ad-hoc augmentation scripts with weak reproducibility and incomplete provenance.
+- After: deterministic rendered variants plus JSON Lines (JSONL) and comma-separated values (CSV) manifests including split assignment and parameters.
+
+**Parameters that matter most**
+- `--variants-per-input`
+- `--intent`
+- `--seed`
+- `--split`
+- `--dry-run`
+
+**Artifacts to listen for**
+- augmentation policy mismatch to task (too mild for contrastive learning, too aggressive for label-sensitive training)
+- split leakage if downstream pipeline ignores source-family grouping
+
 ## Attribution
 
 Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).

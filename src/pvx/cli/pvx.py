@@ -7,7 +7,9 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import csv
 import difflib
+import glob
 import importlib
 import io
 import json
@@ -231,6 +233,10 @@ EXAMPLE_COMMANDS: dict[str, tuple[str, str]] = {
     "smoke": (
         "Synthetic end-to-end smoke render",
         "pvx smoke --output smoke_out.wav",
+    ),
+    "augment": (
+        "Deterministic dataset augmentation for AI research",
+        "pvx augment data/*.wav --output-dir aug_out --variants-per-input 4 --intent asr_robust --seed 1337",
     ),
     "basic": ("Basic stretch", "pvx voc input.wav --stretch 1.20 --output output.wav"),
     "speech": ("Slow speech for review", "pvx voc speech.wav --preset vocal_studio --stretch 1.30 --output speech_slow.wav"),
@@ -474,6 +480,7 @@ def print_tools() -> None:
     print("  transforms   Show transform choices and recommendations")
     print("  safe         Run `pvx voc` with conservative quality-first defaults")
     print("  smoke        Fast synthetic end-to-end smoke render")
+    print("  augment      Deterministic AI dataset augmentation with manifests")
     print("  guided       Interactive command builder")
     print("  follow       Track one file and control another in one command")
     print("  chain        Run a managed multi-stage one-line tool chain")
@@ -841,6 +848,314 @@ def run_smoke_mode(forwarded_args: list[str]) -> int:
             f"[smoke] ok -> {out_path} | frames={int(info.frames)} sr={int(info.samplerate)} channels={int(info.channels)}"
         )
     return 0
+
+
+def _expand_augment_inputs(tokens: list[str]) -> list[Path]:
+    resolved: list[Path] = []
+    seen: set[str] = set()
+    for token in tokens:
+        raw = str(token).strip()
+        if not raw:
+            continue
+        if any(ch in raw for ch in "*?["):
+            candidates = [Path(p) for p in sorted(glob.glob(raw, recursive=True))]
+        else:
+            candidates = [Path(raw)]
+        for candidate in candidates:
+            p = candidate.expanduser().resolve()
+            if p.is_dir():
+                for child in sorted(p.rglob("*")):
+                    if child.is_file() and child.suffix.lower() in _AUDIO_EXTENSIONS:
+                        key = str(child.resolve())
+                        if key not in seen:
+                            seen.add(key)
+                            resolved.append(child.resolve())
+                continue
+            if p.is_file() and p.suffix.lower() in _AUDIO_EXTENSIONS:
+                key = str(p)
+                if key not in seen:
+                    seen.add(key)
+                    resolved.append(p)
+    return resolved
+
+
+def _parse_split_ratios(text: str) -> tuple[float, float, float]:
+    parts = [part.strip() for part in str(text).split(",")]
+    if len(parts) != 3:
+        raise ValueError("--split must be three comma-separated ratios: train,val,test")
+    train, val, test = (float(parts[0]), float(parts[1]), float(parts[2]))
+    if train < 0.0 or val < 0.0 or test < 0.0:
+        raise ValueError("--split ratios must be >= 0")
+    total = train + val + test
+    if total <= 0.0:
+        raise ValueError("--split ratio sum must be > 0")
+    return train / total, val / total, test / total
+
+
+def _pick_split(rng: random.Random, ratios: tuple[float, float, float]) -> str:
+    train, val, _ = ratios
+    x = rng.random()
+    if x < train:
+        return "train"
+    if x < train + val:
+        return "val"
+    return "test"
+
+
+def _sample_augment_params(intent: str, rng: random.Random) -> dict[str, str]:
+    key = str(intent).strip().lower()
+    if key == "asr_robust":
+        stretch = rng.uniform(0.92, 1.12)
+        pitch = rng.uniform(-1.5, 1.5)
+        formant = rng.uniform(0.55, 0.95)
+        transient = rng.uniform(0.50, 0.75)
+        preset = "vocal_studio"
+        window = rng.choice(["hann", "hamming", "blackmanharris"])
+    elif key == "mir_music":
+        stretch = rng.uniform(0.85, 1.25)
+        pitch = rng.uniform(-3.0, 3.0)
+        formant = rng.uniform(0.30, 0.70)
+        transient = rng.uniform(0.45, 0.70)
+        preset = "stereo_coherent"
+        window = rng.choice(["hann", "blackmanharris", "kaiser"])
+    else:  # ssl_contrastive
+        stretch = rng.uniform(0.70, 1.45)
+        pitch = rng.uniform(-4.5, 4.5)
+        formant = rng.uniform(0.20, 0.80)
+        transient = rng.uniform(0.40, 0.85)
+        preset = rng.choice(["vocal_studio", "drums_safe", "stereo_coherent"])
+        window = rng.choice(["hann", "hamming", "blackmanharris", "kaiser", "tukey"])
+
+    transform = rng.choice(["fft", "dft"])
+    target_lufs = rng.uniform(-24.0, -14.0)
+    return {
+        "stretch": f"{stretch:.6f}",
+        "pitch": f"{pitch:.6f}",
+        "formant_strength": f"{formant:.6f}",
+        "transient_sensitivity": f"{transient:.6f}",
+        "preset": preset,
+        "window": window,
+        "transform": transform,
+        "target_lufs": f"{target_lufs:.6f}",
+        "phase_locking": "identity",
+        "transient_mode": "hybrid",
+        "stereo_mode": "mid_side_lock",
+        "coherence_strength": "0.85",
+    }
+
+
+def run_augment_mode(forwarded_args: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        prog="pvx augment",
+        description=(
+            "Deterministic dataset augmentation for AI research/data augmentation.\n"
+            "Generates variants with reproducible random seeds and writes manifests."
+        ),
+    )
+    parser.add_argument("inputs", nargs="+", help="Input audio files, directories, and/or glob patterns")
+    parser.add_argument("--output-dir", required=True, type=Path, help="Output directory for augmented files")
+    parser.add_argument(
+        "--variants-per-input",
+        type=int,
+        default=3,
+        help="Number of augmented outputs per input file (default: 3)",
+    )
+    parser.add_argument(
+        "--intent",
+        choices=["asr_robust", "mir_music", "ssl_contrastive"],
+        default="asr_robust",
+        help="Augmentation intent profile (default: asr_robust)",
+    )
+    parser.add_argument("--seed", type=int, default=1337, help="Deterministic random seed (default: 1337)")
+    parser.add_argument(
+        "--split",
+        default="0.8,0.1,0.1",
+        help="train,val,test split ratios (default: 0.8,0.1,0.1)",
+    )
+    parser.add_argument(
+        "--manifest-jsonl",
+        type=Path,
+        default=None,
+        help="Optional JSONL manifest path (default: <output-dir>/augment_manifest.jsonl)",
+    )
+    parser.add_argument(
+        "--manifest-csv",
+        type=Path,
+        default=None,
+        help="Optional CSV manifest path (default: <output-dir>/augment_manifest.csv)",
+    )
+    parser.add_argument(
+        "--output-format",
+        choices=["wav", "flac", "aiff", "ogg", "caf"],
+        default="wav",
+        help="Output format container (default: wav)",
+    )
+    parser.add_argument("--overwrite", action="store_true", help="Overwrite existing outputs")
+    parser.add_argument("--dry-run", action="store_true", help="Plan manifest and filenames without rendering audio")
+    parser.add_argument("--device", choices=["auto", "cpu", "cuda"], default="auto", help="Processing device")
+    parser.add_argument("--quiet", action="store_true", help="Reduce logs")
+    parser.add_argument("--silent", action="store_true", help="Suppress logs")
+    args = parser.parse_args(forwarded_args)
+
+    if int(args.variants_per_input) <= 0:
+        parser.error("--variants-per-input must be > 0")
+
+    try:
+        split_ratios = _parse_split_ratios(str(args.split))
+    except ValueError as exc:
+        parser.error(str(exc))
+
+    sources = _expand_augment_inputs(list(args.inputs))
+    if not sources:
+        parser.error("No input audio files matched provided inputs")
+
+    out_dir = Path(args.output_dir).expanduser().resolve()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    manifest_jsonl = (
+        Path(args.manifest_jsonl).expanduser().resolve()
+        if args.manifest_jsonl is not None
+        else out_dir / "augment_manifest.jsonl"
+    )
+    manifest_csv = (
+        Path(args.manifest_csv).expanduser().resolve()
+        if args.manifest_csv is not None
+        else out_dir / "augment_manifest.csv"
+    )
+
+    base_seed = int(args.seed)
+    records: list[dict[str, object]] = []
+    total_jobs = len(sources) * int(args.variants_per_input)
+    job_idx = 0
+    failures = 0
+
+    for src_idx, src in enumerate(sources):
+        for variant_idx in range(int(args.variants_per_input)):
+            job_idx += 1
+            sample_seed = base_seed + (src_idx * 10_000) + variant_idx
+            rng = random.Random(sample_seed)
+            params = _sample_augment_params(str(args.intent), rng)
+            split_name = _pick_split(rng, split_ratios)
+
+            out_name = (
+                f"{src.stem}__aug_{str(args.intent)}_{variant_idx + 1:03d}_{sample_seed}.{str(args.output_format)}"
+            )
+            out_path = out_dir / out_name
+            planned = {
+                "source_path": str(src),
+                "output_path": str(out_path),
+                "intent": str(args.intent),
+                "seed": sample_seed,
+                "split": split_name,
+                "params": dict(params),
+                "status": "planned" if bool(args.dry_run) else "rendered",
+            }
+
+            if not bool(args.silent):
+                print(f"[augment] {job_idx}/{total_jobs} {src.name} -> {out_name}")
+
+            if not bool(args.dry_run):
+                voc_args = [
+                    str(src),
+                    "--stretch",
+                    str(params["stretch"]),
+                    "--pitch",
+                    str(params["pitch"]),
+                    "--preset",
+                    str(params["preset"]),
+                    "--window",
+                    str(params["window"]),
+                    "--transform",
+                    str(params["transform"]),
+                    "--phase-locking",
+                    str(params["phase_locking"]),
+                    "--transient-mode",
+                    str(params["transient_mode"]),
+                    "--transient-sensitivity",
+                    str(params["transient_sensitivity"]),
+                    "--stereo-mode",
+                    str(params["stereo_mode"]),
+                    "--coherence-strength",
+                    str(params["coherence_strength"]),
+                    "--formant-strength",
+                    str(params["formant_strength"]),
+                    "--target-lufs",
+                    str(params["target_lufs"]),
+                    "--output",
+                    str(out_path),
+                    "--output-format",
+                    str(args.output_format),
+                    "--device",
+                    str(args.device),
+                ]
+                if bool(args.overwrite):
+                    voc_args.append("--overwrite")
+                if bool(args.quiet) or bool(args.silent):
+                    voc_args.append("--silent")
+                code = dispatch_tool("voc", voc_args)
+                if int(code) != 0:
+                    failures += 1
+                    planned["status"] = f"error:{code}"
+
+            records.append(planned)
+
+    manifest_jsonl.parent.mkdir(parents=True, exist_ok=True)
+    with manifest_jsonl.open("w", encoding="utf-8") as handle:
+        for record in records:
+            handle.write(json.dumps(record, sort_keys=True) + "\n")
+
+    manifest_csv.parent.mkdir(parents=True, exist_ok=True)
+    fields = [
+        "source_path",
+        "output_path",
+        "intent",
+        "seed",
+        "split",
+        "status",
+        "stretch",
+        "pitch",
+        "preset",
+        "window",
+        "transform",
+        "formant_strength",
+        "transient_sensitivity",
+        "target_lufs",
+    ]
+    with manifest_csv.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer.writeheader()
+        for record in records:
+            params = dict(record.get("params", {}))
+            writer.writerow(
+                {
+                    "source_path": str(record.get("source_path", "")),
+                    "output_path": str(record.get("output_path", "")),
+                    "intent": str(record.get("intent", "")),
+                    "seed": str(record.get("seed", "")),
+                    "split": str(record.get("split", "")),
+                    "status": str(record.get("status", "")),
+                    "stretch": str(params.get("stretch", "")),
+                    "pitch": str(params.get("pitch", "")),
+                    "preset": str(params.get("preset", "")),
+                    "window": str(params.get("window", "")),
+                    "transform": str(params.get("transform", "")),
+                    "formant_strength": str(params.get("formant_strength", "")),
+                    "transient_sensitivity": str(params.get("transient_sensitivity", "")),
+                    "target_lufs": str(params.get("target_lufs", "")),
+                }
+            )
+
+    rendered = sum(1 for record in records if str(record.get("status", "")).startswith("rendered"))
+    planned_count = sum(1 for record in records if str(record.get("status", "")).startswith("planned"))
+    if not bool(args.silent):
+        print(f"[augment] done inputs={len(sources)} variants={len(records)} failures={failures}")
+        print(f"[augment] manifest jsonl -> {manifest_jsonl}")
+        print(f"[augment] manifest csv   -> {manifest_csv}")
+        if bool(args.dry_run):
+            print(f"[augment] dry-run planned variants={planned_count}")
+        else:
+            print(f"[augment] rendered variants={rendered}")
+
+    return 1 if failures else 0
 
 
 def _extract_follow_example_request(args: list[str]) -> str | None:
@@ -2251,6 +2566,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  pvx safe input.wav --material mix --output output.wav\n"
             "  pvx transforms\n"
             "  pvx smoke --output smoke_out.wav\n"
+            "  pvx augment data/*.wav --output-dir aug_out --variants-per-input 4 --intent asr_robust --seed 1337\n"
             "  pvx voc input.wav --output-dir out --lucky 8\n"
             "  pvx list\n"
             "  pvx examples basic\n"
@@ -2302,6 +2618,7 @@ def main(argv: list[str] | None = None) -> int:
         "transforms",
         "safe",
         "smoke",
+        "augment",
         "guided",
         "guide",
         "follow",
@@ -2343,6 +2660,10 @@ def main(argv: list[str] | None = None) -> int:
         if lucky_count is not None:
             parser.error("--lucky is not supported with `pvx smoke`")
         return run_smoke_mode(forwarded)
+    if command == "augment":
+        if lucky_count is not None:
+            parser.error("--lucky is not supported with `pvx augment`")
+        return run_augment_mode(forwarded)
     if command in {"guided", "guide"}:
         if lucky_count is not None:
             parser.error("--lucky is not supported with `pvx guided`")
@@ -2410,6 +2731,9 @@ def main(argv: list[str] | None = None) -> int:
                 return 0
             if target == "smoke":
                 print("Run `pvx smoke --help` for a fast synthetic end-to-end verification render.")
+                return 0
+            if target == "augment":
+                print("Run `pvx augment --help` for deterministic AI dataset augmentation workflows.")
                 return 0
             if target in {"list", "ls", "tools"}:
                 print_tools()

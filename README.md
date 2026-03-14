@@ -42,6 +42,7 @@ At a glance, `pvx` provides:
 - [Performance and GPU (Quality-First)](#performance-and-gpu-quality-first)
 - [CLI Discoverability and UX](#cli-discoverability-and-ux)
 - [Announcement Readiness: Top 5 Complaints (and Fixes)](#announcement-readiness-top-5-complaints-and-fixes)
+- [AI Research and Data Augmentation](#ai-research-and-data-augmentation)
 - [Benchmarking (pvx vs Rubber Band vs librosa)](#benchmarking-pvx-vs-rubber-band-vs-librosa)
 - [Visual Documentation](#visual-documentation)
 - [Troubleshooting](#troubleshooting)
@@ -669,6 +670,7 @@ Start
 | Harmonic layering | `pvx harmonize` | `pvx harmonize lead.wav --intervals 0,4,7 --gains 1,0.8,0.7 --output-dir out` |
 | Cross-source morphing / cross-synthesis | `pvx morph` | `pvx morph a.wav b.wav --blend-mode carrier_a_envelope_b --alpha 0.7 --output morph.wav` |
 | Phase-consistent denoising | `pvx denoise` / `pvx noisefilter` | `pvx denoise speech.wav --noise-seconds 0.4 --reduction-db 5 --smooth 9 --output speech_clean.wav` |
+| AI dataset augmentation (deterministic) | `pvx augment` | `pvx augment data/*.wav --output-dir aug_out --variants-per-input 4 --intent asr_robust --seed 1337` |
 | Build control envelope map | `pvx envelope` / `pvx lfo` | `pvx envelope --mode adsr --duration 8 --rate 20 --key stretch --output stretch_env.csv` |
 | Build periodic LFO map (sine/triangle/square/saw) | `pvx lfo` | `pvx lfo --wave triangle --duration 8 --frequency-hz 0.5 --center 1.0 --amplitude 0.2 --key stretch --output stretch_lfo.csv` |
 | Reshape control map | `pvx reshape` | `pvx reshape stretch_env.csv --key stretch --operation resample --rate 50 --interp polynomial --order 5 --output stretch_dense.csv` |
@@ -720,6 +722,7 @@ Additional helper workflows:
 - `pvx chain`: managed multi-stage chains without manually wiring per-stage `--stdout` / `-` plumbing
 - `pvx stream`: stateful chunk engine for long-form streaming workflows (`--mode stateful` default, `--mode wrapper` compatibility fallback)
 - `pvx stretch-budget`: estimate max safe stretch from an input file and disk budget before launching extreme renders
+- `pvx augment`: deterministic augmentation dataset generation for machine-learning pipelines with JSONL/CSV manifests
 
 `pvx voc` includes beginner UX features:
 
@@ -792,6 +795,36 @@ pvx safe input.wav --material mix --output output_safe.wav
 pvx transforms
 pvx smoke --output smoke_out.wav
 ```
+
+## AI Research and Data Augmentation
+
+`pvx` now includes deterministic augmentation workflows for machine-learning and research datasets via `pvx augment`.
+
+Key properties:
+- deterministic generation with `--seed`
+- repeatable train/validation/test assignment with `--split`
+- intent profiles tuned for common tasks:
+  - `asr_robust` (automatic speech recognition robustness)
+  - `mir_music` (music information retrieval)
+  - `ssl_contrastive` (self-supervised contrastive augmentation)
+- manifest outputs for reproducibility/audit:
+  - JSON Lines (JSONL): default `augment_manifest.jsonl`
+  - comma-separated values (CSV): default `augment_manifest.csv`
+
+Command examples:
+
+```bash
+# Speech-focused augmentation set
+pvx augment data/speech/*.wav --output-dir aug/speech --variants-per-input 6 --intent asr_robust --seed 1337
+
+# Music-focused augmentation set with custom split ratios
+pvx augment data/music/*.wav --output-dir aug/music --variants-per-input 4 --intent mir_music --split 0.7,0.2,0.1 --seed 2026
+
+# Dry-run planning only (no audio renders, manifest only)
+pvx augment data/*.wav --output-dir aug/plan --variants-per-input 3 --intent ssl_contrastive --dry-run --seed 42
+```
+
+See full guide: [docs/AI_AUGMENTATION.md](docs/AI_AUGMENTATION.md)
 
 ## Benchmarking (pvx vs Rubber Band vs librosa)
 
@@ -1192,6 +1225,7 @@ Roadmap sort key:
 Complete Markdown documentation list (all `.md` documentation files):
 
 - [docs/ALGORITHM_LIMITATIONS.md](docs/ALGORITHM_LIMITATIONS.md)
+- [docs/AI_AUGMENTATION.md](docs/AI_AUGMENTATION.md)
 - [docs/API_OVERVIEW.md](docs/API_OVERVIEW.md)
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - [docs/BENCHMARKS.md](docs/BENCHMARKS.md)
