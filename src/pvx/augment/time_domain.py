@@ -464,14 +464,189 @@ class FixedLengthCrop(Transform):
 
 
 # ---------------------------------------------------------------------------
-# TimeStretch — wraps pvx voc for production-quality stretching
+# Engine detection helper
+# ---------------------------------------------------------------------------
+
+def _has_torch() -> bool:
+    """Return True if PyTorch is importable."""
+    try:
+        import torch  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
+def _has_torchaudio() -> bool:
+    """Return True if torchaudio is importable."""
+    try:
+        import torchaudio  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
+def _resolve_engine(engine: str) -> str:
+    """Resolve ``"auto"`` to the best available engine.
+
+    Returns ``"torchaudio"``, ``"pytorch"``, or ``"pvx-cli"``.
+
+    Priority for ``"auto"``: torchaudio > pytorch > pvx-cli.
+    """
+    if engine == "torchaudio":
+        if not _has_torchaudio():
+            raise RuntimeError(
+                "engine='torchaudio' requested but torchaudio is not installed. "
+                "Install with: pip install 'pvx[torch]'"
+            )
+        return "torchaudio"
+    if engine == "pytorch":
+        if not _has_torch():
+            raise RuntimeError(
+                "engine='pytorch' requested but PyTorch is not installed. "
+                "Install with: pip install 'pvx[torch]'"
+            )
+        return "pytorch"
+    if engine == "pvx-cli":
+        return "pvx-cli"
+    # auto: prefer torchaudio > pytorch > pvx-cli
+    if _has_torchaudio():
+        return "torchaudio"
+    if _has_torch():
+        return "pytorch"
+    return "pvx-cli"
+
+
+def _torchaudio_time_stretch(audio: np.ndarray, sr: int, rate: float) -> tuple[np.ndarray, int]:
+    """Time-stretch using torchaudio's built-in phase vocoder.
+
+    torchaudio.transforms.TimeStretch uses an optimized C++ phase-vocoder
+    kernel that is typically faster than the pure-Python loop in
+    ``_torch_phase_vocoder``.
+    """
+    import torch
+    import torchaudio
+
+    was_mono = audio.ndim == 1
+    if was_mono:
+        arr = audio[np.newaxis, :]
+    else:
+        arr = audio
+
+    # torchaudio.transforms.TimeStretch expects (batch, freq, time) complex STFT
+    # but the functional API is more direct:
+    n_fft = 2048
+    hop_length = 512
+    tensor = torch.from_numpy(arr.astype(np.float32))  # (C, T)
+    window = torch.hann_window(n_fft)
+
+    channels = []
+    for ch in range(tensor.shape[0]):
+        spec = torch.stft(
+            tensor[ch], n_fft=n_fft, hop_length=hop_length,
+            window=window, return_complex=True,
+        )  # (n_bins, n_frames)
+        # Use torchaudio's phase_vocoder
+        stretched_spec = torchaudio.functional.phase_vocoder(
+            spec.unsqueeze(0),  # (1, n_bins, n_frames)
+            rate=rate,
+            phase_advance=torch.linspace(
+                0, torch.pi * hop_length, spec.shape[0], dtype=torch.float32
+            )[..., None],
+        ).squeeze(0)  # (n_bins, n_out_frames)
+        # iSTFT
+        stretched = torch.istft(
+            stretched_spec, n_fft=n_fft, hop_length=hop_length, window=window,
+        )
+        channels.append(stretched.numpy())
+
+    result = np.stack(channels, axis=0)
+    if was_mono:
+        result = result[0]
+    return result, sr
+
+
+def _torchaudio_pitch_shift(audio: np.ndarray, sr: int, semitones: float) -> tuple[np.ndarray, int]:
+    """Pitch-shift using torchaudio's built-in phase vocoder + resampling."""
+    from scipy.signal import resample
+
+    pitch_ratio = 2.0 ** (semitones / 12.0)
+    stretched, _ = _torchaudio_time_stretch(audio, sr, rate=pitch_ratio)
+
+    # Resample back to original length
+    orig_len = audio.shape[-1]
+    if stretched.ndim == 1:
+        result = resample(stretched, orig_len).astype(np.float32)
+    else:
+        channels = []
+        for ch in range(stretched.shape[0]):
+            channels.append(resample(stretched[ch], orig_len).astype(np.float32))
+        result = np.stack(channels, axis=0)
+
+    return result, sr
+
+
+def _pytorch_time_stretch(audio: np.ndarray, sr: int, rate: float) -> tuple[np.ndarray, int]:
+    """Time-stretch using the native PyTorch phase vocoder."""
+    import torch
+    from .gpu import _torch_phase_vocoder
+
+    was_mono = audio.ndim == 1
+    if was_mono:
+        arr = audio[np.newaxis, :]
+    else:
+        arr = audio
+
+    channels = []
+    for ch in range(arr.shape[0]):
+        t = torch.from_numpy(arr[ch].astype(np.float32))
+        stretched = _torch_phase_vocoder(t, stretch=rate)
+        channels.append(stretched.numpy())
+
+    result = np.stack(channels, axis=0)
+    if was_mono:
+        result = result[0]
+    return result, sr
+
+
+def _pytorch_pitch_shift(audio: np.ndarray, sr: int, semitones: float) -> tuple[np.ndarray, int]:
+    """Pitch-shift using the native PyTorch phase vocoder + resampling."""
+    import torch
+    from scipy.signal import resample
+
+    pitch_ratio = 2.0 ** (semitones / 12.0)
+
+    # Step 1: time-stretch by pitch_ratio
+    stretched, _ = _pytorch_time_stretch(audio, sr, rate=pitch_ratio)
+
+    # Step 2: resample back to original length
+    orig_len = audio.shape[-1]
+    if stretched.ndim == 1:
+        result = resample(stretched, orig_len).astype(np.float32)
+    else:
+        channels = []
+        for ch in range(stretched.shape[0]):
+            channels.append(resample(stretched[ch], orig_len).astype(np.float32))
+        result = np.stack(channels, axis=0)
+
+    return result, sr
+
+
+# ---------------------------------------------------------------------------
+# TimeStretch — phase-vocoder time stretching
 # ---------------------------------------------------------------------------
 
 class TimeStretch(Transform):
-    """High-quality time-stretch via the pvx phase-vocoder engine.
+    """High-quality time-stretch via a phase-vocoder engine.
 
-    Calls ``pvx voc`` as a subprocess to leverage the full pvx DSP stack
-    (transient handling, stereo coherence, formant preservation).
+    By default (``engine="auto"``), uses the native PyTorch phase vocoder
+    when PyTorch is installed, falling back to ``pvx voc`` (subprocess) if
+    not.  You can force a specific engine with ``engine="pytorch"`` or
+    ``engine="pvx-cli"``.
+
+    The ``pvx-cli`` engine leverages the full pvx DSP stack (transient
+    handling, stereo coherence, formant preservation) but requires the
+    pvx CLI to be installed.  The ``pytorch`` engine runs entirely in
+    Python with no subprocess overhead.
 
     Parameters
     ----------
@@ -480,16 +655,23 @@ class TimeStretch(Transform):
         ``(min, max)`` range.
     preserve_pitch:
         If ``True`` pitch is locked at 0 semitones during stretching.
+        Only used with ``engine="pvx-cli"``.
     preset:
         pvx preset name (e.g. ``"vocal_studio"``, ``"drums_safe"``).
+        Only used with ``engine="pvx-cli"``.
+    engine:
+        ``"auto"`` (default — prefer pytorch), ``"pytorch"``, or ``"pvx-cli"``.
     p:
         Probability of applying this transform.
 
     Examples
     --------
     >>> from pvx.augment import TimeStretch
-    >>> aug = TimeStretch(rate=(0.8, 1.25), preset="vocal_studio")
+    >>> aug = TimeStretch(rate=(0.8, 1.25))
     >>> audio_out, sr = aug(audio, sr=16000, seed=0)
+
+    >>> # Force pvx CLI for production-quality transient handling
+    >>> aug = TimeStretch(rate=(0.8, 1.25), engine="pvx-cli", preset="drums_safe")
     """
 
     def __init__(
@@ -497,6 +679,7 @@ class TimeStretch(Transform):
         rate: float | tuple[float, float] = (0.8, 1.25),
         preserve_pitch: bool = True,
         preset: str = "default",
+        engine: str = "auto",
         p: float = 1.0,
     ) -> None:
         super().__init__(p=p)
@@ -506,6 +689,9 @@ class TimeStretch(Transform):
             self.rate_range = (float(rate[0]), float(rate[1]))
         self.preserve_pitch = preserve_pitch
         self.preset = preset
+        if engine not in ("auto", "pytorch", "torchaudio", "pvx-cli"):
+            raise ValueError(f"engine must be auto/pytorch/torchaudio/pvx-cli, got {engine!r}")
+        self.engine = engine
 
     def apply(
         self,
@@ -514,18 +700,34 @@ class TimeStretch(Transform):
         rng: np.random.Generator,
     ) -> tuple[np.ndarray, int]:
         rate = float(rng.uniform(self.rate_range[0], self.rate_range[1]))
-        pitch_arg = ["--pitch", "0"] if self.preserve_pitch else []
-        return _call_pvx_voc(audio, sr, rng, stretch=rate, pitch=0.0 if self.preserve_pitch else None, preset=self.preset)
+        engine = _resolve_engine(self.engine)
+
+        if engine == "torchaudio":
+            return _torchaudio_time_stretch(audio, sr, rate)
+        elif engine == "pytorch":
+            return _pytorch_time_stretch(audio, sr, rate)
+        else:
+            return _call_pvx_voc(
+                audio, sr, rng, stretch=rate,
+                pitch=0.0 if self.preserve_pitch else None,
+                preset=self.preset,
+            )
 
 
 # ---------------------------------------------------------------------------
-# PitchShift — wraps pvx voc for production-quality pitch shifting
+# PitchShift — phase-vocoder pitch shifting
 # ---------------------------------------------------------------------------
 
 class PitchShift(Transform):
-    """High-quality pitch shift via the pvx phase-vocoder engine.
+    """High-quality pitch shift via a phase-vocoder engine.
 
-    Calls ``pvx voc`` as a subprocess.
+    By default (``engine="auto"``), uses the native PyTorch phase vocoder
+    + resampling when PyTorch is installed, falling back to ``pvx voc``
+    (subprocess) if not.
+
+    The ``pvx-cli`` engine supports formant preservation and advanced
+    presets.  The ``pytorch`` engine runs entirely in Python with no
+    subprocess overhead.
 
     Parameters
     ----------
@@ -535,16 +737,23 @@ class PitchShift(Transform):
         If ``True`` stretch is locked at 1.0.
     formant_mode:
         ``"formant-preserving"`` or ``"standard"``.
+        Only used with ``engine="pvx-cli"``.
     preset:
         pvx preset name.
+        Only used with ``engine="pvx-cli"``.
+    engine:
+        ``"auto"`` (default — prefer pytorch), ``"pytorch"``, or ``"pvx-cli"``.
     p:
         Probability of applying this transform.
 
     Examples
     --------
     >>> from pvx.augment import PitchShift
-    >>> aug = PitchShift(semitones=(-2, 2), formant_mode="formant-preserving")
+    >>> aug = PitchShift(semitones=(-2, 2))
     >>> audio_out, sr = aug(audio, sr=16000, seed=1)
+
+    >>> # Force pvx CLI for formant-preserving pitch shift
+    >>> aug = PitchShift(semitones=(-2, 2), engine="pvx-cli", formant_mode="formant-preserving")
     """
 
     def __init__(
@@ -553,6 +762,7 @@ class PitchShift(Transform):
         preserve_duration: bool = True,
         formant_mode: str = "formant-preserving",
         preset: str = "vocal_studio",
+        engine: str = "auto",
         p: float = 1.0,
     ) -> None:
         super().__init__(p=p)
@@ -563,6 +773,9 @@ class PitchShift(Transform):
         self.preserve_duration = preserve_duration
         self.formant_mode = formant_mode
         self.preset = preset
+        if engine not in ("auto", "pytorch", "torchaudio", "pvx-cli"):
+            raise ValueError(f"engine must be auto/pytorch/torchaudio/pvx-cli, got {engine!r}")
+        self.engine = engine
 
     def apply(
         self,
@@ -571,8 +784,18 @@ class PitchShift(Transform):
         rng: np.random.Generator,
     ) -> tuple[np.ndarray, int]:
         semitones = float(rng.uniform(self.semitones_range[0], self.semitones_range[1]))
-        stretch = 1.0 if self.preserve_duration else None
-        return _call_pvx_voc(audio, sr, rng, stretch=stretch, pitch=semitones, preset=self.preset, formant_mode=self.formant_mode)
+        engine = _resolve_engine(self.engine)
+
+        if engine == "torchaudio":
+            return _torchaudio_pitch_shift(audio, sr, semitones)
+        elif engine == "pytorch":
+            return _pytorch_pitch_shift(audio, sr, semitones)
+        else:
+            stretch = 1.0 if self.preserve_duration else None
+            return _call_pvx_voc(
+                audio, sr, rng, stretch=stretch, pitch=semitones,
+                preset=self.preset, formant_mode=self.formant_mode,
+            )
 
 
 # ---------------------------------------------------------------------------

@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 # Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
 
-"""Benchmark runner for pvx augmentation workflows."""
+"""Benchmark runner for pvx augmentation workflows.
+
+Supports profile-driven benchmark presets (speech/music/noisy/stereo) with
+both relative (baseline drift) and absolute metric gates.
+"""
 
 from __future__ import annotations
 
@@ -19,8 +23,23 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
+DEFAULT_PROFILES_PATH = ROOT / "benchmarks" / "augment_profiles.json"
+
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
+
+
+PROFILE_FLAG_MAP: dict[str, tuple[str, ...]] = {
+    "input_glob": ("--input-glob",),
+    "intent": ("--intent",),
+    "pair_mode": ("--pair-mode",),
+    "seed": ("--seed",),
+    "split": ("--split",),
+    "workers": ("--workers",),
+    "variants_per_input": ("--variants-per-input",),
+    "baseline": ("--baseline",),
+    "gate_tolerance": ("--gate-tolerance",),
+}
 
 
 def _load_manifest_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -140,7 +159,7 @@ def _summarize(rows: list[dict[str, Any]], *, target_split: tuple[float, float, 
     }
 
 
-def _metric_gate(cur: dict[str, Any], base: dict[str, Any], tolerance: float) -> tuple[bool, list[str]]:
+def _relative_metric_gate(cur: dict[str, Any], base: dict[str, Any], tolerance: float) -> tuple[bool, list[str]]:
     keys = (
         "records_total",
         "rendered_total",
@@ -162,7 +181,24 @@ def _metric_gate(cur: dict[str, Any], base: dict[str, Any], tolerance: float) ->
         denom = max(abs(b), 1e-9)
         rel = abs(a - b) / denom
         if rel > tolerance:
-            failures.append(f"{key}: current={a:.6g} baseline={b:.6g} rel={rel:.4f} tol={tolerance:.4f}")
+            failures.append(f"relative:{key}: current={a:.6g} baseline={b:.6g} rel={rel:.4f} tol={tolerance:.4f}")
+    return len(failures) == 0, failures
+
+
+def _absolute_metric_gate(cur: dict[str, Any], rules: dict[str, Any]) -> tuple[bool, list[str]]:
+    failures: list[str] = []
+    for metric, rule_obj in rules.items():
+        if not isinstance(rule_obj, dict):
+            continue
+        value = _safe_float(cur.get(metric))
+        if value is None:
+            continue
+        min_v = _safe_float(rule_obj.get("min"))
+        max_v = _safe_float(rule_obj.get("max"))
+        if min_v is not None and value < min_v:
+            failures.append(f"absolute:{metric}: {value:.6g} < min {min_v:.6g}")
+        if max_v is not None and value > max_v:
+            failures.append(f"absolute:{metric}: {value:.6g} > max {max_v:.6g}")
     return len(failures) == 0, failures
 
 
@@ -176,7 +212,89 @@ def _json_safe(value: Any) -> Any:
     return value
 
 
+def _flag_present(argv: list[str], flags: tuple[str, ...]) -> bool:
+    for arg in argv:
+        for flag in flags:
+            if arg == flag or arg.startswith(f"{flag}="):
+                return True
+    return False
+
+
+def _load_profiles(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {"profiles": {}}
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        return {"profiles": {}}
+    if not isinstance(payload.get("profiles"), dict):
+        payload["profiles"] = {}
+    return payload
+
+
+def _profile_names(payload: dict[str, Any]) -> list[str]:
+    profiles = payload.get("profiles", {})
+    if not isinstance(profiles, dict):
+        return []
+    return sorted(str(k) for k in profiles.keys())
+
+
+def _resolve_profile_path(path_str: str | None) -> Path | None:
+    if not path_str:
+        return None
+    p = Path(path_str).expanduser()
+    if not p.is_absolute():
+        p = (ROOT / p).resolve()
+    return p
+
+
+def _apply_profile_overrides(
+    args: argparse.Namespace,
+    *,
+    argv: list[str],
+    profile_name: str,
+    profiles_payload: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    profiles = profiles_payload.get("profiles", {})
+    if not isinstance(profiles, dict) or profile_name not in profiles:
+        available = ", ".join(_profile_names(profiles_payload)) or "(none)"
+        raise SystemExit(f"Unknown --profile {profile_name!r}. Available profiles: {available}")
+
+    profile = profiles[profile_name]
+    if not isinstance(profile, dict):
+        raise SystemExit(f"Profile {profile_name!r} is malformed (expected object)")
+
+    for key, flags in PROFILE_FLAG_MAP.items():
+        if key not in profile:
+            continue
+        if _flag_present(argv, flags):
+            continue
+        value = profile[key]
+        if key in {"seed", "workers", "variants_per_input"}:
+            value = int(value)
+        elif key == "gate_tolerance":
+            value = float(value)
+        elif key == "baseline":
+            rp = _resolve_profile_path(str(value))
+            value = None if rp is None else rp
+        else:
+            value = str(value)
+        setattr(args, key, value)
+
+    if bool(args.quick) and (not _flag_present(argv, ("--variants-per-input",))):
+        quick_var = profile.get("quick_variants_per_input")
+        if quick_var is not None:
+            args.variants_per_input = int(quick_var)
+
+    absolute_rules = profile.get("absolute_gates", {})
+    if not isinstance(absolute_rules, dict):
+        absolute_rules = {}
+
+    return profile, absolute_rules
+
+
 def main(argv: list[str] | None = None) -> int:
+    cli_argv = list(sys.argv[1:] if argv is None else argv)
+
     parser = argparse.ArgumentParser(description="Run pvx augmentation benchmark and optional regression gate.")
     parser.add_argument("--input-glob", default="test.wav", help="Input glob for augmentation benchmark")
     parser.add_argument("--out-dir", type=Path, default=Path("benchmarks/out_augment"), help="Output directory")
@@ -187,11 +305,55 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--split", default="0.8,0.1,0.1")
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--baseline", type=Path, default=None, help="Optional baseline JSON path")
-    parser.add_argument("--gate", action="store_true", help="Enable regression gate against baseline")
-    parser.add_argument("--gate-tolerance", type=float, default=0.20, help="Relative tolerance for gate")
+    parser.add_argument("--gate", action="store_true", help="Enable regression gate against baseline/absolute rules")
+    parser.add_argument("--gate-tolerance", type=float, default=0.20, help="Relative tolerance for baseline drift")
     parser.add_argument("--refresh-baseline", action="store_true", help="Write current metrics to baseline path")
     parser.add_argument("--quick", action="store_true", help="Run smaller/faster benchmark")
-    args = parser.parse_args(argv)
+    parser.add_argument("--profile", default=None, help="Named profile from --profiles-file")
+    parser.add_argument("--profiles-file", type=Path, default=DEFAULT_PROFILES_PATH, help="Profile JSON file path")
+    parser.add_argument("--list-profiles", action="store_true", help="List available profiles and exit")
+    parser.add_argument("--absolute-gates-json", default=None, help="Override absolute gate rules with JSON object")
+    args = parser.parse_args(cli_argv)
+
+    profiles_payload = _load_profiles(Path(args.profiles_file).expanduser().resolve())
+
+    if bool(args.list_profiles):
+        names = _profile_names(profiles_payload)
+        if names:
+            print("Available profiles:")
+            for name in names:
+                desc = ""
+                profile = profiles_payload.get("profiles", {}).get(name, {})
+                if isinstance(profile, dict):
+                    desc = str(profile.get("description", "")).strip()
+                if desc:
+                    print(f"- {name}: {desc}")
+                else:
+                    print(f"- {name}")
+        else:
+            print("No profiles available.")
+        return 0
+
+    profile_name = str(args.profile).strip() if args.profile else ""
+    profile_data: dict[str, Any] = {}
+    profile_abs_rules: dict[str, Any] = {}
+    if profile_name:
+        profile_data, profile_abs_rules = _apply_profile_overrides(
+            args,
+            argv=cli_argv,
+            profile_name=profile_name,
+            profiles_payload=profiles_payload,
+        )
+
+    if args.absolute_gates_json:
+        try:
+            payload = json.loads(args.absolute_gates_json)
+            if isinstance(payload, dict):
+                profile_abs_rules = payload
+            else:
+                raise ValueError("must decode to object")
+        except Exception as exc:
+            raise SystemExit(f"Invalid --absolute-gates-json: {exc}") from exc
 
     out_dir = Path(args.out_dir).expanduser().resolve()
     aug_dir = out_dir / "aug"
@@ -200,7 +362,7 @@ def main(argv: list[str] | None = None) -> int:
     manifest_jsonl = out_dir / "augment_manifest.jsonl"
     manifest_csv = out_dir / "augment_manifest.csv"
 
-    variants = int(args.variants_per_input)
+    variants = max(1, int(args.variants_per_input))
     if bool(args.quick):
         variants = max(1, min(variants, 1))
 
@@ -248,6 +410,9 @@ def main(argv: list[str] | None = None) -> int:
     metrics = _summarize(rows, target_split=target)
     report = {
         "meta": {
+            "profile": profile_name or None,
+            "profile_description": str(profile_data.get("description", "")).strip() if profile_data else "",
+            "profiles_file": str(Path(args.profiles_file).expanduser().resolve()),
             "input_glob": str(args.input_glob),
             "out_dir": str(out_dir),
             "intent": str(args.intent),
@@ -264,24 +429,42 @@ def main(argv: list[str] | None = None) -> int:
     }
 
     baseline_payload: dict[str, Any] | None = None
-    gate_failures: list[str] = []
-    gate_ok = True
-    if args.baseline is not None and Path(args.baseline).exists():
-        baseline_payload = json.loads(Path(args.baseline).read_text(encoding="utf-8"))
+    baseline_path = Path(args.baseline).expanduser().resolve() if args.baseline is not None else None
+    relative_failures: list[str] = []
+    absolute_failures: list[str] = []
+    relative_ok = True
+    absolute_ok = True
+
+    if baseline_path is not None and baseline_path.exists():
+        baseline_payload = json.loads(baseline_path.read_text(encoding="utf-8"))
         base_metrics = dict(baseline_payload.get("metrics", {}))
-        gate_ok, gate_failures = _metric_gate(metrics, base_metrics, float(args.gate_tolerance))
-    if bool(args.refresh_baseline) and args.baseline is not None:
-        baseline_path = Path(args.baseline).expanduser().resolve()
+        relative_ok, relative_failures = _relative_metric_gate(metrics, base_metrics, float(args.gate_tolerance))
+
+    if profile_abs_rules:
+        absolute_ok, absolute_failures = _absolute_metric_gate(metrics, profile_abs_rules)
+
+    if bool(args.refresh_baseline) and baseline_path is not None:
         baseline_path.parent.mkdir(parents=True, exist_ok=True)
         baseline_path.write_text(json.dumps(_json_safe(report), indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
+    gate_ok = bool(relative_ok and absolute_ok)
     report["gate"] = {
         "enabled": bool(args.gate),
         "ok": bool(gate_ok),
-        "tolerance": float(args.gate_tolerance),
-        "failures": gate_failures,
-        "baseline_path": None if args.baseline is None else str(Path(args.baseline).expanduser().resolve()),
-        "baseline_loaded": baseline_payload is not None,
+        "relative": {
+            "enabled": baseline_path is not None,
+            "ok": bool(relative_ok),
+            "tolerance": float(args.gate_tolerance),
+            "failures": relative_failures,
+            "baseline_path": None if baseline_path is None else str(baseline_path),
+            "baseline_loaded": baseline_payload is not None,
+        },
+        "absolute": {
+            "enabled": bool(profile_abs_rules),
+            "ok": bool(absolute_ok),
+            "rules": profile_abs_rules,
+            "failures": absolute_failures,
+        },
     }
 
     report_json = out_dir / "report.json"
@@ -292,6 +475,11 @@ def main(argv: list[str] | None = None) -> int:
     lines: list[str] = []
     lines.append("# pvx Augmentation Benchmark")
     lines.append("")
+    if profile_name:
+        lines.append(f"- Profile: `{profile_name}`")
+        profile_desc = str(profile_data.get("description", "")).strip()
+        if profile_desc:
+            lines.append(f"- Profile description: {profile_desc}")
     lines.append(f"- Input glob: `{args.input_glob}`")
     lines.append(f"- Intent: `{args.intent}`")
     lines.append(f"- Pair mode: `{args.pair_mode}`")
@@ -315,16 +503,22 @@ def main(argv: list[str] | None = None) -> int:
     lines.append("")
     lines.append(f"- Enabled: `{bool(args.gate)}`")
     lines.append(f"- Pass: `{bool(gate_ok)}`")
-    if gate_failures:
-        lines.append("- Failures:")
-        for item in gate_failures:
+    lines.append(f"- Relative gate pass: `{bool(relative_ok)}`")
+    lines.append(f"- Absolute gate pass: `{bool(absolute_ok)}`")
+    if relative_failures:
+        lines.append("- Relative failures:")
+        for item in relative_failures:
+            lines.append(f"  - {item}")
+    if absolute_failures:
+        lines.append("- Absolute failures:")
+        for item in absolute_failures:
             lines.append(f"  - {item}")
     report_md.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     print(f"[augment-bench] report json -> {report_json}")
     print(f"[augment-bench] report md   -> {report_md}")
     if bool(args.gate) and not bool(gate_ok):
-        for item in gate_failures:
+        for item in (relative_failures + absolute_failures):
             print(f"[augment-bench] gate failure: {item}", file=sys.stderr)
         return 1
     return 0

@@ -8,6 +8,21 @@
 - `CHANGELOG.md` is updated.
 - `pyproject.toml` version is updated.
 
+## Pre-Tag Validation
+
+Run release validation locally before creating the tag:
+
+```bash
+uv run pytest -q
+python benchmarks/run_augment_profile_suite.py --quick --gate --out-dir benchmarks/out_augment_profiles_release
+```
+
+Optional baseline refresh (only when benchmark behavior intentionally changed):
+
+```bash
+python benchmarks/run_augment_profile_suite.py --quick --refresh-baselines --out-dir benchmarks/out_augment_profiles_refresh
+```
+
 ## Create a Release Tag
 
 ```bash

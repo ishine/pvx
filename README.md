@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/pvx_logo.png" alt="pvx logo" width="420" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TheColby/pvx/main/assets/pvx_logo.png" alt="pvx logo" width="420" /></p>
 
 # pvx
 
@@ -850,8 +850,11 @@ pvx augment data/*.wav --output-dir aug/resume --variants-per-input 4 --intent m
 pvx augment-manifest validate aug/resume/augment_manifest.jsonl --strict
 pvx augment-manifest merge aug/run_a/augment_manifest.jsonl aug/run_b/augment_manifest.jsonl --output-jsonl aug/merged_manifest.jsonl --output-csv aug/merged_manifest.csv
 
-# Augmentation regression benchmark and gate
-python benchmarks/run_augment_bench.py --quick --out-dir benchmarks/out_augment --baseline benchmarks/baseline_augment_small.json --gate --gate-tolerance 0.30
+# Augmentation profile benchmark suite and gates (speech/music/noisy/stereo)
+python benchmarks/run_augment_profile_suite.py --quick --gate --out-dir benchmarks/out_augment_profiles
+
+# Refresh per-profile baselines after intentional benchmark changes
+python benchmarks/run_augment_profile_suite.py --quick --refresh-baselines --out-dir benchmarks/out_augment_profiles_refresh
 ```
 
 See full guide: [docs/AI_AUGMENTATION.md](docs/AI_AUGMENTATION.md)

@@ -197,20 +197,31 @@ pvx augment-manifest stats reports/merged_manifest.jsonl
 
 ## Benchmarking Augmentation Pipelines
 
-Use the dedicated augmentation benchmark:
+Use the profile suite benchmark (speech/music/noisy/stereo):
 
 ```bash
-python benchmarks/run_augment_bench.py \
+python benchmarks/run_augment_profile_suite.py \
   --quick \
-  --out-dir benchmarks/out_augment \
-  --baseline benchmarks/baseline_augment_small.json \
   --gate \
-  --gate-tolerance 0.30
+  --out-dir benchmarks/out_augment_profiles
+```
+
+Refresh all per-profile baselines after intentional benchmark changes:
+
+```bash
+python benchmarks/run_augment_profile_suite.py \
+  --quick \
+  --refresh-baselines \
+  --out-dir benchmarks/out_augment_profiles_refresh
 ```
 
 Outputs:
-- `benchmarks/out_augment/report.json`
-- `benchmarks/out_augment/report.md`
+- Per-profile reports:
+  - `benchmarks/out_augment_profiles/<profile>/report.json`
+  - `benchmarks/out_augment_profiles/<profile>/report.md`
+- Suite report:
+  - `benchmarks/out_augment_profiles/suite_report.json`
+  - `benchmarks/out_augment_profiles/suite_report.md`
 
 ## Running with uv
 

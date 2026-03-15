@@ -21,7 +21,8 @@ zero-boilerplate adapters for the three most popular deep-learning ecosystems.
 5. [TensorFlow / tf.data Integration](#tensorflow--tfdata-integration)
 6. [Determinism and Reproducibility](#determinism-and-reproducibility)
 7. [Performance Tips](#performance-tips)
-8. [Available Transforms](#available-transforms)
+8. [GPU-Accelerated Transforms (PyTorch)](#gpu-accelerated-transforms-pytorch)
+9. [Available Transforms](#available-transforms)
 
 ---
 
@@ -368,21 +369,92 @@ intermediate results:
 ds_aug = ds.map(augment_fn, num_proc=8, cache_file_name="data/cache/aug.arrow")
 ```
 
-### TimeStretch and PitchShift require the pvx CLI
+### TimeStretch and PitchShift — Engine Selection
 
-`TimeStretch` and `PitchShift` call `pvx voc` as a subprocess to leverage the
-full phase-vocoder DSP engine.  This means:
+`TimeStretch` and `PitchShift` support four processing engines via the
+`engine` parameter:
 
-- The `pvx` package must be installed (`pip install pvx`) and the `pvx` CLI
-  must be available on `PATH`.
-- If the CLI is missing or fails, these transforms will raise a `RuntimeError`
-  with a clear message — they will **not** silently return unmodified audio.
-- For large-scale training, we recommend pre-computing time-stretch and
-  pitch-shift offline with the CLI and applying lighter transforms online.
+| Engine | Requires | Notes |
+|---|---|---|
+| `"auto"` (default) | — | Prefers torchaudio > pytorch > pvx-cli |
+| `"torchaudio"` | `pip install "pvx[torch]"` | Optimized C++ phase-vocoder kernel via torchaudio |
+| `"pytorch"` | `pip install "pvx[torch]"` | Vectorized phase-vocoder in pure PyTorch |
+| `"pvx-cli"` | pvx CLI on `PATH` | Full pvxvoc DSP stack via subprocess |
 
-If you need a lightweight, pure-Python pitch shift that does not require the
-CLI, use `PitchShiftSimple` (spectral bin interpolation, ±1–3 semitone
+```python
+from pvx.augment import TimeStretch, PitchShift
+
+# Auto-select best available engine (recommended)
+ts = TimeStretch(rate=(0.8, 1.2), engine="auto")
+
+# Force torchaudio engine (fastest, requires torchaudio)
+ts = TimeStretch(rate=(0.8, 1.2), engine="torchaudio")
+
+# Force PyTorch engine (no torchaudio needed, just torch)
+ts = TimeStretch(rate=(0.8, 1.2), engine="pytorch")
+
+# Force pvx CLI subprocess (full DSP stack: transients, formants, stereo)
+ts = TimeStretch(rate=(0.8, 1.2), engine="pvx-cli")
+```
+
+The CLI `pvx augment` command also accepts `--engine`:
+
+```bash
+pvx augment data/train/*.wav \
+  --output-dir data/train_aug \
+  --engine torchaudio \
+  --intent asr_robust
+```
+
+If no engine is available, `TimeStretch` and `PitchShift` will raise a
+`RuntimeError` with a clear message — they will **not** silently return
+unmodified audio.
+
+For a lightweight, pure-Python pitch shift that requires no external engine,
+use `PitchShiftSimple` (spectral bin interpolation, ±1–3 semitone
 approximation).
+
+### Streaming Augmentation for Long-Form Audio
+
+For podcasts, audiobooks, and other long-form content, use the streaming
+API to process files in chunks with bounded memory:
+
+```python
+from pvx.augment import stream_augment_file, Pipeline, AddNoise, GainPerturber
+
+pipeline = Pipeline([
+    GainPerturber(gain_db=(-3, 3), p=0.8),
+    AddNoise(snr_db=(15, 35), noise_type="pink", p=0.5),
+], seed=42)
+
+# Process a 2-hour podcast in 30-second chunks
+stream_augment_file(
+    "podcast_2h.wav",
+    "podcast_2h_aug.wav",
+    pipeline=pipeline,
+    chunk_duration_s=30.0,
+    seed=42,
+)
+```
+
+### Impulse Response Database
+
+For physics-based room acoustics, use real impulse responses instead of
+synthetic approximations:
+
+```python
+from pvx.augment import IRDatabase, ImpulseResponseConvolver
+
+db = IRDatabase()
+db.download("echothief")  # 115 real-world IRs, cached locally
+
+# Use all IRs
+aug = ImpulseResponseConvolver(db.ir_dir("echothief"), wet_range=(0.4, 1.0))
+
+# Or filter by category
+halls = db.filter("echothief", category="hall")
+aug = ImpulseResponseConvolver(halls, wet_range=(0.5, 0.9))
+```
 
 ### Mix online and offline augmentation
 
@@ -423,6 +495,10 @@ from pvx.augment.gpu import (
     TorchSpecAugment,
     TorchNormalizer,
     TorchClippingSimulator,
+    TorchTimeStretch,
+    TorchPitchShift,
+    TorchRoomSimulator,
+    TorchMixup,
     NumpyTransformAdapter,  # wrap any NumPy transform for GPU use
 )
 
@@ -465,6 +541,10 @@ gpu_pipeline = TorchPipeline([
 | `TorchSpecAugment` | `SpecAugment` | Frequency + time masking |
 | `TorchNormalizer` | `Normalizer` | Peak/RMS normalization |
 | `TorchClippingSimulator` | `ClippingSimulator` | Hard/soft clipping |
+| `TorchTimeStretch` | `TimeStretch` | Phase-vocoder time stretch on GPU |
+| `TorchPitchShift` | `PitchShift` | Pitch shift via stretch + resample |
+| `TorchRoomSimulator` | `RoomSimulator` | Synthetic reverb approximation |
+| `TorchMixup` | — | Zhang et al. 2018 batch mixing |
 | `NumpyTransformAdapter` | any `Transform` | CPU fallback wrapper |
 
 ---
@@ -492,8 +572,10 @@ gpu_pipeline = TorchPipeline([
 | `Fade` | `time_domain` | `fade_in`, `fade_out` | Boundary artifact reduction |
 | `TrimSilence` | `time_domain` | `threshold_db` | Pre-processing |
 | `FixedLengthCrop` | `time_domain` | `duration_s` | Batching fixed-size inputs |
-| `TimeStretch` | `time_domain` | `rate`, `preset` | Tempo invariance (requires pvx CLI) |
-| `PitchShift` | `time_domain` | `semitones`, `formant_mode` | Pitch invariance (requires pvx CLI) |
+| `TimeStretch` | `time_domain` | `rate`, `preset`, `engine` | Tempo invariance (auto/torchaudio/pytorch/pvx-cli) |
+| `PitchShift` | `time_domain` | `semitones`, `formant_mode`, `engine` | Pitch invariance (auto/torchaudio/pytorch/pvx-cli) |
+| `stream_augment_file` | `streaming` | `chunk_duration_s`, `overlap_s` | Memory-bounded long-form processing |
+| `IRDatabase` | `ir_database` | `cache_dir` | Real IR collection manager |
 | `PitchShiftSimple` | `spectral` | `semitones` | Lightweight pitch approximation |
 | `Pipeline` | `core` | `transforms`, `seed` | Sequential composition |
 | `OneOf` | `core` | `transforms`, `weights` | Random selection |

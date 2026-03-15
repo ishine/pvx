@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-m",
+      "pvx.cli.pvx",
+      "augment",
+      "benchmarks/data/drum_like_stereo.wav",
+      "--output-dir",
+      "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/music/aug",
+      "--variants-per-input",
+      "1",
+      "--intent",
+      "mir_music",
+      "--pair-mode",
+      "off",
+      "--seed",
+      "1337",
+      "--split",
+      "0.8,0.1,0.1",
+      "--workers",
+      "1",
+      "--manifest-jsonl",
+      "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/music/augment_manifest.jsonl",
+      "--manifest-csv",
+      "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/music/augment_manifest.csv",
+      "--overwrite",
+      "--quiet"
+    ],
+    "elapsed_sec": 3.742543416999979,
+    "input_glob": "benchmarks/data/drum_like_stereo.wav",
+    "intent": "mir_music",
+    "out_dir": "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/music",
+    "pair_mode": "off",
+    "platform": "macOS-15.1.1-arm64-arm-64bit-Mach-O",
+    "profile": "music",
+    "profile_description": "Music-oriented profile for timbral and pitch/time diversity.",
+    "profiles_file": "/Users/cleider/dev/pvx/benchmarks/augment_profiles.json",
+    "python": "3.14.3",
+    "seed": 1337,
+    "split": "0.8,0.1,0.1",
+    "variants_per_input": 1
+  },
+  "metrics": {
+    "clip_pct_max": 0.0221540019622116,
+    "intent_counts": {
+      "mir_music": 1
+    },
+    "pair_coverage": null,
+    "peak_dbfs_p95": 0.0,
+    "pitch_abs_mean": 0.199593,
+    "pitch_mean": 0.199593,
+    "pitch_std": 0.0,
+    "records_total": 1,
+    "rendered_total": 1,
+    "required_field_errors": 0,
+    "split_balance_l1": 0.39999999999999997,
+    "split_counts": {
+      "test": 0,
+      "train": 1,
+      "val": 0
+    },
+    "stretch_mean": 1.097101,
+    "stretch_std": 0.0,
+    "unique_sources": 1
+  }
+}

@@ -62,6 +62,7 @@ pvx augment data/train/*.wav \
   --output-dir data/train_aug \
   --variants-per-input 3 \
   --intent asr_robust \
+  --engine auto \
   --seed 1337 \
   --workers 16
 
@@ -249,6 +250,7 @@ beat_pipeline = Pipeline([
         rate=(0.8, 1.25),
         preserve_pitch=True,
         preset="drums_safe",
+        engine="auto",   # uses PyTorch when available, else pvx CLI
         p=0.8,
     ),
     GainPerturber(gain_db=(-4, 4), p=0.8),

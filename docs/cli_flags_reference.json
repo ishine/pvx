@@ -4846,6 +4846,21 @@
       "tool": "pvx"
     },
     {
+      "action": "",
+      "choices": [
+        "auto",
+        "pytorch",
+        "torchaudio",
+        "pvx-cli"
+      ],
+      "default": "auto",
+      "flag": "--engine",
+      "help": "DSP engine for time-stretch and pitch-shift transforms. 'auto' prefers torchaudio > pytorch > pvx-cli. 'torchaudio' uses torchaudio C++ kernel. 'pytorch' uses native PyTorch phase vocoder. 'pvx-cli' always uses subprocess. (default: auto)",
+      "required": false,
+      "source": "src/pvx/cli/pvx.py",
+      "tool": "pvx"
+    },
+    {
       "action": "store_true",
       "choices": [],
       "default": null,

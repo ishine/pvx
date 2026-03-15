@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-m",
+      "pvx.cli.pvx",
+      "augment",
+      "benchmarks/data/drum_like_stereo.wav",
+      "--output-dir",
+      "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/stereo/aug",
+      "--variants-per-input",
+      "1",
+      "--intent",
+      "ssl_contrastive",
+      "--pair-mode",
+      "contrastive2",
+      "--seed",
+      "1337",
+      "--split",
+      "0.8,0.1,0.1",
+      "--workers",
+      "1",
+      "--manifest-jsonl",
+      "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/stereo/augment_manifest.jsonl",
+      "--manifest-csv",
+      "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/stereo/augment_manifest.csv",
+      "--overwrite",
+      "--quiet"
+    ],
+    "elapsed_sec": 6.262072625017026,
+    "input_glob": "benchmarks/data/drum_like_stereo.wav",
+    "intent": "ssl_contrastive",
+    "out_dir": "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/stereo",
+    "pair_mode": "contrastive2",
+    "platform": "macOS-15.1.1-arm64-arm-64bit-Mach-O",
+    "profile": "stereo",
+    "profile_description": "Stereo coherence profile using paired contrastive views.",
+    "profiles_file": "/Users/cleider/dev/pvx/benchmarks/augment_profiles.json",
+    "python": "3.14.3",
+    "seed": 1337,
+    "split": "0.8,0.1,0.1",
+    "variants_per_input": 1
+  },
+  "metrics": {
+    "clip_pct_max": 0.04477077363896848,
+    "intent_counts": {
+      "ssl_contrastive": 2
+    },
+    "pair_coverage": 1.0,
+    "peak_dbfs_p95": 0.0,
+    "pitch_abs_mean": 0.863672,
+    "pitch_mean": -0.564282,
+    "pitch_std": 0.863672,
+    "records_total": 2,
+    "rendered_total": 2,
+    "required_field_errors": 0,
+    "split_balance_l1": 0.39999999999999997,
+    "split_counts": {
+      "test": 0,
+      "train": 2,
+      "val": 0
+    },
+    "stretch_mean": 1.1143335,
+    "stretch_std": 0.04898150000000001,
+    "unique_sources": 1
+  }
+}

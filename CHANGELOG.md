@@ -1,6 +1,50 @@
 # Changelog
 
+## 2026-03-15
 
+- Alpha release readiness pass (research- and production-oriented):
+  - cleaned packaging/test artifacts from the release flow (`build/`, `dist/`, `*.egg-info/`) and added ignore rules in `/Users/cleider/dev/pvx/.gitignore`.
+  - expanded packaging metadata and distribution inputs:
+    - `/Users/cleider/dev/pvx/pyproject.toml`
+    - `/Users/cleider/dev/pvx/MANIFEST.in`
+  - added a full multi-version continuous integration workflow:
+    - `/Users/cleider/dev/pvx/.github/workflows/ci.yml`
+
+- Augmentation benchmark depth expansion:
+  - upgraded `/Users/cleider/dev/pvx/benchmarks/run_augment_bench.py` with:
+    - named benchmark profiles (`--profile`, `--profiles-file`, `--list-profiles`)
+    - profile-aware override logic
+    - absolute metric gates in addition to baseline-relative drift gates
+    - richer gate reporting in JSON and Markdown
+  - added profile configuration:
+    - `/Users/cleider/dev/pvx/benchmarks/augment_profiles.json`
+  - added per-profile baselines:
+    - `/Users/cleider/dev/pvx/benchmarks/baselines/augment_speech.json`
+    - `/Users/cleider/dev/pvx/benchmarks/baselines/augment_music.json`
+    - `/Users/cleider/dev/pvx/benchmarks/baselines/augment_noisy.json`
+    - `/Users/cleider/dev/pvx/benchmarks/baselines/augment_stereo.json`
+  - added suite runner for one-command matrix execution:
+    - `/Users/cleider/dev/pvx/benchmarks/run_augment_profile_suite.py`
+  - updated CI augmentation regression job to run profile suite gates:
+    - `/Users/cleider/dev/pvx/.github/workflows/augment-bench-regression.yml`
+
+- Augmentation framework/API expansion:
+  - added optional long-form streaming augmentation:
+    - `/Users/cleider/dev/pvx/src/pvx/augment/streaming.py`
+  - added impulse-response database management for room simulation pipelines:
+    - `/Users/cleider/dev/pvx/src/pvx/augment/ir_database.py`
+  - added/expanded GPU path and augmentation transforms/tests/docs in:
+    - `/Users/cleider/dev/pvx/src/pvx/augment/gpu.py`
+    - `/Users/cleider/dev/pvx/src/pvx/augment/time_domain.py`
+    - `/Users/cleider/dev/pvx/tests/test_augment_transforms.py`
+    - `/Users/cleider/dev/pvx/tests/test_gpu_transforms.py`
+    - `/Users/cleider/dev/pvx/docs/ML_INTEGRATION.md`
+    - `/Users/cleider/dev/pvx/docs/AUGMENTATION_COOKBOOK.md`
+
+- Validation:
+  - full test suite pass in local environment: `205 passed, 3 skipped`.
+  - augmentation profile suite quick gate pass:
+    - `python benchmarks/run_augment_profile_suite.py --quick --gate`.
 
 ## 2026-02-23
 

@@ -85,20 +85,42 @@ Raw machine-readable benchmark output: `docs/benchmarks/latest.json`.
 
 ## Augmentation Benchmark Gate
 
-For AI research/data augmentation workflows, run:
+For AI research/data augmentation workflows, run the profile suite:
 
 ```bash
-python benchmarks/run_augment_bench.py \
+python benchmarks/run_augment_profile_suite.py \
   --quick \
-  --out-dir benchmarks/out_augment \
-  --baseline benchmarks/baseline_augment_small.json \
   --gate \
-  --gate-tolerance 0.30
+  --out-dir benchmarks/out_augment_profiles
 ```
 
-Outputs:
-- `benchmarks/out_augment/report.json`
-- `benchmarks/out_augment/report.md`
+This executes four task-specific profiles from `benchmarks/augment_profiles.json`:
+
+- `speech`: automatic speech recognition (ASR)-oriented augmentation
+- `music`: music information retrieval (MIR)-oriented augmentation
+- `noisy`: noise-stress profile for robustness checks
+- `stereo`: contrastive paired-view profile for stereo/coherence-sensitive workflows
+
+To refresh profile baselines after an intentional benchmark change:
+
+```bash
+python benchmarks/run_augment_profile_suite.py \
+  --quick \
+  --refresh-baselines \
+  --out-dir benchmarks/out_augment_profiles_refresh
+```
+
+Per-profile reports are written to:
+- `benchmarks/out_augment_profiles/<profile>/report.json`
+- `benchmarks/out_augment_profiles/<profile>/report.md`
+
+Suite summary is written to:
+- `benchmarks/out_augment_profiles/suite_report.json`
+- `benchmarks/out_augment_profiles/suite_report.md`
+
+Each profile applies:
+- relative drift gating against its baseline (profile-specific `gate_tolerance`)
+- absolute metric gates (for example, manifest integrity, clipping bounds, pair coverage)
 
 Tracked metrics include:
 - record/rendered counts

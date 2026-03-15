@@ -568,6 +568,393 @@ class TorchPipeline:
 # Adapter: wrap NumPy transforms for batched GPU usage
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# TorchPhaseVocoder — core engine for time-stretch on GPU
+# ---------------------------------------------------------------------------
+
+def _torch_phase_vocoder(audio_1d, stretch: float, n_fft: int = 2048,
+                         hop_length: int = 512, window=None):
+    """Phase vocoder time-stretch operating on a 1-D torch tensor.
+
+    Uses a vectorized implementation: magnitudes are interpolated in a
+    single batched operation, and phase advances are computed via
+    ``torch.cumsum`` instead of a Python-level per-frame loop.
+
+    Parameters
+    ----------
+    audio_1d:
+        ``(T,)`` float tensor.
+    stretch:
+        Stretch factor (>1 = slower, <1 = faster).
+    n_fft:
+        FFT window size.
+    hop_length:
+        Analysis hop size.
+    window:
+        Window tensor of length *n_fft*.  Defaults to Hann.
+
+    Returns
+    -------
+    torch.Tensor
+        Time-stretched 1-D tensor.
+    """
+    import torch
+
+    device = audio_1d.device
+    if window is None:
+        window = torch.hann_window(n_fft, device=device)
+
+    # STFT
+    spec = torch.stft(
+        audio_1d, n_fft=n_fft, hop_length=hop_length,
+        window=window, return_complex=True,
+    )  # (n_bins, n_frames)
+    n_bins, n_frames = spec.shape
+
+    # Output time steps (fractional indices into analysis frames)
+    n_out_frames = max(int(n_frames * stretch), 2)
+    time_steps = torch.arange(n_out_frames, device=device, dtype=torch.float32) / stretch
+
+    # Frame indices for interpolation (vectorized)
+    frame_idx = time_steps.long()            # (n_out,)
+    frac = (time_steps - frame_idx.float())  # (n_out,)
+
+    left = frame_idx.clamp(max=n_frames - 1)          # (n_out,)
+    right = (frame_idx + 1).clamp(max=n_frames - 1)   # (n_out,)
+
+    # Gather magnitudes and angles for all frames at once
+    spec_mag = spec.abs()     # (n_bins, n_frames)
+    spec_angle = spec.angle() # (n_bins, n_frames)
+
+    mag_left = spec_mag[:, left]    # (n_bins, n_out)
+    mag_right = spec_mag[:, right]  # (n_bins, n_out)
+    frac_2d = frac.unsqueeze(0)     # (1, n_out) for broadcasting
+
+    # Interpolated magnitudes — fully vectorized
+    mag_interp = (1.0 - frac_2d) * mag_left + frac_2d * mag_right  # (n_bins, n_out)
+
+    # Expected phase advance per hop (analysis angular velocity)
+    omega = (2.0 * torch.pi * torch.arange(n_bins, device=device, dtype=torch.float32)
+             * hop_length / n_fft)  # (n_bins,)
+
+    # Instantaneous frequency deviation for each output frame
+    angle_left = spec_angle[:, left]    # (n_bins, n_out)
+    angle_right = spec_angle[:, right]  # (n_bins, n_out)
+    dphi = angle_right - angle_left - omega.unsqueeze(1)  # (n_bins, n_out)
+
+    # Principal angle wrap: dphi ∈ [-π, π)
+    dphi = dphi - 2.0 * torch.pi * torch.round(dphi / (2.0 * torch.pi))
+
+    # Phase advance per frame = omega + dphi
+    phase_advance = omega.unsqueeze(1) + dphi  # (n_bins, n_out)
+
+    # Phase accumulation via cumulative sum
+    # phase[0] = angle(spec[:, 0])
+    # phase[i] = phase[0] + sum(phase_advance[:, 1:i+1])
+    initial_phase = spec_angle[:, 0:1]  # (n_bins, 1)
+    # For frame 0, use the initial phase directly; for frames 1..N-1,
+    # accumulate the phase advances.
+    cumulative = torch.cumsum(phase_advance[:, 1:], dim=1)  # (n_bins, n_out-1)
+    phase = torch.cat([initial_phase, initial_phase + cumulative], dim=1)  # (n_bins, n_out)
+
+    # Reconstruct complex STFT from magnitude + phase
+    out_spec = torch.polar(mag_interp, phase)  # (n_bins, n_out)
+
+    # iSTFT
+    result = torch.istft(
+        out_spec, n_fft=n_fft, hop_length=hop_length, window=window,
+    )
+    return result
+
+
+# ---------------------------------------------------------------------------
+# TorchTimeStretch
+# ---------------------------------------------------------------------------
+
+class TorchTimeStretch(TorchTransform):
+    """GPU-accelerated time-stretch via a native PyTorch phase vocoder.
+
+    No subprocess or pvx CLI required — runs entirely on the GPU.
+
+    Parameters
+    ----------
+    rate:
+        Stretch factor or ``(min, max)`` range.
+        > 1.0 = slower (longer), < 1.0 = faster (shorter).
+    n_fft:
+        FFT window size (default 2048).
+    hop_length:
+        Hop size (default 512).
+    p:
+        Probability of applying this transform.
+
+    Examples
+    --------
+    >>> aug = TorchTimeStretch(rate=(0.8, 1.25))
+    >>> audio_out = aug(audio_batch, sr=16000)
+    """
+
+    def __init__(
+        self,
+        rate: float | tuple[float, float] = (0.8, 1.25),
+        n_fft: int = 2048,
+        hop_length: int = 512,
+        p: float = 1.0,
+    ) -> None:
+        super().__init__(p=p)
+        if isinstance(rate, (int, float)):
+            self.rate_min = self.rate_max = float(rate)
+        else:
+            self.rate_min, self.rate_max = float(rate[0]), float(rate[1])
+        self.n_fft = int(n_fft)
+        self.hop_length = int(hop_length)
+
+    def apply(self, audio, sr: int, generator=None):
+        torch = _require_torch()
+        B, C, T = audio.shape
+        window = torch.hann_window(self.n_fft, device=audio.device)
+
+        # Sample one rate per batch element
+        rates = torch.empty(B, device=audio.device).uniform_(
+            self.rate_min, self.rate_max, generator=generator
+        )
+
+        results = []
+        for b in range(B):
+            rate = rates[b].item()
+            channels = []
+            for ch in range(C):
+                stretched = _torch_phase_vocoder(
+                    audio[b, ch], stretch=rate,
+                    n_fft=self.n_fft, hop_length=self.hop_length,
+                    window=window,
+                )
+                channels.append(stretched)
+            # All channels have the same output length from same rate
+            out_len = channels[0].shape[0]
+            results.append(torch.stack(channels, dim=0))  # (C, T')
+
+        # Pad/crop to uniform length (longest in batch)
+        max_len = max(r.shape[-1] for r in results)
+        padded = []
+        for r in results:
+            if r.shape[-1] < max_len:
+                r = torch.nn.functional.pad(r, (0, max_len - r.shape[-1]))
+            else:
+                r = r[..., :max_len]
+            padded.append(r)
+
+        return torch.stack(padded, dim=0)
+
+
+# ---------------------------------------------------------------------------
+# TorchPitchShift
+# ---------------------------------------------------------------------------
+
+class TorchPitchShift(TorchTransform):
+    """GPU-accelerated pitch shift via phase vocoder + resampling.
+
+    Pitch is shifted by time-stretching then resampling to the original
+    length, entirely on the GPU with no subprocess calls.
+
+    Parameters
+    ----------
+    semitones:
+        Shift amount or ``(min, max)`` range in semitones.
+    n_fft:
+        FFT window size.
+    hop_length:
+        Hop size.
+    p:
+        Probability of applying this transform.
+
+    Examples
+    --------
+    >>> aug = TorchPitchShift(semitones=(-2, 2))
+    >>> audio_out = aug(audio_batch, sr=16000)
+    """
+
+    def __init__(
+        self,
+        semitones: float | tuple[float, float] = (-2.0, 2.0),
+        n_fft: int = 2048,
+        hop_length: int = 512,
+        p: float = 1.0,
+    ) -> None:
+        super().__init__(p=p)
+        if isinstance(semitones, (int, float)):
+            self.st_min = self.st_max = float(semitones)
+        else:
+            self.st_min, self.st_max = float(semitones[0]), float(semitones[1])
+        self.n_fft = int(n_fft)
+        self.hop_length = int(hop_length)
+
+    def apply(self, audio, sr: int, generator=None):
+        torch = _require_torch()
+        B, C, T = audio.shape
+        window = torch.hann_window(self.n_fft, device=audio.device)
+
+        semitones = torch.empty(B, device=audio.device).uniform_(
+            self.st_min, self.st_max, generator=generator
+        )
+
+        results = []
+        for b in range(B):
+            st = semitones[b].item()
+            # pitch_ratio = 2^(st/12); to pitch up, time-stretch by ratio then resample down
+            pitch_ratio = 2.0 ** (st / 12.0)
+            stretch = pitch_ratio  # stretch by pitch_ratio, then resample to original length
+
+            channels = []
+            for ch in range(C):
+                stretched = _torch_phase_vocoder(
+                    audio[b, ch], stretch=stretch,
+                    n_fft=self.n_fft, hop_length=self.hop_length,
+                    window=window,
+                )
+                # Resample back to original length to preserve duration
+                resampled = torch.nn.functional.interpolate(
+                    stretched.unsqueeze(0).unsqueeze(0),  # (1, 1, T')
+                    size=T,
+                    mode="linear",
+                    align_corners=False,
+                ).squeeze(0).squeeze(0)  # (T,)
+                channels.append(resampled)
+            results.append(torch.stack(channels, dim=0))
+
+        return torch.stack(results, dim=0)
+
+
+# ---------------------------------------------------------------------------
+# TorchRoomSimulator
+# ---------------------------------------------------------------------------
+
+class TorchRoomSimulator(TorchTransform):
+    """GPU-accelerated synthetic reverb via FFT convolution.
+
+    Generates an exponential-decay noise RIR on the GPU and convolves
+    with the input signal using ``torch.fft`` — no scipy required.
+
+    This is a statistical approximation suitable for data augmentation,
+    not a physics-based room model.
+
+    Parameters
+    ----------
+    rt60_range:
+        ``(min_s, max_s)`` reverberation time.
+    wet_range:
+        ``(min, max)`` wet/dry mix (0 = dry, 1 = fully wet).
+    drr_db_range:
+        ``(min, max)`` direct-to-reverb ratio in dB.
+    p:
+        Probability of applying this transform.
+    """
+
+    def __init__(
+        self,
+        rt60_range: tuple[float, float] = (0.2, 1.5),
+        wet_range: tuple[float, float] = (0.3, 0.8),
+        drr_db_range: tuple[float, float] = (3.0, 12.0),
+        p: float = 1.0,
+    ) -> None:
+        super().__init__(p=p)
+        self.rt60_min, self.rt60_max = float(rt60_range[0]), float(rt60_range[1])
+        self.wet_min, self.wet_max = float(wet_range[0]), float(wet_range[1])
+        self.drr_min, self.drr_max = float(drr_db_range[0]), float(drr_db_range[1])
+
+    def apply(self, audio, sr: int, generator=None):
+        torch = _require_torch()
+        B, C, T = audio.shape
+
+        rt60 = torch.empty(B, device=audio.device).uniform_(self.rt60_min, self.rt60_max, generator=generator)
+        wet = torch.empty(B, device=audio.device).uniform_(self.wet_min, self.wet_max, generator=generator)
+        drr_db = torch.empty(B, device=audio.device).uniform_(self.drr_min, self.drr_max, generator=generator)
+
+        results = []
+        for b in range(B):
+            rt60_s = rt60[b].item()
+            rir_len = max(int(rt60_s * sr), 64)
+
+            # Generate synthetic RIR: direct impulse + exponential decay noise
+            decay_rate = 3.0 * 2.302585 / rt60_s  # 3*ln(10)
+            t = torch.arange(rir_len, device=audio.device, dtype=torch.float32) / sr
+            envelope = torch.exp(-decay_rate * t)
+            noise = torch.randn(rir_len, device=audio.device, generator=generator)
+            tail = noise * envelope
+
+            direct_amp = 10.0 ** (drr_db[b].item() / 20.0)
+            rir = tail.clone()
+            rir[0] = rir[0] + direct_amp
+
+            # Normalize
+            rir = rir / (rir.abs().max() + 1e-8)
+
+            # FFT convolution per channel
+            conv_len = T + rir_len - 1
+            fft_len = 1
+            while fft_len < conv_len:
+                fft_len *= 2
+
+            rir_fft = torch.fft.rfft(rir, n=fft_len)
+
+            ch_results = []
+            for ch in range(C):
+                sig_fft = torch.fft.rfft(audio[b, ch], n=fft_len)
+                wet_sig = torch.fft.irfft(sig_fft * rir_fft, n=fft_len)[:T]
+                w = wet[b].item()
+                mixed = (1.0 - w) * audio[b, ch] + w * wet_sig
+                ch_results.append(mixed)
+            results.append(torch.stack(ch_results, dim=0))
+
+        return torch.stack(results, dim=0)
+
+
+# ---------------------------------------------------------------------------
+# TorchMixup
+# ---------------------------------------------------------------------------
+
+class TorchMixup(TorchTransform):
+    """GPU-accelerated Mixup augmentation (Zhang et al. 2018).
+
+    Mixes pairs of audio within the batch using a Beta-distributed
+    lambda, producing interpolated training examples.
+
+    Parameters
+    ----------
+    alpha:
+        Beta distribution parameter.  Lower values bias lambda toward 0
+        and 1 (less mixing); higher values produce more uniform mixing.
+    p:
+        Probability of applying mixup to the batch.
+    """
+
+    def __init__(self, alpha: float = 0.4, p: float = 1.0) -> None:
+        super().__init__(p=p)
+        self.alpha = float(alpha)
+
+    def apply(self, audio, sr: int, generator=None):
+        torch = _require_torch()
+        B, C, T = audio.shape
+        if B < 2:
+            return audio
+
+        # Shuffle indices for pairing
+        perm = torch.randperm(B, device=audio.device, generator=generator)
+
+        # Sample lambda from Beta(alpha, alpha)
+        # Use numpy for beta sampling (not available in torch.distributions on all devices)
+        import numpy as np
+        lam = float(np.random.default_rng().beta(self.alpha, self.alpha))
+        lam = max(lam, 1.0 - lam)  # Ensure lam >= 0.5 (original dominates)
+
+        mixed = lam * audio + (1.0 - lam) * audio[perm]
+        return mixed
+
+
+# ---------------------------------------------------------------------------
+# Adapter: wrap NumPy transforms for batched GPU usage
+# ---------------------------------------------------------------------------
+
 class NumpyTransformAdapter(TorchTransform):
     """Wrap any NumPy-based ``pvx.augment.Transform`` for use in a
     :class:`TorchPipeline`.

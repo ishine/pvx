@@ -1,0 +1,2 @@
+include LICENSE CHANGELOG.md ATTRIBUTION.md
+recursive-include assets *.png

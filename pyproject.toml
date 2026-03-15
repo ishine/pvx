@@ -9,6 +9,37 @@ description = "Phase-vocoder DSP toolkit with pvx command suite"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.10"
+authors = [
+    { name = "Colby Leider", email = "colby@thecolby.com" },
+]
+keywords = [
+    "audio",
+    "dsp",
+    "phase-vocoder",
+    "time-stretch",
+    "pitch-shift",
+    "data-augmentation",
+    "machine-learning",
+    "pytorch",
+    "speech",
+    "music",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Multimedia :: Sound/Audio :: Analysis",
+    "Topic :: Multimedia :: Sound/Audio :: Sound Synthesis",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = [
     "numpy>=1.24",
     "soundfile>=0.12.1",
@@ -16,6 +47,12 @@ dependencies = [
     "librosa>=0.10.2",
     "pyloudnorm>=0.1.1",
 ]
+
+[project.urls]
+Homepage = "https://github.com/TheColby/pvx"
+Repository = "https://github.com/TheColby/pvx"
+Issues = "https://github.com/TheColby/pvx/issues"
+Documentation = "https://github.com/TheColby/pvx/tree/main/docs"
 
 [project.optional-dependencies]
 dev = [

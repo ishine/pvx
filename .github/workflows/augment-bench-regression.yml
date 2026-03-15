@@ -26,17 +26,15 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
           python -m pip install -e .
-      - name: Run augmentation benchmark + gate
+      - name: Run augmentation profile suite + gates
         run: |
-          python benchmarks/run_augment_bench.py \
+          python benchmarks/run_augment_profile_suite.py \
             --quick \
-            --out-dir benchmarks/out_augment \
-            --baseline benchmarks/baseline_augment_small.json \
             --gate \
-            --gate-tolerance 0.30
+            --out-dir benchmarks/out_augment_profiles
       - name: Upload augmentation benchmark report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: augment-benchmark-report
-          path: benchmarks/out_augment/
+          path: benchmarks/out_augment_profiles/

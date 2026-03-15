@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "profiles": {
+    "speech": {
+      "description": "Speech robustness profile for ASR-style augmentation.",
+      "input_glob": "benchmarks/data/speech_like.wav",
+      "intent": "asr_robust",
+      "pair_mode": "off",
+      "seed": 1337,
+      "split": "0.8,0.1,0.1",
+      "workers": 1,
+      "variants_per_input": 2,
+      "quick_variants_per_input": 1,
+      "baseline": "benchmarks/baselines/augment_speech.json",
+      "gate_tolerance": 0.12,
+      "absolute_gates": {
+        "required_field_errors": {"max": 0},
+        "split_balance_l1": {"max": 2.0},
+        "clip_pct_max": {"max": 5.0}
+      }
+    },
+    "music": {
+      "description": "Music-oriented profile for timbral and pitch/time diversity.",
+      "input_glob": "benchmarks/data/drum_like_stereo.wav",
+      "intent": "mir_music",
+      "pair_mode": "off",
+      "seed": 1337,
+      "split": "0.8,0.1,0.1",
+      "workers": 1,
+      "variants_per_input": 2,
+      "quick_variants_per_input": 1,
+      "baseline": "benchmarks/baselines/augment_music.json",
+      "gate_tolerance": 0.15,
+      "absolute_gates": {
+        "required_field_errors": {"max": 0},
+        "clip_pct_max": {"max": 5.0},
+        "peak_dbfs_p95": {"max": 0.0}
+      }
+    },
+    "noisy": {
+      "description": "Noise stress profile to verify clipping and split stability.",
+      "input_glob": "benchmarks/data/speech_like.wav",
+      "intent": "asr_robust",
+      "pair_mode": "off",
+      "seed": 2026,
+      "split": "0.7,0.2,0.1",
+      "workers": 1,
+      "variants_per_input": 2,
+      "quick_variants_per_input": 1,
+      "baseline": "benchmarks/baselines/augment_noisy.json",
+      "gate_tolerance": 0.12,
+      "absolute_gates": {
+        "required_field_errors": {"max": 0},
+        "split_balance_l1": {"max": 2.0},
+        "clip_pct_max": {"max": 7.5}
+      }
+    },
+    "stereo": {
+      "description": "Stereo coherence profile using paired contrastive views.",
+      "input_glob": "benchmarks/data/drum_like_stereo.wav",
+      "intent": "ssl_contrastive",
+      "pair_mode": "contrastive2",
+      "seed": 1337,
+      "split": "0.8,0.1,0.1",
+      "workers": 1,
+      "variants_per_input": 2,
+      "quick_variants_per_input": 1,
+      "baseline": "benchmarks/baselines/augment_stereo.json",
+      "gate_tolerance": 0.1,
+      "absolute_gates": {
+        "required_field_errors": {"max": 0},
+        "pair_coverage": {"min": 1.0},
+        "clip_pct_max": {"max": 5.0}
+      }
+    }
+  }
+}

@@ -439,5 +439,74 @@ class TestPresetFactories(unittest.TestCase):
         self.assertFalse(np.allclose(out_b, audio))
 
 
+# ---------------------------------------------------------------------------
+# Engine selection for TimeStretch / PitchShift (requires PyTorch)
+# ---------------------------------------------------------------------------
+
+class TestEngineSelection(unittest.TestCase):
+    """Test the engine='auto'/'pytorch'/'pvx-cli' parameter."""
+
+    def setUp(self):
+        try:
+            import torch  # noqa: F401
+            self._has_torch = True
+        except ImportError:
+            self._has_torch = False
+
+    @unittest.skipUnless(True, "always runs — tests resolve logic")
+    def test_resolve_engine_auto_returns_string(self):
+        from pvx.augment.time_domain import _resolve_engine
+        result = _resolve_engine("auto")
+        self.assertIn(result, ("pytorch", "pvx-cli"))
+
+    @unittest.skipUnless(True, "always runs")
+    def test_resolve_engine_pvx_cli(self):
+        from pvx.augment.time_domain import _resolve_engine
+        self.assertEqual(_resolve_engine("pvx-cli"), "pvx-cli")
+
+    def test_time_stretch_accepts_engine_param(self):
+        from pvx.augment import TimeStretch
+        ts = TimeStretch(rate=(0.9, 1.1), engine="auto")
+        self.assertEqual(ts.engine, "auto")
+
+    def test_pitch_shift_accepts_engine_param(self):
+        from pvx.augment import PitchShift
+        ps = PitchShift(semitones=(-1, 1), engine="auto")
+        self.assertEqual(ps.engine, "auto")
+
+    def test_time_stretch_pytorch_engine(self):
+        if not self._has_torch:
+            self.skipTest("PyTorch not installed")
+        from pvx.augment import TimeStretch
+        ts = TimeStretch(rate=(1.1, 1.1), engine="pytorch", p=1.0)
+        audio, sr = _sine(freq=440.0, sr=16000, duration=0.5)
+        out, out_sr = ts(audio, sr, seed=42)
+        self.assertEqual(out_sr, sr)
+        # Stretched by 1.1 → ~10% longer
+        self.assertGreater(len(out), len(audio) * 1.05)
+
+    def test_pitch_shift_pytorch_engine(self):
+        if not self._has_torch:
+            self.skipTest("PyTorch not installed")
+        from pvx.augment import PitchShift
+        ps = PitchShift(semitones=(2, 2), engine="pytorch", p=1.0)
+        audio, sr = _sine(freq=440.0, sr=16000, duration=0.5)
+        out, out_sr = ps(audio, sr, seed=42)
+        self.assertEqual(out_sr, sr)
+        # Duration should be preserved (approximately)
+        self.assertAlmostEqual(len(out) / sr, len(audio) / sr, delta=0.05)
+
+    def test_pytorch_engine_raises_without_torch(self):
+        """engine='pytorch' should raise RuntimeError when torch is missing."""
+        from pvx.augment.time_domain import _resolve_engine
+        if self._has_torch:
+            # Can only truly test this without torch; just verify it doesn't crash
+            result = _resolve_engine("pytorch")
+            self.assertEqual(result, "pytorch")
+        else:
+            with self.assertRaises(RuntimeError):
+                _resolve_engine("pytorch")
+
+
 if __name__ == "__main__":
     unittest.main()

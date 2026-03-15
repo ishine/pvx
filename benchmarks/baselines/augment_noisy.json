@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-m",
+      "pvx.cli.pvx",
+      "augment",
+      "benchmarks/data/speech_like.wav",
+      "--output-dir",
+      "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/noisy/aug",
+      "--variants-per-input",
+      "1",
+      "--intent",
+      "asr_robust",
+      "--pair-mode",
+      "off",
+      "--seed",
+      "2026",
+      "--split",
+      "0.7,0.2,0.1",
+      "--workers",
+      "1",
+      "--manifest-jsonl",
+      "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/noisy/augment_manifest.jsonl",
+      "--manifest-csv",
+      "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/noisy/augment_manifest.csv",
+      "--overwrite",
+      "--quiet"
+    ],
+    "elapsed_sec": 0.7210649579938035,
+    "input_glob": "benchmarks/data/speech_like.wav",
+    "intent": "asr_robust",
+    "out_dir": "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/noisy",
+    "pair_mode": "off",
+    "platform": "macOS-15.1.1-arm64-arm-64bit-Mach-O",
+    "profile": "noisy",
+    "profile_description": "Noise stress profile to verify clipping and split stability.",
+    "profiles_file": "/Users/cleider/dev/pvx/benchmarks/augment_profiles.json",
+    "python": "3.14.3",
+    "seed": 2026,
+    "split": "0.7,0.2,0.1",
+    "variants_per_input": 1
+  },
+  "metrics": {
+    "clip_pct_max": 0.0,
+    "intent_counts": {
+      "asr_robust": 1
+    },
+    "pair_coverage": null,
+    "peak_dbfs_p95": -0.00026507636037961915,
+    "pitch_abs_mean": 0.007547,
+    "pitch_mean": 0.007547,
+    "pitch_std": 0.0,
+    "records_total": 1,
+    "rendered_total": 1,
+    "required_field_errors": 0,
+    "split_balance_l1": 0.6000000000000001,
+    "split_counts": {
+      "test": 0,
+      "train": 1,
+      "val": 0
+    },
+    "stretch_mean": 0.943824,
+    "stretch_std": 0.0,
+    "unique_sources": 1
+  }
+}

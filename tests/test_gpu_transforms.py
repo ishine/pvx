@@ -16,6 +16,10 @@ from pvx.augment.gpu import (  # noqa: E402
     TorchSpecAugment,
     TorchNormalizer,
     TorchClippingSimulator,
+    TorchTimeStretch,
+    TorchPitchShift,
+    TorchRoomSimulator,
+    TorchMixup,
     TorchPipeline,
     NumpyTransformAdapter,
 )
@@ -259,5 +263,162 @@ class TestNumpyTransformAdapter:
             NumpyTransformAdapter(NpAddNoise(snr_db=(10, 30), noise_type="white")),
         ], seed=42)
         audio = _sine_audio(batch=2)
+        result = pipeline(audio, sr=16000)
+        assert result.shape == audio.shape
+
+
+# ---------------------------------------------------------------------------
+# TorchTimeStretch
+# ---------------------------------------------------------------------------
+
+class TestTorchTimeStretch:
+    def test_output_shape_stretch_down(self):
+        aug = TorchTimeStretch(rate=(0.5, 0.5), p=1.0)
+        audio = _sine_audio(batch=2, samples=8192)
+        result = aug(audio, sr=16000)
+        # Stretched down → shorter; result is batched with same T across batch
+        assert result.ndim == 3
+        assert result.shape[0] == 2
+        assert result.shape[1] == 1
+        # At rate=0.5 output should be roughly half length (padded to uniform)
+        assert result.shape[2] > 0
+
+    def test_output_shape_stretch_up(self):
+        aug = TorchTimeStretch(rate=(1.5, 1.5), p=1.0)
+        audio = _sine_audio(batch=2, samples=4096)
+        result = aug(audio, sr=16000)
+        assert result.ndim == 3
+        assert result.shape[2] > 4096  # should be ~1.5x longer
+
+    def test_identity_stretch(self):
+        aug = TorchTimeStretch(rate=(1.0, 1.0), p=1.0)
+        audio = _sine_audio(batch=2, samples=4096)
+        result = aug(audio, sr=16000)
+        # At rate=1.0 output length should match input (approximately)
+        assert abs(result.shape[2] - audio.shape[2]) < 512  # within one hop
+
+    def test_finite_output(self):
+        aug = TorchTimeStretch(rate=(0.8, 1.25))
+        audio = _random_audio(batch=4, samples=8192)
+        result = aug(audio, sr=16000)
+        assert torch.isfinite(result).all()
+
+    def test_probability_zero(self):
+        aug = TorchTimeStretch(rate=(2.0, 2.0), p=0.0)
+        audio = _random_audio(batch=2, samples=4096)
+        result = aug(audio, sr=16000)
+        assert torch.allclose(result, audio)
+
+
+# ---------------------------------------------------------------------------
+# TorchPitchShift
+# ---------------------------------------------------------------------------
+
+class TestTorchPitchShift:
+    def test_preserves_duration(self):
+        aug = TorchPitchShift(semitones=(2, 2), p=1.0)
+        audio = _sine_audio(batch=2, samples=8192)
+        result = aug(audio, sr=16000)
+        # Pitch shift should preserve duration (resampled back)
+        assert result.shape == audio.shape
+
+    def test_changes_signal(self):
+        aug = TorchPitchShift(semitones=(5, 5), p=1.0)
+        audio = _sine_audio(batch=2, samples=8192)
+        result = aug(audio, sr=16000)
+        assert not torch.allclose(result, audio)
+
+    def test_negative_shift(self):
+        aug = TorchPitchShift(semitones=(-3, -3), p=1.0)
+        audio = _sine_audio(batch=2, samples=8192)
+        result = aug(audio, sr=16000)
+        assert result.shape == audio.shape
+        assert torch.isfinite(result).all()
+
+    def test_finite_output(self):
+        aug = TorchPitchShift(semitones=(-2, 2))
+        audio = _random_audio(batch=4, samples=8192)
+        result = aug(audio, sr=16000)
+        assert torch.isfinite(result).all()
+
+    def test_probability_zero(self):
+        aug = TorchPitchShift(semitones=(12, 12), p=0.0)
+        audio = _random_audio(batch=2, samples=4096)
+        result = aug(audio, sr=16000)
+        assert torch.allclose(result, audio)
+
+
+# ---------------------------------------------------------------------------
+# TorchRoomSimulator
+# ---------------------------------------------------------------------------
+
+class TestTorchRoomSimulator:
+    def test_output_shape(self):
+        aug = TorchRoomSimulator(rt60_range=(0.2, 0.5))
+        audio = _sine_audio(batch=2, samples=8192)
+        result = aug(audio, sr=16000)
+        assert result.shape == audio.shape
+
+    def test_changes_signal(self):
+        aug = TorchRoomSimulator(rt60_range=(0.5, 0.5), wet_range=(0.8, 0.8), p=1.0)
+        audio = _sine_audio(batch=2, samples=8192)
+        result = aug(audio, sr=16000)
+        assert not torch.allclose(result, audio)
+
+    def test_dry_signal_preserved(self):
+        aug = TorchRoomSimulator(wet_range=(0.0, 0.0), p=1.0)
+        audio = _sine_audio(batch=2, samples=8192)
+        result = aug(audio, sr=16000)
+        assert torch.allclose(result, audio, atol=1e-4)
+
+    def test_finite_output(self):
+        aug = TorchRoomSimulator(rt60_range=(0.1, 2.0), wet_range=(0.3, 0.9))
+        audio = _random_audio(batch=4, samples=8192)
+        result = aug(audio, sr=16000)
+        assert torch.isfinite(result).all()
+
+    def test_stereo(self):
+        aug = TorchRoomSimulator(rt60_range=(0.2, 0.5))
+        audio = torch.randn(2, 2, 8192)  # (B=2, C=2, T)
+        result = aug(audio, sr=16000)
+        assert result.shape == audio.shape
+
+
+# ---------------------------------------------------------------------------
+# TorchMixup
+# ---------------------------------------------------------------------------
+
+class TestTorchMixup:
+    def test_output_shape(self):
+        aug = TorchMixup(alpha=0.4)
+        audio = _random_audio(batch=4, samples=8192)
+        result = aug(audio, sr=16000)
+        assert result.shape == audio.shape
+
+    def test_single_sample_passthrough(self):
+        aug = TorchMixup(alpha=0.4, p=1.0)
+        audio = _random_audio(batch=1, samples=4096)
+        result = aug(audio, sr=16000)
+        assert torch.allclose(result, audio)
+
+    def test_changes_signal(self):
+        aug = TorchMixup(alpha=1.0, p=1.0)  # alpha=1 → uniform Beta
+        audio = _random_audio(batch=8, samples=4096)
+        result = aug(audio, sr=16000)
+        # With high alpha and many samples, at least some should differ
+        assert not torch.allclose(result, audio)
+
+    def test_finite_output(self):
+        aug = TorchMixup(alpha=0.4)
+        audio = _random_audio(batch=8, samples=4096)
+        result = aug(audio, sr=16000)
+        assert torch.isfinite(result).all()
+
+    def test_in_pipeline(self):
+        pipeline = TorchPipeline([
+            TorchGainPerturber(gain_db=(-3, 3)),
+            TorchMixup(alpha=0.4),
+        ], seed=42)
+        audio = _random_audio(batch=4, samples=4096)
         result = pipeline(audio, sr=16000)
         assert result.shape == audio.shape

@@ -1228,6 +1228,43 @@ def _sample_augment_params(
     }
 
 
+def _render_job_pytorch(
+    record: dict[str, object],
+    params: dict[str, object],
+    src: Path,
+    out_path: Path,
+    engine_name: str = "pytorch",
+) -> dict[str, object]:
+    """Render an augmentation job using a Python-native engine.
+
+    Reads the source audio, applies time-stretch and pitch-shift via
+    ``pvx.augment.time_domain`` with the specified engine, then writes
+    the output.  Works with ``engine_name="pytorch"`` or ``"torchaudio"``.
+    """
+    import soundfile as sf
+    import numpy as np
+    from pvx.augment.time_domain import TimeStretch, PitchShift
+
+    audio, sr = sf.read(str(src), always_2d=False, dtype="float32")
+
+    stretch = float(params.get("stretch", 1.0))
+    pitch_semitones = float(params.get("pitch", 0.0))
+
+    if abs(stretch - 1.0) > 1e-6:
+        ts = TimeStretch(rate=(stretch, stretch), preserve_pitch=True, engine=engine_name, p=1.0)
+        audio, sr = ts(audio, sr)
+
+    if abs(pitch_semitones) > 1e-6:
+        ps = PitchShift(semitones=(pitch_semitones, pitch_semitones), engine=engine_name, p=1.0)
+        audio, sr = ps(audio, sr)
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    sf.write(str(out_path), audio, sr)
+    record["status"] = "rendered"
+    record["engine_used"] = engine_name
+    return record
+
+
 def run_augment_mode(forwarded_args: list[str]) -> int:
     parser = argparse.ArgumentParser(
         prog="pvx augment",
@@ -1349,6 +1386,18 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
         help="Disable audit metric computation",
     )
     parser.add_argument("--device", choices=["auto", "cpu", "cuda"], default="auto", help="Processing device")
+    parser.add_argument(
+        "--engine",
+        choices=["auto", "pytorch", "torchaudio", "pvx-cli"],
+        default="auto",
+        help=(
+            "DSP engine for time-stretch and pitch-shift transforms. "
+            "'auto' prefers torchaudio > pytorch > pvx-cli. "
+            "'torchaudio' uses torchaudio.functional.phase_vocoder. "
+            "'pytorch' uses native PyTorch phase vocoder. "
+            "'pvx-cli' always uses subprocess. (default: auto)"
+        ),
+    )
     parser.add_argument("--quiet", action="store_true", help="Reduce logs")
     parser.add_argument("--silent", action="store_true", help="Suppress logs")
     args = parser.parse_args(forwarded_args)
@@ -1388,6 +1437,8 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
             args.workers = int(policy_cfg.get("workers", args.workers))
         if not _flag_present(tokens, ("--device",)):
             args.device = str(policy_cfg.get("device", args.device))
+        if not _flag_present(tokens, ("--engine",)):
+            args.engine = str(policy_cfg.get("engine", args.engine))
         if not _flag_present(tokens, ("--output-format",)):
             args.output_format = str(policy_cfg.get("output_format", args.output_format))
 
@@ -1508,6 +1559,7 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
                         "label_policy": str(args.label_policy),
                         "source_sha256": str(source_hash_cache[str(src.resolve())]),
                         "params": dict(params),
+                        "engine": str(args.engine),
                         "status": "planned" if bool(args.dry_run) else "rendering",
                     }
                 )
@@ -1526,6 +1578,38 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
             return record
 
         params = dict(record.get("params", {}))
+
+        # When engine is "pytorch", "torchaudio", or "auto" (with torch
+        # available), use the Python augment API with a native phase-vocoder
+        # instead of spawning a pvxvoc subprocess.  Falls back to pvx-cli
+        # path on error in auto mode.
+        engine_choice = str(args.engine)
+        resolved_engine: str | None = None
+        if engine_choice in ("pytorch", "torchaudio"):
+            resolved_engine = engine_choice
+        elif engine_choice == "auto":
+            try:
+                import torchaudio as _ta  # noqa: F401
+                resolved_engine = "torchaudio"
+            except ImportError:
+                try:
+                    import torch as _torch  # noqa: F401
+                    resolved_engine = "pytorch"
+                except ImportError:
+                    resolved_engine = None  # fall through to pvx-cli
+
+        if resolved_engine is not None:
+            try:
+                record = _render_job_pytorch(record, params, src, out_path, engine_name=resolved_engine)
+                return record
+            except Exception as exc:
+                if engine_choice in ("pytorch", "torchaudio"):
+                    record["status"] = f"error:{engine_choice}:{exc}"
+                    return record
+                # auto mode: fall through to pvx-cli path
+                if not bool(args.silent):
+                    print(f"[augment] PyTorch engine failed, falling back to pvx-cli: {exc}")
+
         voc_args = [
             str(src),
             "--stretch",

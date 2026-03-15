@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-m",
+      "pvx.cli.pvx",
+      "augment",
+      "benchmarks/data/speech_like.wav",
+      "--output-dir",
+      "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/speech/aug",
+      "--variants-per-input",
+      "1",
+      "--intent",
+      "asr_robust",
+      "--pair-mode",
+      "off",
+      "--seed",
+      "1337",
+      "--split",
+      "0.8,0.1,0.1",
+      "--workers",
+      "1",
+      "--manifest-jsonl",
+      "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/speech/augment_manifest.jsonl",
+      "--manifest-csv",
+      "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/speech/augment_manifest.csv",
+      "--overwrite",
+      "--quiet"
+    ],
+    "elapsed_sec": 0.8189132499974221,
+    "input_glob": "benchmarks/data/speech_like.wav",
+    "intent": "asr_robust",
+    "out_dir": "/Users/cleider/dev/pvx/benchmarks/out_augment_profiles/speech",
+    "pair_mode": "off",
+    "platform": "macOS-15.1.1-arm64-arm-64bit-Mach-O",
+    "profile": "speech",
+    "profile_description": "Speech robustness profile for ASR-style augmentation.",
+    "profiles_file": "/Users/cleider/dev/pvx/benchmarks/augment_profiles.json",
+    "python": "3.14.3",
+    "seed": 1337,
+    "split": "0.8,0.1,0.1",
+    "variants_per_input": 1
+  },
+  "metrics": {
+    "clip_pct_max": 0.0,
+    "intent_counts": {
+      "asr_robust": 1
+    },
+    "pair_coverage": null,
+    "peak_dbfs_p95": -0.00026507636037961915,
+    "pitch_abs_mean": 0.099797,
+    "pitch_mean": 0.099797,
+    "pitch_std": 0.0,
+    "records_total": 1,
+    "rendered_total": 1,
+    "required_field_errors": 0,
+    "split_balance_l1": 1.8,
+    "split_counts": {
+      "test": 1,
+      "train": 0,
+      "val": 0
+    },
+    "stretch_mean": 1.043551,
+    "stretch_std": 0.0,
+    "unique_sources": 1
+  }
+}

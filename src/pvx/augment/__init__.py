@@ -297,6 +297,10 @@ try:
         TorchSpecAugment,
         TorchNormalizer,
         TorchClippingSimulator,
+        TorchTimeStretch,
+        TorchPitchShift,
+        TorchRoomSimulator,
+        TorchMixup,
         NumpyTransformAdapter,
     )
 
@@ -309,10 +313,32 @@ try:
         "TorchSpecAugment",
         "TorchNormalizer",
         "TorchClippingSimulator",
+        "TorchTimeStretch",
+        "TorchPitchShift",
+        "TorchRoomSimulator",
+        "TorchMixup",
         "NumpyTransformAdapter",
     ]
 except ImportError:
     pass  # PyTorch not installed — GPU transforms unavailable
+
+# Streaming augmentation
+from .streaming import (  # noqa: F401
+    stream_augment,
+    stream_augment_file,
+    stream_augment_directory,
+)
+
+__all__ += [
+    "stream_augment",
+    "stream_augment_file",
+    "stream_augment_directory",
+]
+
+# IR database (no extra dependencies)
+from .ir_database import IRDatabase  # noqa: F401
+
+__all__ += ["IRDatabase"]
 
 # Version
 __version__ = "0.1.0a1"
