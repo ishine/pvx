@@ -723,6 +723,7 @@ Additional helper workflows:
 - `pvx stream`: stateful chunk engine for long-form streaming workflows (`--mode stateful` default, `--mode wrapper` compatibility fallback)
 - `pvx stretch-budget`: estimate max safe stretch from an input file and disk budget before launching extreme renders
 - `pvx augment`: deterministic augmentation dataset generation for machine-learning pipelines with JSONL/CSV manifests
+- `pvx augment-manifest`: validate/merge/stats utilities for augmentation manifests
 
 `pvx voc` includes beginner UX features:
 
@@ -806,10 +807,23 @@ Key properties:
 - split-leakage control via grouping:
   - `--grouping stem-prefix` (default)
   - `--group-separator "__"`
+- optional balanced split assignment from label metadata:
+  - `--split-mode label_balanced`
+  - `--split-mode speaker_balanced`
+  - `--labels-csv labels.csv`
 - intent profiles tuned for common tasks:
   - `asr_robust` (automatic speech recognition robustness)
   - `mir_music` (music information retrieval)
   - `ssl_contrastive` (self-supervised contrastive augmentation)
+- paired contrastive view mode: `--pair-mode contrastive2`
+- label perturbation policy: `--label-policy preserve|allow_alter`
+- policy files for reproducible settings: `--policy augment_policy.json`
+- deterministic parallel rendering with resume support:
+  - `--workers N`
+  - `--resume`
+  - `--append-manifest`
+- provenance fields in manifest: `source_sha256`, `output_sha256`
+- optional per-output audit metrics in manifest: peak/rms/clip/zero-crossing
 - manifest outputs for reproducibility/audit:
   - JSON Lines (JSONL): default `augment_manifest.jsonl`
   - comma-separated values (CSV): default `augment_manifest.csv`
@@ -825,6 +839,19 @@ pvx augment data/music/*.wav --output-dir aug/music --variants-per-input 4 --int
 
 # Dry-run planning only (no audio renders, manifest only)
 pvx augment data/*.wav --output-dir aug/plan --variants-per-input 3 --intent ssl_contrastive --dry-run --seed 42
+
+# Balanced split assignment by speaker metadata
+pvx augment data/*.wav --output-dir aug/speaker_bal --variants-per-input 3 --intent asr_robust --split-mode speaker_balanced --labels-csv labels.csv --seed 42
+
+# Resume interrupted runs and append to existing manifest
+pvx augment data/*.wav --output-dir aug/resume --variants-per-input 4 --intent mir_music --resume --append-manifest --seed 2026
+
+# Manifest validation and merge tools
+pvx augment-manifest validate aug/resume/augment_manifest.jsonl --strict
+pvx augment-manifest merge aug/run_a/augment_manifest.jsonl aug/run_b/augment_manifest.jsonl --output-jsonl aug/merged_manifest.jsonl --output-csv aug/merged_manifest.csv
+
+# Augmentation regression benchmark and gate
+python benchmarks/run_augment_bench.py --quick --out-dir benchmarks/out_augment --baseline benchmarks/baseline_augment_small.json --gate --gate-tolerance 0.30
 ```
 
 See full guide: [docs/AI_AUGMENTATION.md](docs/AI_AUGMENTATION.md)

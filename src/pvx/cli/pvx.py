@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import concurrent.futures
 import csv
 import difflib
 import glob
@@ -214,6 +215,37 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
         summary="Mono-to-multichannel trajectory convolution reverb",
         aliases=("pvxtrajectoryreverb", "trajreverb", "spatial-reverb"),
     ),
+    # ── ML/DL data augmentation tools ─────────────────────────────────────
+    ToolSpec(
+        name="noise",
+        entrypoint="pvx.cli.pvxnoise:main",
+        summary="Add synthetic or background noise at a controlled SNR",
+        aliases=("pvxnoise", "addnoise"),
+    ),
+    ToolSpec(
+        name="rir",
+        entrypoint="pvx.cli.pvxrir:main",
+        summary="Simulate room acoustics via impulse response convolution",
+        aliases=("pvxrir", "reverb-sim", "room-sim"),
+    ),
+    ToolSpec(
+        name="codec",
+        entrypoint="pvx.cli.pvxcodec:main",
+        summary="Simulate lossy codec artifacts (MP3, telephone, VoIP)",
+        aliases=("pvxcodec", "codec-sim"),
+    ),
+    ToolSpec(
+        name="specaugment",
+        entrypoint="pvx.cli.pvxspecaugment:main",
+        summary="Apply SpecAugment frequency and time masking (Park et al. 2019)",
+        aliases=("pvxspecaugment", "spec-augment"),
+    ),
+    ToolSpec(
+        name="gain",
+        entrypoint="pvx.cli.pvxgain:main",
+        summary="Random gain perturbation or loudness normalization",
+        aliases=("pvxgain",),
+    ),
 )
 
 
@@ -238,6 +270,10 @@ EXAMPLE_COMMANDS: dict[str, tuple[str, str]] = {
     "augment": (
         "Deterministic dataset augmentation for AI research",
         "pvx augment data/*.wav --output-dir aug_out --variants-per-input 4 --intent asr_robust --seed 1337",
+    ),
+    "augment-manifest": (
+        "Validate/merge augmentation manifests",
+        "pvx augment-manifest validate aug_out/augment_manifest.jsonl",
     ),
     "basic": ("Basic stretch", "pvx voc input.wav --stretch 1.20 --output output.wav"),
     "speech": ("Slow speech for review", "pvx voc speech.wav --preset vocal_studio --stretch 1.30 --output speech_slow.wav"),
@@ -482,6 +518,7 @@ def print_tools() -> None:
     print("  safe         Run `pvx voc` with conservative quality-first defaults")
     print("  smoke        Fast synthetic end-to-end smoke render")
     print("  augment      Deterministic AI dataset augmentation with manifests")
+    print("  augment-manifest  Validate/merge augmentation manifest files")
     print("  guided       Interactive command builder")
     print("  follow       Track one file and control another in one command")
     print("  chain        Run a managed multi-stage one-line tool chain")
@@ -919,7 +956,203 @@ def _augment_group_key(path: Path, grouping: str, separator: str) -> str:
     return stem
 
 
-def _sample_augment_params(intent: str, rng: random.Random) -> dict[str, str]:
+def _flag_present(argv: list[str], names: tuple[str, ...]) -> bool:
+    for token in argv:
+        raw = str(token)
+        flag = _token_flag(raw)
+        if flag in names:
+            return True
+    return False
+
+
+def _load_augment_policy(path: Path) -> dict[str, object]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError("Augmentation policy must be a JSON object.")
+    return dict(payload)
+
+
+def _load_label_metadata(path: Path | None) -> dict[str, dict[str, str]]:
+    if path is None:
+        return {}
+    p = Path(path).expanduser().resolve()
+    if not p.exists():
+        raise ValueError(f"Label metadata CSV not found: {p}")
+    out: dict[str, dict[str, str]] = {}
+    with p.open("r", encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        if reader.fieldnames is None:
+            raise ValueError(f"Label metadata CSV has no header: {p}")
+        for row in reader:
+            source = str(
+                row.get("source_path")
+                or row.get("path")
+                or row.get("file")
+                or row.get("filename")
+                or ""
+            ).strip()
+            if not source:
+                continue
+            label = str(row.get("label") or "").strip()
+            speaker = str(row.get("speaker") or row.get("speaker_id") or "").strip()
+            meta = {"label": label, "speaker": speaker}
+            source_path = Path(source).expanduser()
+            if source_path.is_absolute():
+                key_abs = str(source_path.resolve())
+                out[key_abs] = meta
+            else:
+                out[source] = meta
+            out[source_path.name] = meta
+    return out
+
+
+def _source_metadata(source: Path, metadata: dict[str, dict[str, str]]) -> dict[str, str]:
+    abs_key = str(source.resolve())
+    name_key = source.name
+    empty = {"label": "", "speaker": ""}
+    if abs_key in metadata:
+        return dict(metadata[abs_key])
+    if name_key in metadata:
+        return dict(metadata[name_key])
+    return empty
+
+
+def _assign_balanced_split_for_groups(
+    group_keys: list[str],
+    *,
+    ratios: tuple[float, float, float],
+    base_seed: int,
+    split_mode: str,
+    group_meta: dict[str, dict[str, str]],
+) -> dict[str, str]:
+    train, val, test = ratios
+    if split_mode == "random":
+        out: dict[str, str] = {}
+        for group_key in group_keys:
+            rng = random.Random(_stable_seed_from_text(base_seed, f"split::{group_key}"))
+            out[group_key] = _pick_split(rng, (train, val, test))
+        return out
+
+    token_key = "label" if split_mode == "label_balanced" else "speaker"
+    split_names = ("train", "val", "test")
+    ratios_map = {"train": train, "val": val, "test": test}
+    out: dict[str, str] = {}
+    total_groups = max(1, len(group_keys))
+    global_counts = {"train": 0, "val": 0, "test": 0}
+
+    buckets: dict[str, list[str]] = {}
+    fallback: list[str] = []
+    for group_key in group_keys:
+        token = str(group_meta.get(group_key, {}).get(token_key, "")).strip()
+        if token:
+            buckets.setdefault(token, []).append(group_key)
+        else:
+            fallback.append(group_key)
+
+    def _assign_bucket(keys: list[str], seed_tag: str) -> None:
+        ordered = sorted(keys)
+        rng = random.Random(_stable_seed_from_text(base_seed, seed_tag))
+        rng.shuffle(ordered)
+        for group_key in ordered:
+            best_split = split_names[0]
+            best_need = -10.0
+            for split_name in split_names:
+                target = ratios_map[split_name] * float(total_groups)
+                need = target - float(global_counts[split_name])
+                if need > best_need:
+                    best_need = need
+                    best_split = split_name
+            out[group_key] = best_split
+            global_counts[best_split] += 1
+
+    for token, keys in sorted(buckets.items(), key=lambda item: item[0]):
+        _assign_bucket(keys, f"{split_mode}::{token}")
+    if fallback:
+        _assign_bucket(fallback, f"{split_mode}::fallback")
+    return out
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            if not chunk:
+                break
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _audio_audit_metrics(path: Path) -> dict[str, float]:
+    audio, sr = sf.read(str(path), always_2d=True)
+    arr = np.asarray(audio, dtype=np.float64)
+    peak = float(np.max(np.abs(arr))) if arr.size else 0.0
+    rms = float(np.sqrt(np.mean(arr * arr))) if arr.size else 0.0
+    peak_dbfs = float(20.0 * np.log10(max(peak, 1e-12)))
+    rms_dbfs = float(20.0 * np.log10(max(rms, 1e-12)))
+    clip_pct = float(100.0 * np.mean(np.abs(arr) >= 0.999999)) if arr.size else 0.0
+    mono = arr.mean(axis=1) if arr.ndim == 2 and arr.shape[1] > 0 else arr.reshape(-1)
+    if mono.size > 1:
+        zcr = float(np.mean(np.abs(np.diff(np.signbit(mono).astype(np.int8)))))
+    else:
+        zcr = 0.0
+    return {
+        "sample_rate_hz": float(sr),
+        "channels": float(arr.shape[1] if arr.ndim == 2 else 1),
+        "samples": float(arr.shape[0] if arr.ndim == 2 else arr.size),
+        "duration_sec": float(arr.shape[0] / float(sr)) if arr.ndim == 2 and sr > 0 else 0.0,
+        "peak_dbfs": peak_dbfs,
+        "rms_dbfs": rms_dbfs,
+        "clip_pct": clip_pct,
+        "zcr": zcr,
+    }
+
+
+def _manifest_required_errors(record: dict[str, object]) -> list[str]:
+    required = ("source_path", "output_path", "intent", "seed", "split", "group_key", "status")
+    errors: list[str] = []
+    for key in required:
+        value = record.get(key)
+        if value in {None, ""}:
+            errors.append(f"missing required field '{key}'")
+    params = record.get("params")
+    if params is not None and not isinstance(params, dict):
+        errors.append("field 'params' must be an object when present")
+    return errors
+
+
+def _load_manifest_jsonl(path: Path) -> list[dict[str, object]]:
+    p = Path(path).expanduser().resolve()
+    if not p.exists():
+        return []
+    rows: list[dict[str, object]] = []
+    for line_no, raw in enumerate(p.read_text(encoding="utf-8").splitlines(), start=1):
+        line = raw.strip()
+        if not line:
+            continue
+        payload = json.loads(line)
+        if not isinstance(payload, dict):
+            raise ValueError(f"{p}:{line_no}: manifest row must be a JSON object")
+        rows.append(dict(payload))
+    return rows
+
+
+def _merge_manifest_rows(rows: list[dict[str, object]], *, dedupe_by: str = "output_path") -> list[dict[str, object]]:
+    merged: dict[str, dict[str, object]] = {}
+    for row in rows:
+        key = str(row.get(dedupe_by, "")).strip()
+        if not key:
+            key = json.dumps(row, sort_keys=True)
+        merged[key] = dict(row)
+    return [merged[key] for key in sorted(merged.keys())]
+
+
+def _sample_augment_params(
+    intent: str,
+    rng: random.Random,
+    *,
+    label_policy: str = "allow_alter",
+    policy_overrides: dict[str, object] | None = None,
+) -> dict[str, str]:
     key = str(intent).strip().lower()
     if key == "asr_robust":
         stretch = rng.uniform(0.92, 1.12)
@@ -943,8 +1176,42 @@ def _sample_augment_params(intent: str, rng: random.Random) -> dict[str, str]:
         preset = rng.choice(["vocal_studio", "drums_safe", "stereo_coherent"])
         window = rng.choice(["hann", "hamming", "blackmanharris", "kaiser", "tukey"])
 
+    if str(label_policy).strip().lower() == "preserve":
+        # Tighten perturbation envelope when labels must remain semantically stable.
+        stretch = float(np.clip(stretch, 0.95, 1.05))
+        pitch = float(np.clip(pitch, -1.0, 1.0))
+        formant = float(np.clip(formant, 0.60, 0.95))
+
     transform = rng.choice(["fft", "dft"])
     target_lufs = rng.uniform(-24.0, -14.0)
+    choices = dict((policy_overrides or {}).get("choices", {})) if isinstance(policy_overrides, dict) else {}
+    bounds = dict((policy_overrides or {}).get("bounds", {})) if isinstance(policy_overrides, dict) else {}
+
+    def _override_bounds(name: str, value: float) -> float:
+        item = bounds.get(name)
+        if isinstance(item, (list, tuple)) and len(item) == 2:
+            lo = float(item[0])
+            hi = float(item[1])
+            if lo > hi:
+                lo, hi = hi, lo
+            return float(np.clip(value, lo, hi))
+        return value
+
+    def _override_choice(name: str, default_value: str) -> str:
+        item = choices.get(name)
+        if isinstance(item, list) and item:
+            return str(rng.choice([str(v) for v in item]))
+        return default_value
+
+    stretch = _override_bounds("stretch", float(stretch))
+    pitch = _override_bounds("pitch", float(pitch))
+    formant = _override_bounds("formant_strength", float(formant))
+    transient = _override_bounds("transient_sensitivity", float(transient))
+    target_lufs = _override_bounds("target_lufs", float(target_lufs))
+    window = _override_choice("window", window)
+    transform = _override_choice("transform", transform)
+    preset = _override_choice("preset", preset)
+
     return {
         "stretch": f"{stretch:.6f}",
         "pitch": f"{pitch:.6f}",
@@ -969,6 +1236,12 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
             "Generates variants with reproducible random seeds and writes manifests."
         ),
     )
+    parser.add_argument(
+        "--policy",
+        type=Path,
+        default=None,
+        help="Optional JSON policy file with augmentation defaults and bounds/choices overrides",
+    )
     parser.add_argument("inputs", nargs="+", help="Input audio files, directories, and/or glob patterns")
     parser.add_argument("--output-dir", required=True, type=Path, help="Output directory for augmented files")
     parser.add_argument(
@@ -983,11 +1256,29 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
         default="asr_robust",
         help="Augmentation intent profile (default: asr_robust)",
     )
+    parser.add_argument(
+        "--label-policy",
+        choices=["allow_alter", "preserve"],
+        default="allow_alter",
+        help="Label perturbation policy (default: allow_alter)",
+    )
     parser.add_argument("--seed", type=int, default=1337, help="Deterministic random seed (default: 1337)")
     parser.add_argument(
         "--split",
         default="0.8,0.1,0.1",
         help="train,val,test split ratios (default: 0.8,0.1,0.1)",
+    )
+    parser.add_argument(
+        "--split-mode",
+        choices=["random", "label_balanced", "speaker_balanced"],
+        default="random",
+        help="Split assignment mode (default: random)",
+    )
+    parser.add_argument(
+        "--labels-csv",
+        type=Path,
+        default=None,
+        help="Optional metadata CSV with path/label/speaker columns for balanced split modes",
     )
     parser.add_argument(
         "--grouping",
@@ -1002,6 +1293,12 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
         "--group-separator",
         default="__",
         help="Separator used by stem-prefix grouping (default: '__')",
+    )
+    parser.add_argument(
+        "--pair-mode",
+        choices=["off", "contrastive2"],
+        default="off",
+        help="Pair-view mode: off or two-view contrastive output (default: off)",
     )
     parser.add_argument(
         "--manifest-jsonl",
@@ -1021,15 +1318,83 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
         default="wav",
         help="Output format container (default: wav)",
     )
+    parser.add_argument("--workers", type=int, default=1, help="Parallel worker count for rendering (default: 1)")
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Skip already-rendered outputs found in existing manifest/output-dir",
+    )
+    parser.add_argument(
+        "--append-manifest",
+        action="store_true",
+        help="Append/merge with existing manifest instead of replacing it",
+    )
+    parser.add_argument(
+        "--strict-manifest",
+        action="store_true",
+        help="Return non-zero if manifest validation errors are found",
+    )
     parser.add_argument("--overwrite", action="store_true", help="Overwrite existing outputs")
     parser.add_argument("--dry-run", action="store_true", help="Plan manifest and filenames without rendering audio")
+    parser.add_argument(
+        "--audit-metrics",
+        action="store_true",
+        default=True,
+        help="Compute per-output audit metrics (default: on)",
+    )
+    parser.add_argument(
+        "--no-audit-metrics",
+        dest="audit_metrics",
+        action="store_false",
+        help="Disable audit metric computation",
+    )
     parser.add_argument("--device", choices=["auto", "cpu", "cuda"], default="auto", help="Processing device")
     parser.add_argument("--quiet", action="store_true", help="Reduce logs")
     parser.add_argument("--silent", action="store_true", help="Suppress logs")
     args = parser.parse_args(forwarded_args)
 
+    tokens = list(forwarded_args or [])
+
+    policy_cfg: dict[str, object] = {}
+    if args.policy is not None:
+        policy_path = Path(args.policy).expanduser().resolve()
+        if not policy_path.exists():
+            parser.error(f"Augmentation policy not found: {policy_path}")
+        try:
+            raw_policy = _load_augment_policy(policy_path)
+        except Exception as exc:
+            parser.error(f"Failed to load --policy {policy_path}: {exc}")
+        policy_cfg = dict(raw_policy.get("augment", raw_policy) if isinstance(raw_policy, dict) else {})
+
+        if not _flag_present(tokens, ("--intent",)):
+            args.intent = str(policy_cfg.get("intent", args.intent))
+        if not _flag_present(tokens, ("--variants-per-input",)):
+            args.variants_per_input = int(policy_cfg.get("variants_per_input", args.variants_per_input))
+        if not _flag_present(tokens, ("--seed",)):
+            args.seed = int(policy_cfg.get("seed", args.seed))
+        if not _flag_present(tokens, ("--split",)):
+            args.split = str(policy_cfg.get("split", args.split))
+        if not _flag_present(tokens, ("--split-mode",)):
+            args.split_mode = str(policy_cfg.get("split_mode", args.split_mode))
+        if not _flag_present(tokens, ("--grouping",)):
+            args.grouping = str(policy_cfg.get("grouping", args.grouping))
+        if not _flag_present(tokens, ("--group-separator",)):
+            args.group_separator = str(policy_cfg.get("group_separator", args.group_separator))
+        if not _flag_present(tokens, ("--pair-mode",)):
+            args.pair_mode = str(policy_cfg.get("pair_mode", args.pair_mode))
+        if not _flag_present(tokens, ("--label-policy",)):
+            args.label_policy = str(policy_cfg.get("label_policy", args.label_policy))
+        if not _flag_present(tokens, ("--workers",)):
+            args.workers = int(policy_cfg.get("workers", args.workers))
+        if not _flag_present(tokens, ("--device",)):
+            args.device = str(policy_cfg.get("device", args.device))
+        if not _flag_present(tokens, ("--output-format",)):
+            args.output_format = str(policy_cfg.get("output_format", args.output_format))
+
     if int(args.variants_per_input) <= 0:
         parser.error("--variants-per-input must be > 0")
+    if int(args.workers) <= 0:
+        parser.error("--workers must be > 0")
 
     try:
         split_ratios = _parse_split_ratios(str(args.split))
@@ -1039,6 +1404,11 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
     sources = _expand_augment_inputs(list(args.inputs))
     if not sources:
         parser.error("No input audio files matched provided inputs")
+
+    try:
+        label_metadata = _load_label_metadata(args.labels_csv)
+    except ValueError as exc:
+        parser.error(str(exc))
 
     out_dir = Path(args.output_dir).expanduser().resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -1053,91 +1423,196 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
         else out_dir / "augment_manifest.csv"
     )
 
+    existing_rows: list[dict[str, object]] = []
+    if (bool(args.resume) or bool(args.append_manifest)) and manifest_jsonl.exists():
+        try:
+            existing_rows = _load_manifest_jsonl(manifest_jsonl)
+        except Exception as exc:
+            parser.error(f"Failed to parse existing manifest {manifest_jsonl}: {exc}")
+    existing_by_output: dict[str, dict[str, object]] = {}
+    for row in existing_rows:
+        key = str(row.get("output_path", "")).strip()
+        if key:
+            existing_by_output[key] = dict(row)
+
+    group_meta: dict[str, dict[str, str]] = {}
+    for src in sources:
+        group_key = _augment_group_key(src, str(args.grouping), str(args.group_separator))
+        if group_key not in group_meta:
+            group_meta[group_key] = _source_metadata(src, label_metadata)
+        else:
+            current = group_meta[group_key]
+            incoming = _source_metadata(src, label_metadata)
+            if not str(current.get("label", "")).strip() and str(incoming.get("label", "")).strip():
+                current["label"] = str(incoming.get("label", ""))
+            if not str(current.get("speaker", "")).strip() and str(incoming.get("speaker", "")).strip():
+                current["speaker"] = str(incoming.get("speaker", ""))
+
+    group_keys = sorted(set(_augment_group_key(src, str(args.grouping), str(args.group_separator)) for src in sources))
+    group_to_split = _assign_balanced_split_for_groups(
+        group_keys,
+        ratios=split_ratios,
+        base_seed=int(args.seed),
+        split_mode=str(args.split_mode),
+        group_meta=group_meta,
+    )
+
     base_seed = int(args.seed)
-    records: list[dict[str, object]] = []
-    total_jobs = len(sources) * int(args.variants_per_input)
-    job_idx = 0
-    failures = 0
-    group_to_split: dict[str, str] = {}
-
+    source_hash_cache: dict[str, str] = {}
+    jobs: list[dict[str, object]] = []
+    total_jobs = 0
     for src_idx, src in enumerate(sources):
+        group_key = _augment_group_key(src, str(args.grouping), str(args.group_separator))
+        src_meta = _source_metadata(src, label_metadata)
+        split_name = group_to_split.get(group_key, "train")
         for variant_idx in range(int(args.variants_per_input)):
-            job_idx += 1
             sample_seed = base_seed + (src_idx * 10_000) + variant_idx
-            rng = random.Random(sample_seed)
-            params = _sample_augment_params(str(args.intent), rng)
-            group_key = _augment_group_key(src, str(args.grouping), str(args.group_separator))
-            if group_key not in group_to_split:
-                group_rng = random.Random(_stable_seed_from_text(base_seed, group_key))
-                group_to_split[group_key] = _pick_split(group_rng, split_ratios)
-            split_name = group_to_split[group_key]
+            views = ("main",) if str(args.pair_mode) == "off" else ("a", "b")
+            pair_id = "" if str(args.pair_mode) == "off" else f"{src.stem}_{variant_idx + 1:03d}_{sample_seed}"
+            for view_idx, view_id in enumerate(views):
+                view_seed = int(sample_seed + (view_idx * 1_000_000))
+                rng = random.Random(view_seed)
+                params = _sample_augment_params(
+                    str(args.intent),
+                    rng,
+                    label_policy=str(args.label_policy),
+                    policy_overrides=policy_cfg,
+                )
+                view_suffix = "" if view_id == "main" else f"_view{view_id}"
+                out_name = (
+                    f"{src.stem}__aug_{str(args.intent)}_{variant_idx + 1:03d}_{sample_seed}{view_suffix}.{str(args.output_format)}"
+                )
+                out_path = out_dir / out_name
+                output_key = str(out_path.resolve())
+                if bool(args.resume):
+                    old = existing_by_output.get(output_key)
+                    if old is not None and str(old.get("status", "")).startswith("rendered") and out_path.exists():
+                        continue
+                total_jobs += 1
+                if str(src.resolve()) not in source_hash_cache:
+                    source_hash_cache[str(src.resolve())] = _sha256_file(src)
+                jobs.append(
+                    {
+                        "source_path": str(src.resolve()),
+                        "output_path": output_key,
+                        "intent": str(args.intent),
+                        "seed": int(view_seed),
+                        "base_seed": int(sample_seed),
+                        "split": str(split_name),
+                        "split_mode": str(args.split_mode),
+                        "group_key": str(group_key),
+                        "label": str(src_meta.get("label", "")),
+                        "speaker": str(src_meta.get("speaker", "")),
+                        "pair_id": str(pair_id),
+                        "view_id": str(view_id),
+                        "label_policy": str(args.label_policy),
+                        "source_sha256": str(source_hash_cache[str(src.resolve())]),
+                        "params": dict(params),
+                        "status": "planned" if bool(args.dry_run) else "rendering",
+                    }
+                )
 
-            out_name = (
-                f"{src.stem}__aug_{str(args.intent)}_{variant_idx + 1:03d}_{sample_seed}.{str(args.output_format)}"
-            )
-            out_path = out_dir / out_name
-            planned = {
-                "source_path": str(src),
-                "output_path": str(out_path),
-                "intent": str(args.intent),
-                "seed": sample_seed,
-                "split": split_name,
-                "group_key": group_key,
-                "params": dict(params),
-                "status": "planned" if bool(args.dry_run) else "rendered",
-            }
+    records: list[dict[str, object]] = []
+    failures = 0
 
-            if not bool(args.silent):
-                print(f"[augment] {job_idx}/{total_jobs} {src.name} -> {out_name}")
+    def _render_job(job: dict[str, object], *, idx: int) -> dict[str, object]:
+        record = dict(job)
+        src = Path(str(record["source_path"]))
+        out_path = Path(str(record["output_path"]))
+        if not bool(args.silent):
+            print(f"[augment] {idx}/{total_jobs} {src.name} -> {out_path.name}")
+        if bool(args.dry_run):
+            record["status"] = "planned"
+            return record
 
-            if not bool(args.dry_run):
-                voc_args = [
-                    str(src),
-                    "--stretch",
-                    str(params["stretch"]),
-                    "--pitch",
-                    str(params["pitch"]),
-                    "--preset",
-                    str(params["preset"]),
-                    "--window",
-                    str(params["window"]),
-                    "--transform",
-                    str(params["transform"]),
-                    "--phase-locking",
-                    str(params["phase_locking"]),
-                    "--transient-mode",
-                    str(params["transient_mode"]),
-                    "--transient-sensitivity",
-                    str(params["transient_sensitivity"]),
-                    "--stereo-mode",
-                    str(params["stereo_mode"]),
-                    "--coherence-strength",
-                    str(params["coherence_strength"]),
-                    "--formant-strength",
-                    str(params["formant_strength"]),
-                    "--target-lufs",
-                    str(params["target_lufs"]),
-                    "--output",
-                    str(out_path),
-                    "--output-format",
-                    str(args.output_format),
-                    "--device",
-                    str(args.device),
-                ]
-                if bool(args.overwrite):
-                    voc_args.append("--overwrite")
-                if bool(args.quiet) or bool(args.silent):
-                    voc_args.append("--silent")
-                code = dispatch_tool("voc", voc_args)
-                if int(code) != 0:
+        params = dict(record.get("params", {}))
+        voc_args = [
+            str(src),
+            "--stretch",
+            str(params.get("stretch", "1.0")),
+            "--pitch",
+            str(params.get("pitch", "0.0")),
+            "--preset",
+            str(params.get("preset", "default")),
+            "--window",
+            str(params.get("window", "hann")),
+            "--transform",
+            str(params.get("transform", "fft")),
+            "--phase-locking",
+            str(params.get("phase_locking", "identity")),
+            "--transient-mode",
+            str(params.get("transient_mode", "hybrid")),
+            "--transient-sensitivity",
+            str(params.get("transient_sensitivity", "0.6")),
+            "--stereo-mode",
+            str(params.get("stereo_mode", "mid_side_lock")),
+            "--coherence-strength",
+            str(params.get("coherence_strength", "0.85")),
+            "--formant-strength",
+            str(params.get("formant_strength", "0.7")),
+            "--target-lufs",
+            str(params.get("target_lufs", "-18.0")),
+            "--output",
+            str(out_path),
+            "--output-format",
+            str(args.output_format),
+            "--device",
+            str(args.device),
+        ]
+        if bool(args.overwrite):
+            voc_args.append("--overwrite")
+        if bool(args.quiet) or bool(args.silent) or int(args.workers) > 1:
+            voc_args.append("--silent")
+        code = dispatch_tool("voc", voc_args)
+        if int(code) != 0:
+            record["status"] = f"error:{code}"
+            return record
+        record["status"] = "rendered"
+        if out_path.exists():
+            record["output_sha256"] = _sha256_file(out_path)
+            if bool(args.audit_metrics):
+                try:
+                    record["audit"] = _audio_audit_metrics(out_path)
+                except Exception as exc:
+                    record["audit_error"] = str(exc)
+        return record
+
+    if int(args.workers) <= 1 or bool(args.dry_run) or len(jobs) <= 1:
+        for idx, job in enumerate(jobs, start=1):
+            row = _render_job(job, idx=idx)
+            if str(row.get("status", "")).startswith("error:"):
+                failures += 1
+            records.append(row)
+    else:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=int(args.workers)) as pool:
+            futures: list[concurrent.futures.Future[dict[str, object]]] = []
+            for idx, job in enumerate(jobs, start=1):
+                futures.append(pool.submit(_render_job, job, idx=idx))
+            for future in concurrent.futures.as_completed(futures):
+                row = future.result()
+                if str(row.get("status", "")).startswith("error:"):
                     failures += 1
-                    planned["status"] = f"error:{code}"
+                records.append(row)
+        records.sort(key=lambda item: (str(item.get("output_path", "")), str(item.get("view_id", ""))))
 
-            records.append(planned)
+    append_mode = bool(args.append_manifest) or bool(args.resume)
+    if append_mode:
+        final_records = _merge_manifest_rows(existing_rows + records, dedupe_by="output_path")
+    else:
+        final_records = list(records)
+
+    manifest_errors: list[str] = []
+    for idx, record in enumerate(final_records, start=1):
+        for err in _manifest_required_errors(record):
+            manifest_errors.append(f"row {idx}: {err}")
+    if manifest_errors and bool(args.strict_manifest):
+        for err in manifest_errors[:20]:
+            print(f"[augment] manifest error: {err}", file=sys.stderr)
+        return 1
 
     manifest_jsonl.parent.mkdir(parents=True, exist_ok=True)
     with manifest_jsonl.open("w", encoding="utf-8") as handle:
-        for record in records:
+        for record in final_records:
             handle.write(json.dumps(record, sort_keys=True) + "\n")
 
     manifest_csv.parent.mkdir(parents=True, exist_ok=True)
@@ -1146,9 +1621,18 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
         "output_path",
         "intent",
         "seed",
+        "base_seed",
         "split",
+        "split_mode",
         "group_key",
+        "label",
+        "speaker",
+        "pair_id",
+        "view_id",
+        "label_policy",
         "status",
+        "source_sha256",
+        "output_sha256",
         "stretch",
         "pitch",
         "preset",
@@ -1157,21 +1641,36 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
         "formant_strength",
         "transient_sensitivity",
         "target_lufs",
+        "audit_duration_sec",
+        "audit_peak_dbfs",
+        "audit_rms_dbfs",
+        "audit_clip_pct",
+        "audit_zcr",
     ]
     with manifest_csv.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)
         writer.writeheader()
-        for record in records:
+        for record in final_records:
             params = dict(record.get("params", {}))
+            audit = dict(record.get("audit", {}))
             writer.writerow(
                 {
                     "source_path": str(record.get("source_path", "")),
                     "output_path": str(record.get("output_path", "")),
                     "intent": str(record.get("intent", "")),
                     "seed": str(record.get("seed", "")),
+                    "base_seed": str(record.get("base_seed", "")),
                     "split": str(record.get("split", "")),
+                    "split_mode": str(record.get("split_mode", "")),
                     "group_key": str(record.get("group_key", "")),
+                    "label": str(record.get("label", "")),
+                    "speaker": str(record.get("speaker", "")),
+                    "pair_id": str(record.get("pair_id", "")),
+                    "view_id": str(record.get("view_id", "")),
+                    "label_policy": str(record.get("label_policy", "")),
                     "status": str(record.get("status", "")),
+                    "source_sha256": str(record.get("source_sha256", "")),
+                    "output_sha256": str(record.get("output_sha256", "")),
                     "stretch": str(params.get("stretch", "")),
                     "pitch": str(params.get("pitch", "")),
                     "preset": str(params.get("preset", "")),
@@ -1180,30 +1679,144 @@ def run_augment_mode(forwarded_args: list[str]) -> int:
                     "formant_strength": str(params.get("formant_strength", "")),
                     "transient_sensitivity": str(params.get("transient_sensitivity", "")),
                     "target_lufs": str(params.get("target_lufs", "")),
+                    "audit_duration_sec": str(audit.get("duration_sec", "")),
+                    "audit_peak_dbfs": str(audit.get("peak_dbfs", "")),
+                    "audit_rms_dbfs": str(audit.get("rms_dbfs", "")),
+                    "audit_clip_pct": str(audit.get("clip_pct", "")),
+                    "audit_zcr": str(audit.get("zcr", "")),
                 }
             )
 
-    rendered = sum(1 for record in records if str(record.get("status", "")).startswith("rendered"))
-    planned_count = sum(1 for record in records if str(record.get("status", "")).startswith("planned"))
+    rendered = sum(1 for record in final_records if str(record.get("status", "")).startswith("rendered"))
+    planned_count = sum(1 for record in final_records if str(record.get("status", "")).startswith("planned"))
     split_counts: dict[str, int] = {"train": 0, "val": 0, "test": 0}
-    for record in records:
+    for record in final_records:
         split = str(record.get("split", "")).strip().lower()
         if split in split_counts:
             split_counts[split] += 1
     if not bool(args.silent):
-        print(f"[augment] done inputs={len(sources)} variants={len(records)} failures={failures}")
+        print(f"[augment] done inputs={len(sources)} variants={len(final_records)} failures={failures}")
         print(f"[augment] manifest jsonl -> {manifest_jsonl}")
         print(f"[augment] manifest csv   -> {manifest_csv}")
         print(
             "[augment] split counts "
             f"train={split_counts['train']} val={split_counts['val']} test={split_counts['test']}"
         )
+        if manifest_errors:
+            print(f"[augment] manifest validation warnings={len(manifest_errors)}")
         if bool(args.dry_run):
             print(f"[augment] dry-run planned variants={planned_count}")
         else:
             print(f"[augment] rendered variants={rendered}")
 
     return 1 if failures else 0
+
+
+def run_augment_manifest_mode(forwarded_args: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        prog="pvx augment-manifest",
+        description="Validate, merge, and inspect augmentation manifests.",
+    )
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    validate_parser = subparsers.add_parser("validate", help="Validate a manifest JSONL")
+    validate_parser.add_argument("manifest", type=Path, help="Manifest JSONL path")
+    validate_parser.add_argument("--json", action="store_true", help="Emit JSON output")
+    validate_parser.add_argument("--strict", action="store_true", help="Return non-zero on validation errors")
+
+    merge_parser = subparsers.add_parser("merge", help="Merge one or more manifest JSONL files")
+    merge_parser.add_argument("manifests", nargs="+", type=Path, help="Manifest JSONL inputs")
+    merge_parser.add_argument("--output-jsonl", required=True, type=Path, help="Merged JSONL output path")
+    merge_parser.add_argument("--output-csv", type=Path, default=None, help="Optional merged CSV output path")
+    merge_parser.add_argument("--dedupe-by", default="output_path", help="Deduplication key (default: output_path)")
+
+    stats_parser = subparsers.add_parser("stats", help="Print quick split/status stats for a manifest")
+    stats_parser.add_argument("manifest", type=Path, help="Manifest JSONL path")
+    stats_parser.add_argument("--json", action="store_true", help="Emit JSON output")
+
+    args = parser.parse_args(forwarded_args)
+
+    if args.command == "validate":
+        rows = _load_manifest_jsonl(Path(args.manifest).expanduser().resolve())
+        errors: list[str] = []
+        for idx, row in enumerate(rows, start=1):
+            for err in _manifest_required_errors(row):
+                errors.append(f"row {idx}: {err}")
+        payload = {
+            "manifest": str(Path(args.manifest).expanduser().resolve()),
+            "rows": len(rows),
+            "errors": errors,
+            "valid": len(errors) == 0,
+        }
+        if bool(args.json):
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print("pvx augment-manifest validate")
+            print(f"- manifest: {payload['manifest']}")
+            print(f"- rows: {payload['rows']}")
+            print(f"- valid: {'yes' if payload['valid'] else 'no'}")
+            if errors:
+                print("- errors:")
+                for err in errors[:20]:
+                    print(f"  - {err}")
+        if bool(args.strict) and errors:
+            return 1
+        return 0
+
+    if args.command == "merge":
+        all_rows: list[dict[str, object]] = []
+        for item in list(args.manifests):
+            all_rows.extend(_load_manifest_jsonl(Path(item).expanduser().resolve()))
+        merged = _merge_manifest_rows(all_rows, dedupe_by=str(args.dedupe_by))
+        out_jsonl = Path(args.output_jsonl).expanduser().resolve()
+        out_jsonl.parent.mkdir(parents=True, exist_ok=True)
+        with out_jsonl.open("w", encoding="utf-8") as handle:
+            for row in merged:
+                handle.write(json.dumps(row, sort_keys=True) + "\n")
+        if args.output_csv is not None:
+            out_csv = Path(args.output_csv).expanduser().resolve()
+            out_csv.parent.mkdir(parents=True, exist_ok=True)
+            headers = sorted({key for row in merged for key in row.keys()})
+            with out_csv.open("w", encoding="utf-8", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=headers)
+                writer.writeheader()
+                for row in merged:
+                    writer.writerow({key: row.get(key, "") for key in headers})
+        print(f"[augment-manifest] merged rows={len(merged)} -> {out_jsonl}")
+        return 0
+
+    if args.command == "stats":
+        rows = _load_manifest_jsonl(Path(args.manifest).expanduser().resolve())
+        split_counts: dict[str, int] = {}
+        status_counts: dict[str, int] = {}
+        intent_counts: dict[str, int] = {}
+        for row in rows:
+            split = str(row.get("split", "unknown")).strip().lower() or "unknown"
+            status = str(row.get("status", "unknown")).strip().lower() or "unknown"
+            intent = str(row.get("intent", "unknown")).strip().lower() or "unknown"
+            split_counts[split] = split_counts.get(split, 0) + 1
+            status_counts[status] = status_counts.get(status, 0) + 1
+            intent_counts[intent] = intent_counts.get(intent, 0) + 1
+        payload = {
+            "manifest": str(Path(args.manifest).expanduser().resolve()),
+            "rows": len(rows),
+            "split_counts": split_counts,
+            "status_counts": status_counts,
+            "intent_counts": intent_counts,
+        }
+        if bool(args.json):
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print("pvx augment-manifest stats")
+            print(f"- manifest: {payload['manifest']}")
+            print(f"- rows: {payload['rows']}")
+            print(f"- split_counts: {json.dumps(split_counts, sort_keys=True)}")
+            print(f"- status_counts: {json.dumps(status_counts, sort_keys=True)}")
+            print(f"- intent_counts: {json.dumps(intent_counts, sort_keys=True)}")
+        return 0
+
+    parser.error(f"Unsupported command: {args.command}")
+    return 2
 
 
 def _extract_follow_example_request(args: list[str]) -> str | None:
@@ -2615,6 +3228,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  pvx transforms\n"
             "  pvx smoke --output smoke_out.wav\n"
             "  pvx augment data/*.wav --output-dir aug_out --variants-per-input 4 --intent asr_robust --seed 1337\n"
+            "  pvx augment-manifest validate aug_out/augment_manifest.jsonl\n"
             "  pvx voc input.wav --output-dir out --lucky 8\n"
             "  pvx list\n"
             "  pvx examples basic\n"
@@ -2667,6 +3281,7 @@ def main(argv: list[str] | None = None) -> int:
         "safe",
         "smoke",
         "augment",
+        "augment-manifest",
         "guided",
         "guide",
         "follow",
@@ -2712,6 +3327,10 @@ def main(argv: list[str] | None = None) -> int:
         if lucky_count is not None:
             parser.error("--lucky is not supported with `pvx augment`")
         return run_augment_mode(forwarded)
+    if command == "augment-manifest":
+        if lucky_count is not None:
+            parser.error("--lucky is not supported with `pvx augment-manifest`")
+        return run_augment_manifest_mode(forwarded)
     if command in {"guided", "guide"}:
         if lucky_count is not None:
             parser.error("--lucky is not supported with `pvx guided`")
@@ -2782,6 +3401,9 @@ def main(argv: list[str] | None = None) -> int:
                 return 0
             if target == "augment":
                 print("Run `pvx augment --help` for deterministic AI dataset augmentation workflows.")
+                return 0
+            if target == "augment-manifest":
+                print("Run `pvx augment-manifest --help` to validate/merge augmentation manifests.")
                 return 0
             if target in {"list", "ls", "tools"}:
                 print_tools()

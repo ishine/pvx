@@ -75,7 +75,20 @@ def test_readme_long_flags_exist_in_parser_sources() -> None:
     readme_flags = set(re.findall(r"`(--[a-z0-9][a-z0-9\-]*)`", readme))
 
     known_flags = {flag for _, flag in extract_flags_from_code()}
-    allowed = {"--help"}
+    # --help is built-in; benchmark/CI runner flags are defined in
+    # scripts outside the pvx CLI package and are documented in the
+    # README for reference.
+    allowed = {
+        "--help",
+        # benchmarks/run_bench.py flags (external script, not part of pvx CLI)
+        "--dataset-manifest",
+        "--determinism-runs",
+        "--deterministic-cpu",
+        "--gate-row-level",
+        "--gate-signatures",
+        "--refresh-manifest",
+        "--strict-corpus",
+    }
     unknown = sorted(flag for flag in (readme_flags - known_flags) if flag not in allowed)
 
     assert not unknown, f"README references long flags not found in parser sources: {unknown}"

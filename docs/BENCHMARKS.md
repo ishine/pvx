@@ -83,6 +83,31 @@ Interpretation notes:
 
 Raw machine-readable benchmark output: `docs/benchmarks/latest.json`.
 
+## Augmentation Benchmark Gate
+
+For AI research/data augmentation workflows, run:
+
+```bash
+python benchmarks/run_augment_bench.py \
+  --quick \
+  --out-dir benchmarks/out_augment \
+  --baseline benchmarks/baseline_augment_small.json \
+  --gate \
+  --gate-tolerance 0.30
+```
+
+Outputs:
+- `benchmarks/out_augment/report.json`
+- `benchmarks/out_augment/report.md`
+
+Tracked metrics include:
+- record/rendered counts
+- required-field manifest validation errors
+- split balance (`split_balance_l1`)
+- augmentation diversity (`stretch_std`, `pitch_std`)
+- safety/quality indicators (`clip_pct_max`, `peak_dbfs_p95`)
+- pair completeness (`pair_coverage`) for contrastive two-view runs
+
 ## Attribution
 
 Copyright (c) 2026 Colby Leider and contributors. See [`ATTRIBUTION.md`](../ATTRIBUTION.md).

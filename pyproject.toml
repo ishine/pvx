@@ -27,6 +27,25 @@ dev = [
 build = [
     "pyinstaller>=6.0",
 ]
+# ML/DL framework integrations (install only what you need)
+torch = [
+    "torch>=2.0",
+    "torchaudio>=2.0",
+]
+huggingface = [
+    "datasets>=2.14",
+    "transformers>=4.35",
+]
+tensorflow = [
+    "tensorflow>=2.13",
+]
+# Install all ML integrations at once
+ml = [
+    "torch>=2.0",
+    "torchaudio>=2.0",
+    "datasets>=2.14",
+    "transformers>=4.35",
+]
 
 [project.scripts]
 pvx = "pvx.cli.pvx:main"
@@ -60,6 +79,12 @@ pvxharmmap = "pvx.cli.pvxharmmap:main"
 pvxchordmapper = "pvx.cli.pvxchordmapper:main"
 pvxinharmonator = "pvx.cli.pvxinharmonator:main"
 pvxtrajectoryreverb = "pvx.cli.pvxtrajectoryreverb:main"
+# ML/DL augmentation tools
+pvxnoise = "pvx.cli.pvxnoise:main"
+pvxrir = "pvx.cli.pvxrir:main"
+pvxcodec = "pvx.cli.pvxcodec:main"
+pvxspecaugment = "pvx.cli.pvxspecaugment:main"
+pvxgain = "pvx.cli.pvxgain:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

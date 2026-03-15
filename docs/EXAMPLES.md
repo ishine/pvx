@@ -2555,6 +2555,142 @@ pvx augment data/*.wav --output-dir aug_out --variants-per-input 4 --intent asr_
 - augmentation policy mismatch to task (too mild for contrastive learning, too aggressive for label-sensitive training)
 - split leakage if downstream pipeline ignores source-family grouping
 
+---
+
+## 92) Speaker-Balanced Split Assignment for Augmentation
+
+**Command**
+```bash
+pvx augment data/*.wav --output-dir aug_speaker --variants-per-input 3 --intent asr_robust --split-mode speaker_balanced --labels-csv labels.csv --seed 1337
+```
+
+**Explanation**
+- Uses speaker metadata to assign train/validation/test splits with better speaker balance.
+- Reduces cross-speaker skew and helps avoid accidental split leakage.
+
+**Before/After**
+- Before: random split may under-represent some speakers in validation/test.
+- After: split assignment uses speaker-aware balancing constraints.
+
+**Parameters that matter most**
+- `--split-mode speaker_balanced`
+- `--labels-csv`
+- `--split`
+- `--grouping`
+
+**Artifacts to listen for**
+- metadata mismatch (wrong speaker IDs) causing unhelpful balancing
+- tiny corpora where strict balancing is statistically limited
+
+---
+
+## 93) Contrastive Paired Views for Self-Supervised Learning
+
+**Command**
+```bash
+pvx augment data/*.wav --output-dir aug_ssl --variants-per-input 2 --intent ssl_contrastive --pair-mode contrastive2 --seed 2026
+```
+
+**Explanation**
+- Generates paired views (`view a` / `view b`) per augmentation variant for contrastive learning pipelines.
+- Pair relationships are tracked in manifest fields (`pair_id`, `view_id`).
+
+**Before/After**
+- Before: only independent single-view augment outputs.
+- After: structured paired views suitable for positive-pair training setups.
+
+**Parameters that matter most**
+- `--pair-mode contrastive2`
+- `--intent ssl_contrastive`
+- `--seed`
+
+**Artifacts to listen for**
+- over-aggressive pair divergence reducing semantic overlap
+- too-similar pairs limiting contrastive learning value
+
+---
+
+## 94) Resume + Append for Long Augmentation Runs
+
+**Command**
+```bash
+pvx augment data/*.wav --output-dir aug_resume --variants-per-input 6 --intent mir_music --resume --append-manifest --workers 4 --seed 9001
+```
+
+**Explanation**
+- Resumes from existing outputs/manifests and appends new records without losing previous lineage metadata.
+- Useful for interrupted jobs and incremental dataset growth.
+
+**Before/After**
+- Before: restarts can duplicate work or overwrite provenance.
+- After: incremental, resumable augmentation workflow.
+
+**Parameters that matter most**
+- `--resume`
+- `--append-manifest`
+- `--workers`
+- `--seed`
+
+**Artifacts to listen for**
+- stale manifest rows if files are manually moved/deleted outside tooling
+- mixed policy runs when appending across dissimilar settings
+
+---
+
+## 95) Manifest Validation and Merge
+
+**Command**
+```bash
+pvx augment-manifest validate aug_run_a/augment_manifest.jsonl --strict
+pvx augment-manifest merge aug_run_a/augment_manifest.jsonl aug_run_b/augment_manifest.jsonl --output-jsonl aug_merged/manifest.jsonl --output-csv aug_merged/manifest.csv
+pvx augment-manifest stats aug_merged/manifest.jsonl
+```
+
+**Explanation**
+- Validates required manifest fields, merges runs with de-duplication, and prints quick stats for auditability.
+- Supports production data curation workflows where multiple augmentation passes are combined.
+
+**Before/After**
+- Before: ad-hoc manual joins and uncertain manifest integrity.
+- After: deterministic validation + merge + reporting in one command family.
+
+**Parameters that matter most**
+- `validate --strict`
+- `merge --dedupe-by`
+- `stats`
+
+**Artifacts to listen for**
+- duplicate lineage entries if dedupe key does not match your data model
+- invalid rows from older manifests lacking required fields
+
+---
+
+## 96) Augmentation Benchmark Gate
+
+**Command**
+```bash
+python benchmarks/run_augment_bench.py --quick --out-dir benchmarks/out_augment --baseline benchmarks/baseline_augment_small.json --gate --gate-tolerance 0.30
+```
+
+**Explanation**
+- Runs deterministic augmentation benchmark checks and compares summary metrics against a baseline.
+- Intended for release and continuous integration (CI) regression gating.
+
+**Before/After**
+- Before: no objective gate for augmentation drift.
+- After: reproducible benchmark reports with pass/fail criteria.
+
+**Parameters that matter most**
+- `--baseline`
+- `--gate`
+- `--gate-tolerance`
+- `--quick`
+
+**Artifacts to listen for**
+- split-balance drift
+- reduced augmentation diversity (low stretch/pitch standard deviation)
+- clipping/level anomalies in audit metrics
+
 ## Attribution
 
 Copyright (c) 2026 Colby Leider and contributors. See [ATTRIBUTION.md](../ATTRIBUTION.md).

@@ -65,6 +65,7 @@ pvx safe input.wav --material mix --output output_safe.wav
 pvx transforms
 pvx smoke --output smoke_out.wav
 pvx augment data/*.wav --output-dir aug_out --variants-per-input 4 --intent asr_robust --seed 1337
+pvx augment-manifest validate aug_out/augment_manifest.jsonl --strict
 ```
 
 What each does:
@@ -74,6 +75,7 @@ What each does:
 - `pvx transforms`: explains transform options and runtime availability.
 - `pvx smoke`: executes a fast synthetic end-to-end sanity render.
 - `pvx augment`: builds deterministic augmentation datasets and writes manifests for machine-learning pipelines.
+- `pvx augment-manifest`: validates, merges, and summarizes augmentation manifests.
 
 ## 0.2 Running Any Command with uv
 

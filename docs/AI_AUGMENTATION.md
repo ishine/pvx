@@ -23,6 +23,12 @@ What this does:
   - `augment_manifest.jsonl`
   - `augment_manifest.csv`
 
+Manifest tool companion:
+
+```bash
+pvx augment-manifest validate aug_out/augment_manifest.jsonl --strict
+```
+
 ## Intent Profiles
 
 | Intent | Typical target | Behavior |
@@ -37,8 +43,16 @@ What this does:
 | --- | --- |
 | `--seed` | Global deterministic seed for all sampled parameters |
 | `--split train,val,test` | Deterministic split assignment ratios written into manifest |
+| `--split-mode` | Split strategy: `random`, `label_balanced`, `speaker_balanced` |
+| `--labels-csv` | Metadata table with `path`/`label`/`speaker` fields for balanced split modes |
 | `--grouping` | Split assignment grouping strategy (`stem-prefix` or `none`) |
 | `--group-separator` | Prefix separator for grouping (default: `__`) |
+| `--pair-mode` | Pair-view mode: `off` or `contrastive2` |
+| `--label-policy` | Perturbation policy: `allow_alter` or `preserve` |
+| `--policy` | JSON policy file with reproducible defaults and parameter bounds |
+| `--workers` | Parallel render workers with deterministic seed behavior |
+| `--resume` | Skip previously rendered outputs using existing manifests/output files |
+| `--append-manifest` | Merge with existing manifests rather than replace |
 | `--dry-run` | Plan outputs and write manifests without rendering audio |
 | `--manifest-jsonl` / `--manifest-csv` | Explicit manifest output paths |
 
@@ -53,6 +67,7 @@ Each JSON Lines (JSONL) row contains:
 - `split` (`train`, `val`, `test`)
 - `group_key` (split-group identifier)
 - `status` (`planned`, `rendered`, or `error:<code>`)
+- `source_sha256`, `output_sha256`
 - `params` object, including:
   - `stretch`
   - `pitch`
@@ -62,6 +77,12 @@ Each JSON Lines (JSONL) row contains:
   - `formant_strength`
   - `transient_sensitivity`
   - `target_lufs`
+- optional `audit` object:
+  - `duration_sec`
+  - `peak_dbfs`
+  - `rms_dbfs`
+  - `clip_pct`
+  - `zcr`
 
 CSV manifest includes the same essential fields in tabular form.
 
@@ -87,6 +108,8 @@ pvx augment corpus/music/**/*.wav \
   --output-dir data_aug/music \
   --variants-per-input 4 \
   --intent mir_music \
+  --split-mode label_balanced \
+  --labels-csv labels.csv \
   --split 0.7,0.2,0.1 \
   --seed 2026
 ```
@@ -98,6 +121,7 @@ pvx augment corpus/*.wav \
   --output-dir data_aug/plan_only \
   --variants-per-input 3 \
   --intent ssl_contrastive \
+  --pair-mode contrastive2 \
   --dry-run \
   --seed 42
 ```
@@ -109,10 +133,84 @@ pvx augment corpus/*.wav \
   --output-dir data_aug/run_a \
   --variants-per-input 5 \
   --intent asr_robust \
+  --label-policy preserve \
+  --policy policies/asr_policy.json \
   --manifest-jsonl reports/run_a_manifest.jsonl \
   --manifest-csv reports/run_a_manifest.csv \
   --seed 9001
 ```
+
+### 5) Resume and append
+
+```bash
+pvx augment corpus/*.wav \
+  --output-dir data_aug/run_resume \
+  --variants-per-input 5 \
+  --intent mir_music \
+  --resume \
+  --append-manifest \
+  --seed 9001
+```
+
+### 6) Manifest merge + stats
+
+```bash
+pvx augment-manifest merge \
+  reports/run_a_manifest.jsonl reports/run_b_manifest.jsonl \
+  --output-jsonl reports/merged_manifest.jsonl \
+  --output-csv reports/merged_manifest.csv
+
+pvx augment-manifest stats reports/merged_manifest.jsonl
+```
+
+## Policy File Template
+
+```json
+{
+  "augment": {
+    "intent": "asr_robust",
+    "variants_per_input": 4,
+    "split": "0.8,0.1,0.1",
+    "split_mode": "speaker_balanced",
+    "grouping": "stem-prefix",
+    "group_separator": "__",
+    "pair_mode": "off",
+    "label_policy": "preserve",
+    "workers": 4,
+    "device": "cpu",
+    "output_format": "wav",
+    "bounds": {
+      "stretch": [0.94, 1.08],
+      "pitch": [-1.0, 1.0],
+      "formant_strength": [0.60, 0.92],
+      "transient_sensitivity": [0.50, 0.75],
+      "target_lufs": [-24.0, -16.0]
+    },
+    "choices": {
+      "window": ["hann", "hamming"],
+      "transform": ["fft", "dft"],
+      "preset": ["vocal_studio"]
+    }
+  }
+}
+```
+
+## Benchmarking Augmentation Pipelines
+
+Use the dedicated augmentation benchmark:
+
+```bash
+python benchmarks/run_augment_bench.py \
+  --quick \
+  --out-dir benchmarks/out_augment \
+  --baseline benchmarks/baseline_augment_small.json \
+  --gate \
+  --gate-tolerance 0.30
+```
+
+Outputs:
+- `benchmarks/out_augment/report.json`
+- `benchmarks/out_augment/report.md`
 
 ## Running with uv
 
