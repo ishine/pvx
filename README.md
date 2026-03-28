@@ -144,7 +144,7 @@ Legacy wrappers remain available for backward compatibility.
 If this is your first phase-vocoder workflow, think of `pvx` as:
 - a way to make audio longer/shorter without changing musical note center
 - a way to change pitch without changing duration
-- a way to do both while protecting attacks, timbre, and stereo image
+- a way to do both while protecting attacks, timbre, and spatial image
 
 You do not need to understand the math first. Start with copy-paste commands, listen, then adjust one parameter at a time. No ceremonial DSP robes required.
 
