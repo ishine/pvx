@@ -1,5 +1,3 @@
-# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
-
 """Unit tests for pvx augment helper mode."""
 
 from __future__ import annotations
@@ -27,6 +25,7 @@ from pvx.cli.pvx import (
     run_augment_manifest_mode,
     run_augment_mode,
 )
+from pvx.cli.pvx_augment import run_augment_mode as run_augment_mode_impl
 
 
 class TestAugmentMode(unittest.TestCase):
@@ -77,7 +76,11 @@ class TestAugmentMode(unittest.TestCase):
 
             manifest = out_dir / "augment_manifest.jsonl"
             self.assertTrue(manifest.exists())
-            rows = [json.loads(line) for line in manifest.read_text(encoding="utf-8").splitlines() if line.strip()]
+            rows = [
+                json.loads(line)
+                for line in manifest.read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
             self.assertEqual(len(rows), 2)
             self.assertEqual(rows[0]["group_key"], "speaker1")
             self.assertEqual(rows[1]["group_key"], "speaker1")
@@ -114,7 +117,9 @@ class TestAugmentMode(unittest.TestCase):
             self.assertEqual(code, 0)
             rows = [
                 json.loads(line)
-                for line in (out_dir / "augment_manifest.jsonl").read_text(encoding="utf-8").splitlines()
+                for line in (out_dir / "augment_manifest.jsonl")
+                .read_text(encoding="utf-8")
+                .splitlines()
                 if line.strip()
             ]
             self.assertEqual(len(rows), 2)
@@ -156,8 +161,51 @@ class TestAugmentMode(unittest.TestCase):
                 ]
             )
             self.assertEqual(code_merge, 0)
-            lines = [line for line in merged.read_text(encoding="utf-8").splitlines() if line.strip()]
+            lines = [
+                line for line in merged.read_text(encoding="utf-8").splitlines() if line.strip()
+            ]
             self.assertEqual(len(lines), 2)
+
+    def test_augment_render_forwards_limiter_threshold(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="pvx-augment-render-") as tmp:
+            root = Path(tmp)
+            sr = 16000
+            t = np.arange(0, int(0.08 * sr), dtype=np.float64) / float(sr)
+            tone = (0.2 * np.sin(2.0 * np.pi * 180.0 * t))[:, None]
+            src = root / "clip.wav"
+            sf.write(str(src), tone, sr)
+            out_dir = root / "aug_out"
+            seen: list[list[str]] = []
+
+            def fake_dispatch(tool: str, args: list[str]) -> int:
+                self.assertEqual(tool, "voc")
+                seen.append(list(args))
+                out_path = Path(args[args.index("--output") + 1])
+                sf.write(str(out_path), tone, sr)
+                return 0
+
+            code = run_augment_mode_impl(
+                [
+                    str(src),
+                    "--output-dir",
+                    str(out_dir),
+                    "--variants-per-input",
+                    "1",
+                    "--intent",
+                    "mir_music",
+                    "--seed",
+                    "5",
+                    "--engine",
+                    "pvx-cli",
+                    "--silent",
+                ],
+                dispatch_tool=fake_dispatch,
+            )
+
+            self.assertEqual(code, 0)
+            self.assertEqual(len(seen), 1)
+            self.assertIn("--limiter-threshold", seen[0])
+            self.assertEqual(seen[0][seen[0].index("--limiter-threshold") + 1], "0.98")
 
 
 if __name__ == "__main__":

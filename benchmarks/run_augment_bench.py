@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
 
 """Benchmark runner for pvx augmentation workflows.
 
@@ -89,7 +88,9 @@ def _split_balance_l1(rows: list[dict[str, Any]], target: tuple[float, float, fl
     return float(sum(abs(observed[i] - target[i]) for i in range(3)))
 
 
-def _summarize(rows: list[dict[str, Any]], *, target_split: tuple[float, float, float]) -> dict[str, Any]:
+def _summarize(
+    rows: list[dict[str, Any]], *, target_split: tuple[float, float, float]
+) -> dict[str, Any]:
     rendered = [row for row in rows if str(row.get("status", "")).startswith("rendered")]
     splits = {"train": 0, "val": 0, "test": 0}
     intents: dict[str, int] = {}
@@ -144,7 +145,9 @@ def _summarize(rows: list[dict[str, Any]], *, target_split: tuple[float, float, 
         "records_total": len(rows),
         "rendered_total": len(rendered),
         "required_field_errors": _required_error_count(rows),
-        "unique_sources": len({str(row.get("source_path", "")) for row in rows if row.get("source_path")}),
+        "unique_sources": len(
+            {str(row.get("source_path", "")) for row in rows if row.get("source_path")}
+        ),
         "split_counts": splits,
         "intent_counts": intents,
         "split_balance_l1": _split_balance_l1(rows, target_split),
@@ -152,14 +155,18 @@ def _summarize(rows: list[dict[str, Any]], *, target_split: tuple[float, float, 
         "stretch_std": float(statistics.pstdev(stretch_values)) if len(stretch_values) > 1 else 0.0,
         "pitch_mean": float(statistics.mean(pitch_values)) if pitch_values else float("nan"),
         "pitch_std": float(statistics.pstdev(pitch_values)) if len(pitch_values) > 1 else 0.0,
-        "pitch_abs_mean": float(statistics.mean(abs(v) for v in pitch_values)) if pitch_values else float("nan"),
+        "pitch_abs_mean": float(statistics.mean(abs(v) for v in pitch_values))
+        if pitch_values
+        else float("nan"),
         "clip_pct_max": float(max(clip_values)) if clip_values else float("nan"),
         "peak_dbfs_p95": peak_p95,
         "pair_coverage": pair_coverage,
     }
 
 
-def _relative_metric_gate(cur: dict[str, Any], base: dict[str, Any], tolerance: float) -> tuple[bool, list[str]]:
+def _relative_metric_gate(
+    cur: dict[str, Any], base: dict[str, Any], tolerance: float
+) -> tuple[bool, list[str]]:
     keys = (
         "records_total",
         "rendered_total",
@@ -170,6 +177,8 @@ def _relative_metric_gate(cur: dict[str, Any], base: dict[str, Any], tolerance: 
         "clip_pct_max",
         "pair_coverage",
     )
+    lower_is_better = {"required_field_errors", "split_balance_l1", "clip_pct_max"}
+    higher_is_better = {"pair_coverage"}
     failures: list[str] = []
     for key in keys:
         if key not in cur or key not in base:
@@ -178,10 +187,16 @@ def _relative_metric_gate(cur: dict[str, Any], base: dict[str, Any], tolerance: 
         b = _safe_float(base[key])
         if a is None or b is None:
             continue
+        if key in lower_is_better and a <= b:
+            continue
+        if key in higher_is_better and a >= b:
+            continue
         denom = max(abs(b), 1e-9)
         rel = abs(a - b) / denom
         if rel > tolerance:
-            failures.append(f"relative:{key}: current={a:.6g} baseline={b:.6g} rel={rel:.4f} tol={tolerance:.4f}")
+            failures.append(
+                f"relative:{key}: current={a:.6g} baseline={b:.6g} rel={rel:.4f} tol={tolerance:.4f}"
+            )
     return len(failures) == 0, failures
 
 
@@ -235,7 +250,7 @@ def _profile_names(payload: dict[str, Any]) -> list[str]:
     profiles = payload.get("profiles", {})
     if not isinstance(profiles, dict):
         return []
-    return sorted(str(k) for k in profiles.keys())
+    return sorted(str(k) for k in profiles)
 
 
 def _resolve_profile_path(path_str: str | None) -> Path | None:
@@ -295,24 +310,44 @@ def _apply_profile_overrides(
 def main(argv: list[str] | None = None) -> int:
     cli_argv = list(sys.argv[1:] if argv is None else argv)
 
-    parser = argparse.ArgumentParser(description="Run pvx augmentation benchmark and optional regression gate.")
-    parser.add_argument("--input-glob", default="test.wav", help="Input glob for augmentation benchmark")
-    parser.add_argument("--out-dir", type=Path, default=Path("benchmarks/out_augment"), help="Output directory")
+    parser = argparse.ArgumentParser(
+        description="Run pvx augmentation benchmark and optional regression gate."
+    )
+    parser.add_argument(
+        "--input-glob", default="test.wav", help="Input glob for augmentation benchmark"
+    )
+    parser.add_argument(
+        "--out-dir", type=Path, default=Path("benchmarks/out_augment"), help="Output directory"
+    )
     parser.add_argument("--variants-per-input", type=int, default=2, help="Variants per input")
-    parser.add_argument("--intent", choices=["asr_robust", "mir_music", "ssl_contrastive"], default="asr_robust")
+    parser.add_argument(
+        "--intent", choices=["asr_robust", "mir_music", "ssl_contrastive"], default="asr_robust"
+    )
     parser.add_argument("--pair-mode", choices=["off", "contrastive2"], default="off")
     parser.add_argument("--seed", type=int, default=1337)
     parser.add_argument("--split", default="0.8,0.1,0.1")
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--baseline", type=Path, default=None, help="Optional baseline JSON path")
-    parser.add_argument("--gate", action="store_true", help="Enable regression gate against baseline/absolute rules")
-    parser.add_argument("--gate-tolerance", type=float, default=0.20, help="Relative tolerance for baseline drift")
-    parser.add_argument("--refresh-baseline", action="store_true", help="Write current metrics to baseline path")
+    parser.add_argument(
+        "--gate", action="store_true", help="Enable regression gate against baseline/absolute rules"
+    )
+    parser.add_argument(
+        "--gate-tolerance", type=float, default=0.20, help="Relative tolerance for baseline drift"
+    )
+    parser.add_argument(
+        "--refresh-baseline", action="store_true", help="Write current metrics to baseline path"
+    )
     parser.add_argument("--quick", action="store_true", help="Run smaller/faster benchmark")
     parser.add_argument("--profile", default=None, help="Named profile from --profiles-file")
-    parser.add_argument("--profiles-file", type=Path, default=DEFAULT_PROFILES_PATH, help="Profile JSON file path")
-    parser.add_argument("--list-profiles", action="store_true", help="List available profiles and exit")
-    parser.add_argument("--absolute-gates-json", default=None, help="Override absolute gate rules with JSON object")
+    parser.add_argument(
+        "--profiles-file", type=Path, default=DEFAULT_PROFILES_PATH, help="Profile JSON file path"
+    )
+    parser.add_argument(
+        "--list-profiles", action="store_true", help="List available profiles and exit"
+    )
+    parser.add_argument(
+        "--absolute-gates-json", default=None, help="Override absolute gate rules with JSON object"
+    )
     args = parser.parse_args(cli_argv)
 
     profiles_payload = _load_profiles(Path(args.profiles_file).expanduser().resolve())
@@ -411,7 +446,9 @@ def main(argv: list[str] | None = None) -> int:
     report = {
         "meta": {
             "profile": profile_name or None,
-            "profile_description": str(profile_data.get("description", "")).strip() if profile_data else "",
+            "profile_description": str(profile_data.get("description", "")).strip()
+            if profile_data
+            else "",
             "profiles_file": str(Path(args.profiles_file).expanduser().resolve()),
             "input_glob": str(args.input_glob),
             "out_dir": str(out_dir),
@@ -429,7 +466,9 @@ def main(argv: list[str] | None = None) -> int:
     }
 
     baseline_payload: dict[str, Any] | None = None
-    baseline_path = Path(args.baseline).expanduser().resolve() if args.baseline is not None else None
+    baseline_path = (
+        Path(args.baseline).expanduser().resolve() if args.baseline is not None else None
+    )
     relative_failures: list[str] = []
     absolute_failures: list[str] = []
     relative_ok = True
@@ -438,14 +477,18 @@ def main(argv: list[str] | None = None) -> int:
     if baseline_path is not None and baseline_path.exists():
         baseline_payload = json.loads(baseline_path.read_text(encoding="utf-8"))
         base_metrics = dict(baseline_payload.get("metrics", {}))
-        relative_ok, relative_failures = _relative_metric_gate(metrics, base_metrics, float(args.gate_tolerance))
+        relative_ok, relative_failures = _relative_metric_gate(
+            metrics, base_metrics, float(args.gate_tolerance)
+        )
 
     if profile_abs_rules:
         absolute_ok, absolute_failures = _absolute_metric_gate(metrics, profile_abs_rules)
 
     if bool(args.refresh_baseline) and baseline_path is not None:
         baseline_path.parent.mkdir(parents=True, exist_ok=True)
-        baseline_path.write_text(json.dumps(_json_safe(report), indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        baseline_path.write_text(
+            json.dumps(_json_safe(report), indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
 
     gate_ok = bool(relative_ok and absolute_ok)
     report["gate"] = {
@@ -470,7 +513,9 @@ def main(argv: list[str] | None = None) -> int:
     report_json = out_dir / "report.json"
     report_md = out_dir / "report.md"
     safe_report = _json_safe(report)
-    report_json.write_text(json.dumps(safe_report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    report_json.write_text(
+        json.dumps(safe_report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
     lines: list[str] = []
     lines.append("# pvx Augmentation Benchmark")
@@ -518,7 +563,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"[augment-bench] report json -> {report_json}")
     print(f"[augment-bench] report md   -> {report_md}")
     if bool(args.gate) and not bool(gate_ok):
-        for item in (relative_failures + absolute_failures):
+        for item in relative_failures + absolute_failures:
             print(f"[augment-bench] gate failure: {item}", file=sys.stderr)
         return 1
     return 0

@@ -1,13 +1,11 @@
-# Copyright (c) 2026 Colby Leider and contributors. See ATTRIBUTION.md.
-
 """Documentation coverage checks for CLI flags."""
 
 from __future__ import annotations
 
 import ast
 import json
-from pathlib import Path
 import re
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -19,14 +17,19 @@ def _string_literal(node: ast.AST) -> str | None:
 
 
 def _iter_cli_sources() -> list[Path]:
-    sources = [ROOT / "src" / "pvx" / "core" / "voc.py"]
+    sources = [
+        ROOT / "src" / "pvx" / "core" / "voc.py",
+        ROOT / "src" / "pvx" / "core" / "voc_console.py",
+    ]
     sources.extend(sorted((ROOT / "src" / "pvx" / "cli").glob("*.py")))
     return [p for p in sources if p.exists() and p.name != "__init__.py"]
 
 
 def _tool_name_for_path(path: Path) -> str:
-    if path.name == "voc.py":
+    if path.name in {"voc.py", "voc_console.py"}:
         return "pvxvoc"
+    if path.stem in {"pvx", "pvx_augment", "pvx_helpers", "pvx_pipeline"}:
+        return "pvx"
     if path.parent.name == "cli":
         return "hps-pitch-track" if path.stem == "hps_pitch_track" else path.stem
     return path.name
@@ -66,7 +69,9 @@ def test_cli_flag_docs_match_parser_definitions() -> None:
     missing_in_docs = sorted(code_pairs - doc_pairs)
     stale_in_docs = sorted(doc_pairs - code_pairs)
 
-    assert not missing_in_docs, f"Flags present in parser code but missing from docs: {missing_in_docs}"
+    assert not missing_in_docs, (
+        f"Flags present in parser code but missing from docs: {missing_in_docs}"
+    )
     assert not stale_in_docs, f"Flags documented but no longer in parser code: {stale_in_docs}"
 
 
