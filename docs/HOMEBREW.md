@@ -6,6 +6,14 @@
 
 Current development / pre-release flow:
 
+From a local checkout:
+
+```bash
+brew install --HEAD ./Formula/pvx.rb
+```
+
+From GitHub once the formula is on `main`:
+
 ```bash
 brew install --HEAD https://raw.githubusercontent.com/TheColby/pvx/main/Formula/pvx.rb
 ```
