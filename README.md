@@ -48,6 +48,15 @@ brew install --HEAD https://raw.githubusercontent.com/TheColby/pvx/main/Formula/
 pvx --help
 ```
 
+For a tagged release formula, use the same path without `--HEAD` after the release formula has been stamped:
+
+```bash
+brew install https://raw.githubusercontent.com/TheColby/pvx/main/Formula/pvx.rb
+pvx --help
+```
+
+Homebrew installs `libsndfile` automatically for runtime audio I/O.
+
 Release/tap details live in [docs/HOMEBREW.md](docs/HOMEBREW.md).
 
 ```bash
