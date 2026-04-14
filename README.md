@@ -9,10 +9,12 @@
 
 It is designed for musically usable results under both normal and extreme processing conditions, including long time stretching, formant-aware pitch movement, transient-sensitive material, and stereo or multichannel coherence preservation.
 
-Project priorities:
-- audio quality first
+Primary project goals and differentiators:
+- audio quality first (phase coherence, transient integrity, formant stability, stereo coherence)
+- speed second (throughput/runtime tuning only after quality targets are met)
+- multichannel-native audio processing
 - reproducible CPU paths, with optional CUDA acceleration where available
-- multichannel-native processing and automation
+- automation-friendly workflows for batch, chain, and follow-style processing
 
 Start here:
 - [Install](#install)
@@ -147,7 +149,7 @@ Legacy wrappers remain available for backward compatibility.
 If this is your first phase-vocoder workflow, think of `pvx` as:
 - a way to make audio longer/shorter without changing musical note center
 - a way to change pitch without changing duration
-- a way to do both while protecting attacks, timbre, and stereo image
+- a way to do both while protecting attacks, timbre, and spatial image
 
 You do not need to understand the math first. Start with copy-paste commands, listen, then adjust one parameter at a time. No ceremonial DSP robes required.
 
