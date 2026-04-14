@@ -7,52 +7,30 @@
 
 `pvx` is a Python toolkit for high-quality time and pitch processing using a phase-vocoder/short-time Fourier transform (STFT) core.
 
-It is designed for users who need musically usable results under both normal and extreme processing conditions, including long time stretching, formant-aware pitch movement, transient-sensitive material, and stereo/multichannel coherence preservation.
+It is designed for musically usable results under both normal and extreme processing conditions, including long time stretching, formant-aware pitch movement, transient-sensitive material, and stereo or multichannel coherence preservation.
 
 Primary project goals and differentiators:
 - audio quality first (phase coherence, transient integrity, formant stability, stereo coherence)
 - speed second (throughput/runtime tuning only after quality targets are met)
 - multichannel-native audio processing
+- reproducible CPU paths, with optional CUDA acceleration where available
+- automation-friendly workflows for batch, chain, and follow-style processing
 
-At a glance, `pvx` provides:
-- a unified command-line interface (CLI) (`pvx`) plus installed tool entry points (`pvxvoc`, `pvxfreeze`, and others)
-- focused tools (`voc`, `freeze`, `harmonize`, `retune`, `morph`, and more) with shared argument conventions
-- deterministic central processing unit (CPU) paths for reproducible runs, plus optional graphics processing unit (GPU)/Compute Unified Device Architecture (CUDA) acceleration where available
-- native Apple Silicon support in the CPU path
-- comma-separated values (CSV)-driven automation workflows for segment-wise and trajectory-driven processing
-- microtonal support (ratio, cents, and scale-constrained retune workflows)
-- shared mastering/output controls (target loudness units relative to full scale (LUFS), limiting, clipping, dithering, and output policy options)
-- comprehensive generated documentation (Markdown, HyperText Markup Language (HTML), and Portable Document Format (PDF))
-
-## Table of Contents
-
-- [Value Proposition](#value-proposition)
+Start here:
 - [Install](#install)
-- [Start Here (No Prior DSP Knowledge Needed)](#start-here-no-prior-dsp-knowledge-needed)
-- [What Is a Phase Vocoder? (No Math Version)](#what-is-a-phase-vocoder-no-math-version)
-- [Analog Tape Methods for Pitch/Time Shifting](#analog-tape-methods-for-pitchtime-shifting)
-- [Mental Model (1 Minute)](#mental-model-1-minute)
 - [30-Second Quick Start](#30-second-quick-start)
-- [Unified CLI (Primary Entry Point)](#unified-cli-primary-entry-point)
-- [5-Minute Tutorial (Single-File Workflow)](#5-minute-tutorial-single-file-workflow)
-- [Conceptual Overview: What Is a Phase Vocoder?](#conceptual-overview-what-is-a-phase-vocoder)
-- [When To Use Which Tool (Decision Tree)](#when-to-use-which-tool-decision-tree)
-- [Common Workflows](#common-workflows)
-- [Supported File Types](#supported-file-types)
-- [Performance and GPU (Quality-First)](#performance-and-gpu-quality-first)
-- [CLI Discoverability and UX](#cli-discoverability-and-ux)
-- [Announcement Readiness: Top 5 Complaints (and Fixes)](#announcement-readiness-top-5-complaints-and-fixes)
-- [AI Research and Data Augmentation](#ai-research-and-data-augmentation)
-- [Benchmarking (pvx vs Rubber Band vs librosa)](#benchmarking-pvx-vs-rubber-band-vs-librosa)
-- [Visual Documentation](#visual-documentation)
-- [Troubleshooting](#troubleshooting)
-- [FAQ](#faq)
-- [Why This Matters](#why-this-matters)
-- [Lessons from Paul Koonce's PVC Package](#lessons-from-paul-koonces-pvc-package)
-- [Progressive Documentation Map](#progressive-documentation-map)
-- [Community and Governance](#community-and-governance)
-- [License](#license)
-- [Attribution](#attribution)
+- [Unified CLI](#unified-cli-primary-entry-point)
+- [When To Use Which Tool](#when-to-use-which-tool-decision-tree)
+- [Alpha Release Guide](docs/ALPHA_RELEASE.md)
+
+## Alpha Surface
+
+For `0.1.0a1`, treat these as the supported public surface:
+- stable CLIs: `pvx`, `pvxvoc`, `pvxfreeze`, `pvxwarp`, `pvxformant`, `pvxfilter`, `pvxretune`, `pvxanalysis`
+- beta CLIs: usable, but flags may still move in minor releases
+- compatibility imports: `pvxalgorithms*` remain available with deprecation warnings only to ease migration
+
+Release-validation commands live in [RELEASE.md](RELEASE.md) and the alpha checklist in [docs/ALPHA_RELEASE.md](docs/ALPHA_RELEASE.md).
 
 ## Value Proposition
 
@@ -64,6 +42,33 @@ At a glance, `pvx` provides:
 - one unified command-line interface (CLI) (`pvx`) with backwards-compatible direct entry points (`pvxvoc`, `pvxfreeze`, etc.)
 
 ## Install
+
+Homebrew:
+
+From a local checkout:
+
+```bash
+brew install --HEAD ./Formula/pvx.rb
+pvx --help
+```
+
+Once the formula is available on `main`:
+
+```bash
+brew install --HEAD https://raw.githubusercontent.com/TheColby/pvx/main/Formula/pvx.rb
+pvx --help
+```
+
+For a tagged release formula, use the same path without `--HEAD` after the release formula has been stamped:
+
+```bash
+brew install https://raw.githubusercontent.com/TheColby/pvx/main/Formula/pvx.rb
+pvx --help
+```
+
+Homebrew installs `libsndfile` automatically for runtime audio I/O.
+
+Release/tap details live in [docs/HOMEBREW.md](docs/HOMEBREW.md).
 
 ```bash
 python3 -m venv .venv

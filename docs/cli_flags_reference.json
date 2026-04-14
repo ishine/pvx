@@ -1,6 +1,6 @@
 {
-  "commit": "77bdfde",
-  "commit_date": "2026-03-02T01:29:29-05:00",
+  "commit": "bf3dc81",
+  "commit_date": "2026-03-15T19:14:21-04:00",
   "entries": [
     {
       "action": "",
@@ -217,6 +217,26 @@
       "tool": "hps-pitch-track"
     },
     {
+      "action": "store_true",
+      "choices": [],
+      "default": null,
+      "flag": "--append-manifest",
+      "help": "Append/merge with existing manifest instead of replacing it",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "store_true",
+      "choices": [],
+      "default": true,
+      "flag": "--audit-metrics",
+      "help": "Compute per-output audit metrics (default: on)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
       "action": "",
       "choices": [
         "auto",
@@ -227,7 +247,17 @@
       "flag": "--backend",
       "help": "Pitch tracker backend",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 16,
+      "flag": "--batch-size",
+      "help": "Number of files processed simultaneously on GPU (default: 16)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -242,7 +272,7 @@
       "flag": "--bit-depth",
       "help": "Bit-depth assumption when --subtype is not set (default: inherit from input subtype).",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_helpers.py",
       "tool": "pvx"
     },
     {
@@ -252,7 +282,7 @@
       "flag": "--budget-path",
       "help": "Path used to query free space when --disk-budget is omitted (default: current directory).",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_helpers.py",
       "tool": "pvx"
     },
     {
@@ -262,7 +292,7 @@
       "flag": "--chunk-seconds",
       "help": "Chunk/segment duration for `--auto-segment-seconds` (default: 0.25)",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -272,7 +302,7 @@
       "flag": "--confidence-floor",
       "help": "Minimum tracker confidence",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -282,7 +312,7 @@
       "flag": "--context-ms",
       "help": "Optional stateful context window in milliseconds (default: auto from window/hop)",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -292,7 +322,32 @@
       "flag": "--crossfade-ms",
       "help": "Crossfade used for segment assembly in milliseconds (default: 0.0)",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": "output_path",
+      "flag": "--dedupe-by",
+      "help": "Deduplication key (default: output_path)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [
+        "auto",
+        "cuda",
+        "mps",
+        "cpu"
+      ],
+      "default": "auto",
+      "flag": "--device",
+      "help": "Compute device (default: auto \u2014 CUDA > MPS > CPU)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -302,7 +357,27 @@
       "flag": "--disk-budget",
       "help": "Total budget size (e.g., 500MB, 20GB, 2TiB). If omitted, use free space at --budget-path.",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_helpers.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "store_true",
+      "choices": [],
+      "default": null,
+      "flag": "--dry-run",
+      "help": "Plan manifest and filenames without rendering audio",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 0.3,
+      "flag": "--duration",
+      "help": "Synthetic input duration seconds (default: 0.30)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_helpers.py",
       "tool": "pvx"
     },
     {
@@ -316,7 +391,22 @@
       "flag": "--emit",
       "help": "Control map emit mode for the guide track (default: pitch_to_stretch)",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [
+        "auto",
+        "pytorch",
+        "torchaudio",
+        "pvx-cli"
+      ],
+      "default": "auto",
+      "flag": "--engine",
+      "help": "DSP engine for time-stretch and pitch-shift transforms. 'auto' prefers torchaudio > pytorch > pvx-cli. 'torchaudio' uses torchaudio.functional.phase_vocoder. 'pytorch' uses native PyTorch phase vocoder. 'pvx-cli' always uses subprocess. (default: auto)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -326,7 +416,7 @@
       "flag": "--example",
       "help": "Print follow example command(s) and exit. Use `--example` for basic or `--example all` for the full set.",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -336,7 +426,7 @@
       "flag": "--fail-if-exceeds",
       "help": "Return non-zero when --requested-stretch does not fit the usable budget.",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_helpers.py",
       "tool": "pvx"
     },
     {
@@ -351,7 +441,7 @@
       "flag": "--feature-set",
       "help": "Feature columns emitted by pitch tracker (default: all)",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -361,7 +451,7 @@
       "flag": "--fmax",
       "help": "Maximum tracked f0 in Hz",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -371,7 +461,7 @@
       "flag": "--fmin",
       "help": "Minimum tracked f0 in Hz",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -381,7 +471,30 @@
       "flag": "--frame-length",
       "help": "Tracker frame length in samples",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": "__",
+      "flag": "--group-separator",
+      "help": "Separator used by stem-prefix grouping (default: '__')",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [
+        "none",
+        "stem-prefix"
+      ],
+      "default": "stem-prefix",
+      "flag": "--grouping",
+      "help": "Split-grouping strategy (default: stem-prefix). `stem-prefix` keeps variants from similarly named sources in one split.",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -391,7 +504,21 @@
       "flag": "--hop-size",
       "help": "Tracker hop size in samples",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [
+        "asr_robust",
+        "mir_music",
+        "ssl_contrastive"
+      ],
+      "default": "asr_robust",
+      "flag": "--intent",
+      "help": "Built-in augmentation intent profile when --pipeline-config is not given (default: asr_robust)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -399,9 +526,9 @@
       "choices": [],
       "default": null,
       "flag": "--json",
-      "help": "Emit machine-readable JSON summary.",
+      "help": "Emit JSON output",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -411,7 +538,76 @@
       "flag": "--keep-intermediate",
       "help": "Keep intermediate stage files after successful completion",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [
+        "allow_alter",
+        "preserve"
+      ],
+      "default": "allow_alter",
+      "flag": "--label-policy",
+      "help": "Label perturbation policy (default: allow_alter)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--labels-csv",
+      "help": "Optional metadata CSV with path/label/speaker columns for balanced split modes",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--manifest-csv",
+      "help": "Optional CSV manifest path (default: <output-dir>/augment_manifest.csv)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--manifest-jsonl",
+      "help": "Optional JSONL manifest path (default: <output-dir>/augment_manifest.jsonl)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [
+        "mix",
+        "speech",
+        "vocal",
+        "drums",
+        "ambient"
+      ],
+      "default": "mix",
+      "flag": "--material",
+      "help": "Material profile for `pvx safe` command generation",
+      "required": false,
+      "source": "src/pvx/cli/pvx_helpers.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 30.0,
+      "flag": "--max-length-s",
+      "help": "Maximum file duration in seconds (default: 30.0)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -421,7 +617,7 @@
       "flag": "--mfcc-count",
       "help": "MFCC column count emitted by pitch tracker (default: 13)",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -434,7 +630,27 @@
       "flag": "--mode",
       "help": "Stream engine: stateful chunk processor (default) or wrapper compatibility mode",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "store_false",
+      "choices": [],
+      "default": null,
+      "flag": "--no-audit-metrics",
+      "help": "Disable audit metric computation",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "store_true",
+      "choices": [],
+      "default": null,
+      "flag": "--no-progress",
+      "help": "Suppress progress messages",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -444,27 +660,88 @@
       "flag": "--out",
       "help": "Output audio path",
       "required": true,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_helpers.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": "output.wav",
+      "flag": "--output",
+      "help": "Output audio path (default: output.wav)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_helpers.py",
       "tool": "pvx"
     },
     {
       "action": "",
       "choices": [],
       "default": null,
-      "flag": "--output",
-      "help": "Output audio path",
-      "required": true,
-      "source": "src/pvx/cli/pvx.py",
+      "flag": "--output-csv",
+      "help": "Optional merged CSV output path",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
       "action": "",
       "choices": [],
-      "default": "auto",
+      "default": null,
+      "flag": "--output-dir",
+      "help": "Output directory for augmented files",
+      "required": true,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [
+        "wav",
+        "flac",
+        "aiff",
+        "ogg",
+        "caf"
+      ],
+      "default": "wav",
       "flag": "--output-format",
-      "help": "Output format assumption: auto, wav, flac, aiff, ogg, caf (default: auto from input extension).",
+      "help": "Output format container (default: wav)",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--output-jsonl",
+      "help": "Merged JSONL output path",
+      "required": true,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [
+        "PCM_16",
+        "PCM_24",
+        "PCM_32",
+        "FLOAT"
+      ],
+      "default": "PCM_16",
+      "flag": "--output-subtype",
+      "help": "Output sample format (default: PCM_16)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": "_aug",
+      "flag": "--output-suffix",
+      "help": "Suffix appended before extension (default: _aug)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -472,9 +749,22 @@
       "choices": [],
       "default": null,
       "flag": "--overwrite",
-      "help": "Overwrite existing output",
+      "help": "Overwrite existing outputs",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [
+        "off",
+        "contrastive2"
+      ],
+      "default": "off",
+      "flag": "--pair-mode",
+      "help": "Pair-view mode: off or two-view contrastive output (default: off)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -484,7 +774,27 @@
       "flag": "--pipeline",
       "help": "Pipeline string with stages separated by '|'. Example: \"voc --stretch 1.2 | formant --mode preserve\"",
       "required": true,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--pipeline-config",
+      "help": "Optional YAML/JSON pipeline manifest (see pvx.augment.config.load_pipeline)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 0.0,
+      "flag": "--pitch",
+      "help": "Smoke render pitch semitones (default: 0.0)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_helpers.py",
       "tool": "pvx"
     },
     {
@@ -494,7 +804,7 @@
       "flag": "--pitch-conf-min",
       "help": "Minimum accepted map confidence for pvx voc (default: 0.75)",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -508,7 +818,7 @@
       "flag": "--pitch-lowconf-mode",
       "help": "Low-confidence handling mode in pvx voc (default: hold)",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -518,7 +828,7 @@
       "flag": "--pitch-map-crossfade-ms",
       "help": "Map segment crossfade in pvx voc (milliseconds, default: 20)",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -528,7 +838,17 @@
       "flag": "--pitch-map-smooth-ms",
       "help": "Additional map smoothing in pvx voc (milliseconds)",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--policy",
+      "help": "Optional JSON policy file with augmentation defaults and bounds/choices overrides",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -536,9 +856,9 @@
       "choices": [],
       "default": null,
       "flag": "--quiet",
-      "help": "Reduce helper logs and hide progress bars",
+      "help": "Reduce logs",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -548,7 +868,7 @@
       "flag": "--ratio-max",
       "help": "Maximum pitch_ratio clamp",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -558,7 +878,7 @@
       "flag": "--ratio-min",
       "help": "Minimum pitch_ratio clamp",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -573,7 +893,7 @@
       "flag": "--ratio-reference",
       "help": "Reference mode for pitch_ratio derivation in tracking",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -583,7 +903,7 @@
       "flag": "--reference-hz",
       "help": "Reference Hz when --ratio-reference hz",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -593,7 +913,17 @@
       "flag": "--requested-stretch",
       "help": "Optional stretch ratio to evaluate against the computed budget.",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_helpers.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "store_true",
+      "choices": [],
+      "default": null,
+      "flag": "--resume",
+      "help": "Skip already-rendered outputs found in existing manifest/output-dir",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -603,7 +933,7 @@
       "flag": "--route",
       "help": "Optional pvx voc control route expression. Repeat to chain. Example: --route stretch=pitch_ratio --route pitch_ratio=const(1.0)",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -613,7 +943,27 @@
       "flag": "--safety-margin",
       "help": "Usable fraction of budget in (0,1]; default: 0.90 (10%% headroom).",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_helpers.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 24000,
+      "flag": "--sample-rate",
+      "help": "Synthetic input sample rate (default: 24000)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_helpers.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 1337,
+      "flag": "--seed",
+      "help": "Deterministic base seed (default: 1337)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -621,9 +971,9 @@
       "choices": [],
       "default": null,
       "flag": "--silent",
-      "help": "Suppress helper logs",
+      "help": "Suppress logs",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -633,17 +983,51 @@
       "flag": "--smooth-frames",
       "help": "Smoothing window in frames",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
       "action": "",
       "choices": [],
-      "default": 1.0,
-      "flag": "--stretch",
-      "help": "Constant stretch value when --emit pitch_map",
+      "default": "0.8,0.1,0.1",
+      "flag": "--split",
+      "help": "train,val,test split ratios (default: 0.8,0.1,0.1)",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [
+        "random",
+        "label_balanced",
+        "speaker_balanced"
+      ],
+      "default": "random",
+      "flag": "--split-mode",
+      "help": "Split assignment mode (default: random)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 16000,
+      "flag": "--sr",
+      "help": "Target sample rate (default: 16000)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 1.25,
+      "flag": "--stretch",
+      "help": "Smoke render stretch factor (default: 1.25)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_helpers.py",
       "tool": "pvx"
     },
     {
@@ -657,7 +1041,7 @@
       "flag": "--stretch-from",
       "help": "Source for deriving stretch in stretch-oriented emit modes",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -667,7 +1051,7 @@
       "flag": "--stretch-max",
       "help": "Upper clamp for derived stretch",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -677,7 +1061,7 @@
       "flag": "--stretch-min",
       "help": "Lower clamp for derived stretch",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
       "tool": "pvx"
     },
     {
@@ -687,7 +1071,27 @@
       "flag": "--stretch-scale",
       "help": "Scale factor for derived stretch track",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "store_true",
+      "choices": [],
+      "default": null,
+      "flag": "--strict",
+      "help": "Return non-zero on validation errors",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "store_true",
+      "choices": [],
+      "default": null,
+      "flag": "--strict-manifest",
+      "help": "Return non-zero if manifest validation errors are found",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -697,7 +1101,17 @@
       "flag": "--subtype",
       "help": "Explicit libsndfile subtype assumption (e.g., PCM_16, PCM_24, FLOAT).",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_helpers.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 3,
+      "flag": "--variants-per-input",
+      "help": "Number of augmented outputs per input file (default: 3)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -707,7 +1121,17 @@
       "flag": "--work-dir",
       "help": "Optional directory for intermediate stage files",
       "required": false,
-      "source": "src/pvx/cli/pvx.py",
+      "source": "src/pvx/cli/pvx_pipeline.py",
+      "tool": "pvx"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 1,
+      "flag": "--workers",
+      "help": "Parallel worker count for rendering (default: 1)",
+      "required": false,
+      "source": "src/pvx/cli/pvx_augment.py",
       "tool": "pvx"
     },
     {
@@ -843,6 +1267,70 @@
       "required": false,
       "source": "src/pvx/cli/pvxanalysis.py",
       "tool": "pvxanalysis"
+    },
+    {
+      "action": "",
+      "choices": [
+        "16",
+        "24",
+        "32",
+        "float"
+      ],
+      "default": "24",
+      "flag": "--bit-depth",
+      "help": "Output file bit depth (default: 24)",
+      "required": false,
+      "source": "src/pvx/cli/pvxcodec.py",
+      "tool": "pvxcodec"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--bits",
+      "help": "Bit depth for raw bit-crushing (4-16). Applied after codec if both specified.",
+      "required": false,
+      "source": "src/pvx/cli/pvxcodec.py",
+      "tool": "pvxcodec"
+    },
+    {
+      "action": "",
+      "choices": [
+        "mp3_low",
+        "mp3_medium",
+        "telephone",
+        "voip_narrow",
+        "voip_wide",
+        "am_radio",
+        "lo_fi",
+        "random"
+      ],
+      "default": null,
+      "flag": "--codec",
+      "help": "Codec preset to simulate (default: none \u2014 use --bits for raw bit-crush)",
+      "required": false,
+      "source": "src/pvx/cli/pvxcodec.py",
+      "tool": "pvxcodec"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--output",
+      "help": "Output audio file",
+      "required": true,
+      "source": "src/pvx/cli/pvxcodec.py",
+      "tool": "pvxcodec"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 0,
+      "flag": "--seed",
+      "help": "Random seed (default: 0)",
+      "required": false,
+      "source": "src/pvx/cli/pvxcodec.py",
+      "tool": "pvxcodec"
     },
     {
       "action": "",
@@ -1555,6 +2043,74 @@
     },
     {
       "action": "",
+      "choices": [
+        "16",
+        "24",
+        "32",
+        "float"
+      ],
+      "default": "24",
+      "flag": "--bit-depth",
+      "help": "Output bit depth (default: 24)",
+      "required": false,
+      "source": "src/pvx/cli/pvxgain.py",
+      "tool": "pvxgain"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--gain",
+      "help": "Gain in dB. Single value (fixed) or 'min,max' (random range). Mutually exclusive with --normalize.",
+      "required": false,
+      "source": "src/pvx/cli/pvxgain.py",
+      "tool": "pvxgain"
+    },
+    {
+      "action": "",
+      "choices": [
+        "peak",
+        "rms"
+      ],
+      "default": null,
+      "flag": "--normalize",
+      "help": "Normalization mode. Mutually exclusive with --gain.",
+      "required": false,
+      "source": "src/pvx/cli/pvxgain.py",
+      "tool": "pvxgain"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--output",
+      "help": "Output audio file",
+      "required": true,
+      "source": "src/pvx/cli/pvxgain.py",
+      "tool": "pvxgain"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 0,
+      "flag": "--seed",
+      "help": "Random seed (default: 0)",
+      "required": false,
+      "source": "src/pvx/cli/pvxgain.py",
+      "tool": "pvxgain"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--target",
+      "help": "Target level in dBFS for normalization (default: -1.0)",
+      "required": false,
+      "source": "src/pvx/cli/pvxgain.py",
+      "tool": "pvxgain"
+    },
+    {
+      "action": "",
       "choices": [],
       "default": 0.45,
       "flag": "--attenuation",
@@ -1960,6 +2516,87 @@
       "required": false,
       "source": "src/pvx/cli/pvxmorph.py",
       "tool": "pvxmorph"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--background-dir",
+      "help": "Directory of background audio files to mix instead of synthetic noise",
+      "required": false,
+      "source": "src/pvx/cli/pvxnoise.py",
+      "tool": "pvxnoise"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": "300,4000",
+      "flag": "--band",
+      "help": "Low,high frequency band in Hz for bandlimited noise (default: 300,4000)",
+      "required": false,
+      "source": "src/pvx/cli/pvxnoise.py",
+      "tool": "pvxnoise"
+    },
+    {
+      "action": "",
+      "choices": [
+        "16",
+        "24",
+        "32",
+        "float"
+      ],
+      "default": "24",
+      "flag": "--bit-depth",
+      "help": "Output bit depth (default: 24)",
+      "required": false,
+      "source": "src/pvx/cli/pvxnoise.py",
+      "tool": "pvxnoise"
+    },
+    {
+      "action": "",
+      "choices": [
+        "white",
+        "pink",
+        "brown",
+        "gaussian",
+        "bandlimited"
+      ],
+      "default": "white",
+      "flag": "--noise-type",
+      "help": "Noise type (default: white)",
+      "required": false,
+      "source": "src/pvx/cli/pvxnoise.py",
+      "tool": "pvxnoise"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--output",
+      "help": "Output audio file",
+      "required": true,
+      "source": "src/pvx/cli/pvxnoise.py",
+      "tool": "pvxnoise"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 0,
+      "flag": "--seed",
+      "help": "Random seed (default: 0)",
+      "required": false,
+      "source": "src/pvx/cli/pvxnoise.py",
+      "tool": "pvxnoise"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": "20",
+      "flag": "--snr",
+      "help": "Signal-to-noise ratio in dB. Single value for fixed SNR or 'min,max' for uniform sampling. (default: 20)",
+      "required": false,
+      "source": "src/pvx/cli/pvxnoise.py",
+      "tool": "pvxnoise"
     },
     {
       "action": "",
@@ -2472,6 +3109,256 @@
       "required": false,
       "source": "src/pvx/cli/pvxring.py",
       "tool": "pvxring"
+    },
+    {
+      "action": "",
+      "choices": [
+        "16",
+        "24",
+        "32",
+        "float"
+      ],
+      "default": "24",
+      "flag": "--bit-depth",
+      "help": "Output bit depth (default: 24)",
+      "required": false,
+      "source": "src/pvx/cli/pvxrir.py",
+      "tool": "pvxrir"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--cache-dir",
+      "help": "Cache directory for downloaded IR databases (default: ~/.pvx/ir_cache)",
+      "required": false,
+      "source": "src/pvx/cli/pvxrir.py",
+      "tool": "pvxrir"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--category",
+      "help": "Filter IRs by category when using --ir-database (e.g., hall, church, outdoor, room, large)",
+      "required": false,
+      "source": "src/pvx/cli/pvxrir.py",
+      "tool": "pvxrir"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": "3,12",
+      "flag": "--drr",
+      "help": "Direct-to-reverb ratio in dB. Single value or 'min,max' range (default: 3,12)",
+      "required": false,
+      "source": "src/pvx/cli/pvxrir.py",
+      "tool": "pvxrir"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--ir-database",
+      "help": "Use IRs from a curated database (auto-downloads on first use). Available: echothief, mit_kemar",
+      "required": false,
+      "source": "src/pvx/cli/pvxrir.py",
+      "tool": "pvxrir"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--ir-dir",
+      "help": "Directory of impulse response files (one is chosen randomly)",
+      "required": false,
+      "source": "src/pvx/cli/pvxrir.py",
+      "tool": "pvxrir"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--ir-file",
+      "help": "Path to an impulse response WAV file (overrides synthetic generation)",
+      "required": false,
+      "source": "src/pvx/cli/pvxrir.py",
+      "tool": "pvxrir"
+    },
+    {
+      "action": "store_true",
+      "choices": [],
+      "default": false,
+      "flag": "--list-databases",
+      "help": "List available IR databases and exit",
+      "required": false,
+      "source": "src/pvx/cli/pvxrir.py",
+      "tool": "pvxrir"
+    },
+    {
+      "action": "store_true",
+      "choices": [],
+      "default": null,
+      "flag": "--no-trim",
+      "help": "Do not trim output to input length (include reverb tail)",
+      "required": false,
+      "source": "src/pvx/cli/pvxrir.py",
+      "tool": "pvxrir"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--output",
+      "help": "Output audio file",
+      "required": true,
+      "source": "src/pvx/cli/pvxrir.py",
+      "tool": "pvxrir"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 5.0,
+      "flag": "--pre-delay-ms",
+      "help": "Pre-delay in ms before the reverberant tail (default: 5.0)",
+      "required": false,
+      "source": "src/pvx/cli/pvxrir.py",
+      "tool": "pvxrir"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": "0.2,1.5",
+      "flag": "--rt60",
+      "help": "Reverberation time in seconds. Single value or 'min,max' range (default: 0.2,1.5)",
+      "required": false,
+      "source": "src/pvx/cli/pvxrir.py",
+      "tool": "pvxrir"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 0,
+      "flag": "--seed",
+      "help": "Random seed (default: 0)",
+      "required": false,
+      "source": "src/pvx/cli/pvxrir.py",
+      "tool": "pvxrir"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": "0.3,0.7",
+      "flag": "--wet",
+      "help": "Wet/dry mix 0-1. Single value or 'min,max' range (default: 0.3,0.7)",
+      "required": false,
+      "source": "src/pvx/cli/pvxrir.py",
+      "tool": "pvxrir"
+    },
+    {
+      "action": "",
+      "choices": [
+        "16",
+        "24",
+        "32",
+        "float"
+      ],
+      "default": "24",
+      "flag": "--bit-depth",
+      "help": "Output bit depth (default: 24)",
+      "required": false,
+      "source": "src/pvx/cli/pvxspecaugment.py",
+      "tool": "pvxspecaugment"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": "0",
+      "flag": "--fill",
+      "help": "Fill value for masked regions: 0, mean, or a float (default: 0)",
+      "required": false,
+      "source": "src/pvx/cli/pvxspecaugment.py",
+      "tool": "pvxspecaugment"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 27,
+      "flag": "--freq-mask",
+      "help": "Maximum frequency mask width F in bins (default: 27)",
+      "required": false,
+      "source": "src/pvx/cli/pvxspecaugment.py",
+      "tool": "pvxspecaugment"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 128,
+      "flag": "--hop-length",
+      "help": "STFT hop length in samples (default: 128)",
+      "required": false,
+      "source": "src/pvx/cli/pvxspecaugment.py",
+      "tool": "pvxspecaugment"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 512,
+      "flag": "--n-fft",
+      "help": "FFT size (default: 512)",
+      "required": false,
+      "source": "src/pvx/cli/pvxspecaugment.py",
+      "tool": "pvxspecaugment"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 2,
+      "flag": "--num-freq-masks",
+      "help": "Number of frequency masks (default: 2)",
+      "required": false,
+      "source": "src/pvx/cli/pvxspecaugment.py",
+      "tool": "pvxspecaugment"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 2,
+      "flag": "--num-time-masks",
+      "help": "Number of time masks (default: 2)",
+      "required": false,
+      "source": "src/pvx/cli/pvxspecaugment.py",
+      "tool": "pvxspecaugment"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": null,
+      "flag": "--output",
+      "help": "Output audio file",
+      "required": true,
+      "source": "src/pvx/cli/pvxspecaugment.py",
+      "tool": "pvxspecaugment"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 0,
+      "flag": "--seed",
+      "help": "Random seed (default: 0)",
+      "required": false,
+      "source": "src/pvx/cli/pvxspecaugment.py",
+      "tool": "pvxspecaugment"
+    },
+    {
+      "action": "",
+      "choices": [],
+      "default": 100,
+      "flag": "--time-mask",
+      "help": "Maximum time mask width T in frames (default: 100)",
+      "required": false,
+      "source": "src/pvx/cli/pvxspecaugment.py",
+      "tool": "pvxspecaugment"
     },
     {
       "action": "",
@@ -3387,7 +4274,7 @@
       "flag": "--no-progress",
       "help": "",
       "required": false,
-      "source": "src/pvx/core/voc.py",
+      "source": "src/pvx/core/voc_console.py",
       "tool": "pvxvoc"
     },
     {
@@ -3691,7 +4578,7 @@
       "flag": "--quiet",
       "help": "Reduce output and hide status bars",
       "required": false,
-      "source": "src/pvx/core/voc.py",
+      "source": "src/pvx/core/voc_console.py",
       "tool": "pvxvoc"
     },
     {
@@ -3775,7 +4662,7 @@
       "flag": "--silent",
       "help": "Suppress all console output",
       "required": false,
-      "source": "src/pvx/core/voc.py",
+      "source": "src/pvx/core/voc_console.py",
       "tool": "pvxvoc"
     },
     {
@@ -4042,7 +4929,7 @@
       "flag": "--verbose",
       "help": "Increase verbosity (repeat for extra detail)",
       "required": false,
-      "source": "src/pvx/core/voc.py",
+      "source": "src/pvx/core/voc_console.py",
       "tool": "pvxvoc"
     },
     {
@@ -4052,7 +4939,7 @@
       "flag": "--verbosity",
       "help": "Console verbosity level",
       "required": false,
-      "source": "src/pvx/core/voc.py",
+      "source": "src/pvx/core/voc_console.py",
       "tool": "pvxvoc"
     },
     {
@@ -4108,797 +4995,6 @@
       "required": false,
       "source": "src/pvx/cli/pvxwarp.py",
       "tool": "pvxwarp"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--output",
-      "help": "Output audio file",
-      "required": true,
-      "source": "src/pvx/cli/pvxnoise.py",
-      "tool": "pvxnoise"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": "20",
-      "flag": "--snr",
-      "help": "Signal-to-noise ratio in dB. Single value for fixed SNR or 'min,max' for uniform sampling. (default: 20)",
-      "required": false,
-      "source": "src/pvx/cli/pvxnoise.py",
-      "tool": "pvxnoise"
-    },
-    {
-      "action": "",
-      "choices": [
-        "white",
-        "pink",
-        "brown",
-        "gaussian",
-        "bandlimited"
-      ],
-      "default": "white",
-      "flag": "--noise-type",
-      "help": "Noise type (default: white)",
-      "required": false,
-      "source": "src/pvx/cli/pvxnoise.py",
-      "tool": "pvxnoise"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": "300,4000",
-      "flag": "--band",
-      "help": "Low,high frequency band in Hz for bandlimited noise (default: 300,4000)",
-      "required": false,
-      "source": "src/pvx/cli/pvxnoise.py",
-      "tool": "pvxnoise"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--background-dir",
-      "help": "Directory of background audio files to mix instead of synthetic noise",
-      "required": false,
-      "source": "src/pvx/cli/pvxnoise.py",
-      "tool": "pvxnoise"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 0,
-      "flag": "--seed",
-      "help": "Random seed (default: 0)",
-      "required": false,
-      "source": "src/pvx/cli/pvxnoise.py",
-      "tool": "pvxnoise"
-    },
-    {
-      "action": "",
-      "choices": [
-        "16",
-        "24",
-        "32",
-        "float"
-      ],
-      "default": "24",
-      "flag": "--bit-depth",
-      "help": "Output bit depth (default: 24)",
-      "required": false,
-      "source": "src/pvx/cli/pvxnoise.py",
-      "tool": "pvxnoise"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--output",
-      "help": "Output audio file",
-      "required": true,
-      "source": "src/pvx/cli/pvxrir.py",
-      "tool": "pvxrir"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": "0.2,1.5",
-      "flag": "--rt60",
-      "help": "Reverberation time in seconds. Single value or 'min,max' range (default: 0.2,1.5)",
-      "required": false,
-      "source": "src/pvx/cli/pvxrir.py",
-      "tool": "pvxrir"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": "0.3,0.7",
-      "flag": "--wet",
-      "help": "Wet/dry mix 0–1. Single value or 'min,max' range (default: 0.3,0.7)",
-      "required": false,
-      "source": "src/pvx/cli/pvxrir.py",
-      "tool": "pvxrir"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": "3,12",
-      "flag": "--drr",
-      "help": "Direct-to-reverb ratio in dB. Single value or 'min,max' range (default: 3,12)",
-      "required": false,
-      "source": "src/pvx/cli/pvxrir.py",
-      "tool": "pvxrir"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 5.0,
-      "flag": "--pre-delay-ms",
-      "help": "Pre-delay in ms before the reverberant tail (default: 5.0)",
-      "required": false,
-      "source": "src/pvx/cli/pvxrir.py",
-      "tool": "pvxrir"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--ir-file",
-      "help": "Path to an impulse response WAV file (overrides synthetic generation)",
-      "required": false,
-      "source": "src/pvx/cli/pvxrir.py",
-      "tool": "pvxrir"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--ir-dir",
-      "help": "Directory of impulse response files (one is chosen randomly)",
-      "required": false,
-      "source": "src/pvx/cli/pvxrir.py",
-      "tool": "pvxrir"
-    },
-    {
-      "action": "store_true",
-      "choices": [],
-      "default": null,
-      "flag": "--no-trim",
-      "help": "Do not trim output to input length (include reverb tail)",
-      "required": false,
-      "source": "src/pvx/cli/pvxrir.py",
-      "tool": "pvxrir"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 0,
-      "flag": "--seed",
-      "help": "Random seed (default: 0)",
-      "required": false,
-      "source": "src/pvx/cli/pvxrir.py",
-      "tool": "pvxrir"
-    },
-    {
-      "action": "",
-      "choices": [
-        "16",
-        "24",
-        "32",
-        "float"
-      ],
-      "default": "24",
-      "flag": "--bit-depth",
-      "help": "Output bit depth (default: 24)",
-      "required": false,
-      "source": "src/pvx/cli/pvxrir.py",
-      "tool": "pvxrir"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--output",
-      "help": "Output audio file",
-      "required": true,
-      "source": "src/pvx/cli/pvxcodec.py",
-      "tool": "pvxcodec"
-    },
-    {
-      "action": "",
-      "choices": [
-        "mp3_low",
-        "mp3_medium",
-        "telephone",
-        "voip_narrow",
-        "voip_wide",
-        "am_radio",
-        "lo_fi",
-        "random"
-      ],
-      "default": null,
-      "flag": "--codec",
-      "help": "Codec preset to simulate (default: none — use --bits for raw bit-crush)",
-      "required": false,
-      "source": "src/pvx/cli/pvxcodec.py",
-      "tool": "pvxcodec"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--bits",
-      "help": "Bit depth for raw bit-crushing (4–16). Applied after codec if both specified.",
-      "required": false,
-      "source": "src/pvx/cli/pvxcodec.py",
-      "tool": "pvxcodec"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 0,
-      "flag": "--seed",
-      "help": "Random seed (default: 0)",
-      "required": false,
-      "source": "src/pvx/cli/pvxcodec.py",
-      "tool": "pvxcodec"
-    },
-    {
-      "action": "",
-      "choices": [
-        "16",
-        "24",
-        "32",
-        "float"
-      ],
-      "default": "24",
-      "flag": "--bit-depth",
-      "help": "Output file bit depth (default: 24)",
-      "required": false,
-      "source": "src/pvx/cli/pvxcodec.py",
-      "tool": "pvxcodec"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--output",
-      "help": "Output audio file",
-      "required": true,
-      "source": "src/pvx/cli/pvxspecaugment.py",
-      "tool": "pvxspecaugment"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 27,
-      "flag": "--freq-mask",
-      "help": "Maximum frequency mask width F in bins (default: 27)",
-      "required": false,
-      "source": "src/pvx/cli/pvxspecaugment.py",
-      "tool": "pvxspecaugment"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 100,
-      "flag": "--time-mask",
-      "help": "Maximum time mask width T in frames (default: 100)",
-      "required": false,
-      "source": "src/pvx/cli/pvxspecaugment.py",
-      "tool": "pvxspecaugment"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 2,
-      "flag": "--num-freq-masks",
-      "help": "Number of frequency masks (default: 2)",
-      "required": false,
-      "source": "src/pvx/cli/pvxspecaugment.py",
-      "tool": "pvxspecaugment"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 2,
-      "flag": "--num-time-masks",
-      "help": "Number of time masks (default: 2)",
-      "required": false,
-      "source": "src/pvx/cli/pvxspecaugment.py",
-      "tool": "pvxspecaugment"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": "0",
-      "flag": "--fill",
-      "help": "Fill value for masked regions: 0, mean, or a float (default: 0)",
-      "required": false,
-      "source": "src/pvx/cli/pvxspecaugment.py",
-      "tool": "pvxspecaugment"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 512,
-      "flag": "--n-fft",
-      "help": "FFT size (default: 512)",
-      "required": false,
-      "source": "src/pvx/cli/pvxspecaugment.py",
-      "tool": "pvxspecaugment"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 128,
-      "flag": "--hop-length",
-      "help": "STFT hop length in samples (default: 128)",
-      "required": false,
-      "source": "src/pvx/cli/pvxspecaugment.py",
-      "tool": "pvxspecaugment"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 0,
-      "flag": "--seed",
-      "help": "Random seed (default: 0)",
-      "required": false,
-      "source": "src/pvx/cli/pvxspecaugment.py",
-      "tool": "pvxspecaugment"
-    },
-    {
-      "action": "",
-      "choices": [
-        "16",
-        "24",
-        "32",
-        "float"
-      ],
-      "default": "24",
-      "flag": "--bit-depth",
-      "help": "Output bit depth (default: 24)",
-      "required": false,
-      "source": "src/pvx/cli/pvxspecaugment.py",
-      "tool": "pvxspecaugment"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--output",
-      "help": "Output audio file",
-      "required": true,
-      "source": "src/pvx/cli/pvxgain.py",
-      "tool": "pvxgain"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--gain",
-      "help": "Gain in dB. Single value (fixed) or 'min,max' (random range). Mutually exclusive with --normalize.",
-      "required": false,
-      "source": "src/pvx/cli/pvxgain.py",
-      "tool": "pvxgain"
-    },
-    {
-      "action": "",
-      "choices": [
-        "peak",
-        "rms"
-      ],
-      "default": null,
-      "flag": "--normalize",
-      "help": "Normalization mode. Mutually exclusive with --gain.",
-      "required": false,
-      "source": "src/pvx/cli/pvxgain.py",
-      "tool": "pvxgain"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--target",
-      "help": "Target level in dBFS for normalization (default: -1.0)",
-      "required": false,
-      "source": "src/pvx/cli/pvxgain.py",
-      "tool": "pvxgain"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 0,
-      "flag": "--seed",
-      "help": "Random seed (default: 0)",
-      "required": false,
-      "source": "src/pvx/cli/pvxgain.py",
-      "tool": "pvxgain"
-    },
-    {
-      "action": "",
-      "choices": [
-        "16",
-        "24",
-        "32",
-        "float"
-      ],
-      "default": "24",
-      "flag": "--bit-depth",
-      "help": "Output bit depth (default: 24)",
-      "required": false,
-      "source": "src/pvx/cli/pvxgain.py",
-      "tool": "pvxgain"
-    },
-    {
-      "action": "store_true",
-      "choices": [],
-      "default": null,
-      "flag": "--strict",
-      "help": "Return non-zero exit code if warnings are found",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [
-        "mix",
-        "speech",
-        "vocal",
-        "drums",
-        "ambient"
-      ],
-      "default": "mix",
-      "flag": "--material",
-      "help": "Material profile for `pvx safe` command generation",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [
-        "mix",
-        "speech",
-        "vocal",
-        "drums",
-        "ambient"
-      ],
-      "default": "mix",
-      "flag": "--material",
-      "help": "Material profile (default: mix)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 0.3,
-      "flag": "--duration",
-      "help": "Synthetic input duration seconds (default: 0.30)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 24000,
-      "flag": "--sample-rate",
-      "help": "Synthetic input sample rate (default: 24000)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 0.0,
-      "flag": "--pitch",
-      "help": "Smoke render pitch semitones (default: 0.0)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--policy",
-      "help": "Optional JSON policy file with augmentation defaults and bounds/choices overrides",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--output-dir",
-      "help": "Output directory for augmented files",
-      "required": true,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 3,
-      "flag": "--variants-per-input",
-      "help": "Number of augmented outputs per input file (default: 3)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [
-        "asr_robust",
-        "mir_music",
-        "ssl_contrastive"
-      ],
-      "default": "asr_robust",
-      "flag": "--intent",
-      "help": "Augmentation intent profile (default: asr_robust)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [
-        "allow_alter",
-        "preserve"
-      ],
-      "default": "allow_alter",
-      "flag": "--label-policy",
-      "help": "Label perturbation policy (default: allow_alter)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 1337,
-      "flag": "--seed",
-      "help": "Deterministic random seed (default: 1337)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": "0.8,0.1,0.1",
-      "flag": "--split",
-      "help": "train,val,test split ratios (default: 0.8,0.1,0.1)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [
-        "random",
-        "label_balanced",
-        "speaker_balanced"
-      ],
-      "default": "random",
-      "flag": "--split-mode",
-      "help": "Split assignment mode (default: random)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--labels-csv",
-      "help": "Optional metadata CSV with path/label/speaker columns for balanced split modes",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [
-        "none",
-        "stem-prefix"
-      ],
-      "default": "stem-prefix",
-      "flag": "--grouping",
-      "help": "Split-grouping strategy (default: stem-prefix). `stem-prefix` keeps variants from similarly named sources in one split.",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": "__",
-      "flag": "--group-separator",
-      "help": "Separator used by stem-prefix grouping (default: '__')",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [
-        "off",
-        "contrastive2"
-      ],
-      "default": "off",
-      "flag": "--pair-mode",
-      "help": "Pair-view mode: off or two-view contrastive output (default: off)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--manifest-jsonl",
-      "help": "Optional JSONL manifest path (default: <output-dir>/augment_manifest.jsonl)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--manifest-csv",
-      "help": "Optional CSV manifest path (default: <output-dir>/augment_manifest.csv)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": 1,
-      "flag": "--workers",
-      "help": "Parallel worker count for rendering (default: 1)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "store_true",
-      "choices": [],
-      "default": null,
-      "flag": "--resume",
-      "help": "Skip already-rendered outputs found in existing manifest/output-dir",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "store_true",
-      "choices": [],
-      "default": null,
-      "flag": "--append-manifest",
-      "help": "Append/merge with existing manifest instead of replacing it",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "store_true",
-      "choices": [],
-      "default": null,
-      "flag": "--strict-manifest",
-      "help": "Return non-zero if manifest validation errors are found",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "store_true",
-      "choices": [],
-      "default": null,
-      "flag": "--dry-run",
-      "help": "Plan manifest and filenames without rendering audio",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "store_true",
-      "choices": [],
-      "default": true,
-      "flag": "--audit-metrics",
-      "help": "Compute per-output audit metrics (default: on)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "store_false",
-      "choices": [],
-      "default": null,
-      "flag": "--no-audit-metrics",
-      "help": "Disable audit metric computation",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [
-        "auto",
-        "cpu",
-        "cuda"
-      ],
-      "default": "auto",
-      "flag": "--device",
-      "help": "Processing device",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [
-        "auto",
-        "pytorch",
-        "torchaudio",
-        "pvx-cli"
-      ],
-      "default": "auto",
-      "flag": "--engine",
-      "help": "DSP engine for time-stretch and pitch-shift transforms. 'auto' prefers torchaudio > pytorch > pvx-cli. 'torchaudio' uses torchaudio C++ kernel. 'pytorch' uses native PyTorch phase vocoder. 'pvx-cli' always uses subprocess. (default: auto)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "store_true",
-      "choices": [],
-      "default": null,
-      "flag": "--strict",
-      "help": "Return non-zero on validation errors",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--output-jsonl",
-      "help": "Merged JSONL output path",
-      "required": true,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": null,
-      "flag": "--output-csv",
-      "help": "Optional merged CSV output path",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
-    },
-    {
-      "action": "",
-      "choices": [],
-      "default": "output_path",
-      "flag": "--dedupe-by",
-      "help": "Deduplication key (default: output_path)",
-      "required": false,
-      "source": "src/pvx/cli/pvx.py",
-      "tool": "pvx"
     }
   ],
   "unique_flags": [
@@ -4908,19 +5004,27 @@
     "--ambient-preset",
     "--amplitude",
     "--analysis-channel",
+    "--append-manifest",
     "--attack-sec",
     "--attenuation",
+    "--audit-metrics",
     "--auto-profile",
     "--auto-profile-lookahead-seconds",
     "--auto-segment-seconds",
     "--auto-transform",
     "--backend",
+    "--background-dir",
+    "--band",
     "--band-gain-db",
     "--band-width-bins",
+    "--batch-size",
     "--bit-depth",
+    "--bits",
     "--blend-mode",
     "--boost-db",
     "--budget-path",
+    "--cache-dir",
+    "--category",
     "--center",
     "--cents",
     "--checkpoint-dir",
@@ -4929,6 +5033,7 @@
     "--chunk-ms",
     "--chunk-seconds",
     "--clip",
+    "--codec",
     "--coherence-strength",
     "--comp-ratio",
     "--comp-threshold-db",
@@ -4953,6 +5058,7 @@
     "--cycles",
     "--decay",
     "--decay-sec",
+    "--dedupe-by",
     "--depth",
     "--detune-cents",
     "--device",
@@ -4960,6 +5066,7 @@
     "--distance-law",
     "--dither",
     "--dither-seed",
+    "--drr",
     "--dry",
     "--dry-mix",
     "--dry-run",
@@ -4967,6 +5074,7 @@
     "--duty-cycle",
     "--emit",
     "--end",
+    "--engine",
     "--envelope-lifter",
     "--example",
     "--exp-curve",
@@ -4985,6 +5093,7 @@
     "--fail-if-exceeds",
     "--feature-set",
     "--feedback",
+    "--fill",
     "--floor",
     "--fmax",
     "--fmin",
@@ -5001,9 +5110,13 @@
     "--frame-length",
     "--freeze-time",
     "--freq",
+    "--freq-mask",
     "--frequency-hz",
+    "--gain",
     "--gains",
     "--gpu",
+    "--group-separator",
+    "--grouping",
     "--guided",
     "--hard-clip-level",
     "--harmonic-gain",
@@ -5011,25 +5124,37 @@
     "--harmonic-pitch-cents",
     "--harmonic-pitch-semitones",
     "--harmonic-stretch",
+    "--hop-length",
     "--hop-size",
     "--inharmonic-f0-hz",
     "--inharmonic-mix",
     "--inharmonicity",
     "--input-format",
+    "--intent",
     "--interp",
     "--intervals",
     "--intervals-cents",
     "--ir",
+    "--ir-database",
+    "--ir-dir",
+    "--ir-file",
     "--json",
     "--kaiser-beta",
     "--keep-intermediate",
     "--key",
+    "--label-policy",
+    "--labels-csv",
     "--limiter-threshold",
+    "--list-databases",
     "--manifest-append",
+    "--manifest-csv",
     "--manifest-json",
+    "--manifest-jsonl",
     "--map",
     "--mask-exponent",
+    "--material",
     "--max",
+    "--max-length-s",
     "--max-stage-stretch",
     "--metadata-policy",
     "--method",
@@ -5041,16 +5166,21 @@
     "--multires-fusion",
     "--multires-weights",
     "--n-fft",
+    "--no-audit-metrics",
     "--no-center",
     "--no-normalize-gains",
     "--no-onset-realign",
     "--no-progress",
+    "--no-trim",
     "--noise-file",
     "--noise-floor",
     "--noise-seconds",
+    "--noise-type",
     "--normalize",
     "--normalize-energy",
     "--normalize-gains",
+    "--num-freq-masks",
+    "--num-time-masks",
     "--offset",
     "--onset-credit-max",
     "--onset-credit-pull",
@@ -5060,11 +5190,16 @@
     "--order",
     "--out",
     "--output",
+    "--output-csv",
     "--output-dir",
     "--output-format",
+    "--output-jsonl",
     "--output-key",
+    "--output-subtype",
+    "--output-suffix",
     "--overlap-ms",
     "--overwrite",
+    "--pair-mode",
     "--pans",
     "--peak",
     "--peak-count",
@@ -5082,6 +5217,7 @@
     "--phase-rad",
     "--phase-random-seed",
     "--pipeline",
+    "--pipeline-config",
     "--pitch",
     "--pitch-conf-min",
     "--pitch-follow-stdin",
@@ -5094,6 +5230,8 @@
     "--pitch-shift-cents",
     "--pitch-shift-ratio",
     "--pitch-shift-semitones",
+    "--policy",
+    "--pre-delay-ms",
     "--preset",
     "--quality-profile",
     "--quiet",
@@ -5122,9 +5260,12 @@
     "--root",
     "--root-hz",
     "--route",
+    "--rt60",
     "--safety-margin",
+    "--sample-rate",
     "--scale",
     "--scale-cents",
+    "--seed",
     "--semitones",
     "--shift-bins",
     "--silent",
@@ -5133,10 +5274,14 @@
     "--smooth",
     "--smooth-frames",
     "--smoothing-bins",
+    "--snr",
     "--soft-clip-drive",
     "--soft-clip-level",
     "--soft-clip-type",
     "--speaker-angles",
+    "--split",
+    "--split-mode",
+    "--sr",
     "--start",
     "--stdout",
     "--stereo-mode",
@@ -5147,10 +5292,13 @@
     "--stretch-min",
     "--stretch-mode",
     "--stretch-scale",
+    "--strict",
+    "--strict-manifest",
     "--subtype",
     "--suffix",
     "--summary-json",
     "--sustain",
+    "--target",
     "--target-duration",
     "--target-f0",
     "--target-lufs",
@@ -5158,6 +5306,7 @@
     "--target-min",
     "--target-pitch-shift-semitones",
     "--target-sample-rate",
+    "--time-mask",
     "--time-stretch",
     "--time-stretch-factor",
     "--tolerance-cents",
@@ -5175,6 +5324,7 @@
     "--tv-key",
     "--tv-map",
     "--tv-order",
+    "--variants-per-input",
     "--verbose",
     "--verbosity",
     "--voices",
@@ -5183,6 +5333,7 @@
     "--width",
     "--win-length",
     "--window",
-    "--work-dir"
+    "--work-dir",
+    "--workers"
   ]
 }
